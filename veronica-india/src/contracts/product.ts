@@ -1,0 +1,95 @@
+import { z } from "zod";
+import { IdSchema, MoneySchema } from "./common";
+
+/** Product lifecycle status. */
+export const ProductStatusSchema = z.enum(["active", "draft", "archived"]);
+export type ProductStatus = z.infer<typeof ProductStatusSchema>;
+
+/** One selectable value on a variant axis, e.g. "24×18" on the "Size" dimension. */
+export const DimensionValueSchema = z.object({
+  id: IdSchema,
+  value: z.string().min(1),
+  label: z.string().optional(),
+  sortOrder: z.number().int().default(0),
+});
+export type DimensionValue = z.infer<typeof DimensionValueSchema>;
+
+/** A named variant axis on a product, e.g. "Size" / "Weight" / "Color". */
+export const VariantDimensionSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  sortOrder: z.number().int().default(0),
+  values: z.array(DimensionValueSchema),
+});
+export type VariantDimension = z.infer<typeof VariantDimensionSchema>;
+
+/** A purchasable unit: a product × a specific combination of dimension values. */
+export const ProductSKUSchema = z.object({
+  id: IdSchema,
+  skuCode: z.string().min(1),
+  price: MoneySchema,
+  salePrice: MoneySchema.nullable(),
+  /** e.g. { "Size": "24×18", "Weight": "Heavy" } */
+  dimensionValues: z.record(z.string(), z.string()),
+  /** Free-form per-SKU details, e.g. { "Bowl Size": "22×16", "mm": "610×510" } */
+  attributes: z.record(z.string(), z.string()).optional(),
+  stock: z.number().int().nullable().optional(),
+});
+export type ProductSKU = z.infer<typeof ProductSKUSchema>;
+
+export const SpecificationSchema = z.object({
+  name: z.string(),
+  value: z.string(),
+});
+export type Specification = z.infer<typeof SpecificationSchema>;
+
+/** Full product detail — what the PDP and admin editor consume. */
+export const ProductSchema = z.object({
+  id: IdSchema,
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  description: z.string().default(""),
+  categoryId: IdSchema,
+  isBestseller: z.boolean().default(false),
+  isNew: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
+  status: ProductStatusSchema.default("draft"),
+  tags: z.array(z.string()).default([]),
+  images: z.array(z.string()),
+  dimensions: z.array(VariantDimensionSchema).default([]),
+  skus: z.array(ProductSKUSchema),
+  specifications: z.array(SpecificationSchema).optional(),
+  includedAccessories: z.array(z.string()).optional(),
+});
+export type Product = z.infer<typeof ProductSchema>;
+
+/**
+ * Lightweight product shape for grids/carousels/search. Pricing is
+ * pre-computed server-side so the client never recomputes from SKUs.
+ */
+export const ProductListItemSchema = z.object({
+  id: IdSchema,
+  name: z.string(),
+  slug: z.string(),
+  categoryId: IdSchema,
+  image: z.string(),
+  minPrice: MoneySchema,
+  maxBasePrice: MoneySchema,
+  bestDiscount: z.number().int().min(0).max(100),
+  isBestseller: z.boolean(),
+  isNew: z.boolean(),
+  isFeatured: z.boolean().default(false),
+  status: ProductStatusSchema,
+  skuCount: z.number().int().nonnegative(),
+  tags: z.array(z.string()).default([]),
+});
+export type ProductListItem = z.infer<typeof ProductListItemSchema>;
+
+/** Admin create payload — id and computed fields are server-assigned. */
+export const AdminProductCreateSchema = ProductSchema.omit({ id: true }).extend({
+  slug: z.string().optional(),
+});
+export type AdminProductCreate = z.infer<typeof AdminProductCreateSchema>;
+
+export const AdminProductUpdateSchema = AdminProductCreateSchema.partial();
+export type AdminProductUpdate = z.infer<typeof AdminProductUpdateSchema>;

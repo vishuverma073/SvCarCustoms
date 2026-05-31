@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780160172984,
+      "tag": "0000_steep_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780172069257,
+      "tag": "0001_rich_preak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780172609724,
+      "tag": "0002_worthless_black_widow",
+      "breakpoints": true
+    }
+  ]
+}
