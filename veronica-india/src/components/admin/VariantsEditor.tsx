@@ -44,7 +44,22 @@ export default function VariantsEditor({
   }
 
   function updateDimensionName(dimId: number, name: string) {
-    commit(dimensions.map((d) => (d.id === dimId ? { ...d, name } : d)));
+    const oldName = dimensions.find((d) => d.id === dimId)?.name;
+    const nextDims = dimensions.map((d) => (d.id === dimId ? { ...d, name } : d));
+    // SKUs key their dimensionValues by dimension *name*, and syncSkus matches
+    // existing SKUs to combinations by that key. Renaming a dimension would
+    // otherwise orphan every SKU (key miss) and reset all entered prices — so
+    // migrate the key on each SKU to preserve the prices already entered.
+    if (oldName && oldName !== name) {
+      const remapped = skus.map((s) => {
+        if (!(oldName in s.dimensionValues)) return s;
+        const { [oldName]: moved, ...rest } = s.dimensionValues;
+        return { ...s, dimensionValues: { ...rest, [name]: moved } };
+      });
+      commit(nextDims, remapped);
+    } else {
+      commit(nextDims);
+    }
   }
 
   function removeDimension(dimId: number) {

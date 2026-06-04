@@ -15,7 +15,6 @@ import { getAdminToken, useAdminAuthStore } from "@/store/adminAuthStore";
 import {
   AdminLoginResponseSchema,
   ProductSchema,
-  ProductListItemSchema,
   CategorySchema,
   CategoryListSchema,
   HomeConfigSchema,
@@ -33,7 +32,191 @@ import {
   type AdminCategoryUpdate,
 } from "@veronica/contracts";
 
-const ProductListSchema = z.array(ProductListItemSchema);
+// ── Anti-corruption layer ───────────────────────────────────────────────────
+// The deployed admin API returns slightly different shapes than these frontend
+// contracts (an {items} envelope, `primaryImage` instead of `image`). These
+// local schemas + mappers translate so the admin pages stay unchanged.
+const BeAdminProductListItem = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.enum(["active", "draft", "archived"]),
+  isBestseller: z.boolean(),
+  isNew: z.boolean(),
+  isFeatured: z.boolean().default(false),
+  categoryName: z.string().optional(),
+  primaryImage: z.string().nullable().optional(),
+  minPrice: z.number().default(0),
+  maxBasePrice: z.number().default(0),
+  bestDiscount: z.number().default(0),
+  skuCount: z.number().default(0),
+});
+const BeAdminProductList = z.object({
+  items: z.array(BeAdminProductListItem),
+  nextCursor: z.string().nullable().optional(),
+});
+
+/** Admin list item = the storefront list shape plus the category name (for the
+ * admin's category filter; the backend includes it on the admin list). */
+export type AdminListProduct = ProductListItem & { categoryName: string };
+
+function mapAdminProduct(p: z.infer<typeof BeAdminProductListItem>): AdminListProduct {
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    categoryId: 0, // not needed by the admin list; backend omits it here
+    categoryName: p.categoryName ?? "",
+    image: p.primaryImage ?? "",
+    minPrice: p.minPrice,
+    maxBasePrice: p.maxBasePrice,
+    bestDiscount: p.bestDiscount,
+    isBestseller: p.isBestseller,
+    isNew: p.isNew,
+    isFeatured: p.isFeatured,
+    status: p.status,
+    skuCount: p.skuCount,
+    tags: [],
+  };
+}
+
+// Admin order list row (backend GET /admin/orders).
+const AdminOrderItemSchema = z.object({
+  id: z.string(),
+  orderNumber: z.string(),
+  customerName: z.string().nullish().transform((v) => v ?? ""),
+  customerPhone: z.string().nullish().transform((v) => v ?? ""),
+  total: z.number(),
+  status: z.string(),
+  itemCount: z.number(),
+  createdAt: z.string(),
+});
+const AdminOrderListSchema = z.object({
+  items: z.array(AdminOrderItemSchema),
+  nextCursor: z.string().nullable().optional(),
+});
+export type AdminOrderItem = z.infer<typeof AdminOrderItemSchema>;
+
+const optStr = z.string().nullish().transform((v) => v ?? "");
+const AdminOrderDetailSchema = z.object({
+  id: z.string(),
+  orderNumber: z.string(),
+  status: z.string(),
+  customerName: optStr,
+  customerPhone: optStr,
+  customerEmail: optStr,
+  shippingAddress: z.record(z.string(), z.unknown()).nullish().transform((v) => v ?? {}),
+  subtotal: z.number(),
+  shippingFee: z.number(),
+  gstAmount: z.number(),
+  total: z.number(),
+  razorpayPaymentId: optStr,
+  createdAt: z.string(),
+  items: z.array(
+    z.object({
+      productName: z.string(),
+      skuCode: optStr,
+      variantLabel: optStr,
+      imageUrl: optStr,
+      unitPrice: z.number(),
+      qty: z.number(),
+      lineTotal: z.number(),
+    }),
+  ),
+});
+export type AdminOrderDetail = z.infer<typeof AdminOrderDetailSchema>;
+
+const AdminOrderEventSchema = z.object({
+  id: z.number(),
+  eventType: z.string(),
+  note: optStr,
+  createdAt: z.string(),
+});
+const AdminOrderEventsSchema = z.object({ events: z.array(AdminOrderEventSchema) });
+export type AdminOrderEvent = z.infer<typeof AdminOrderEventSchema>;
+
+// Home config: the backend uses a discriminated-union section list with a nested
+// `config` per key; the frontend composer uses a flat {sections, hero, promo,
+// featured, categories} shape. These translate between the two.
+const BeHomeSection = z.object({
+  key: z.string(),
+  enabled: z.boolean(),
+  order: z.number(),
+  config: z.record(z.string(), z.unknown()).default({}),
+});
+const BeHomeSchema = z.object({ sections: z.array(BeHomeSection) });
+
+function cfgStr(c: Record<string, unknown>, k: string): string {
+  return typeof c[k] === "string" ? (c[k] as string) : "";
+}
+function cfgIds(c: Record<string, unknown>, k: string): number[] {
+  return Array.isArray(c[k]) ? (c[k] as number[]) : [];
+}
+
+function mapHomeFromBackend(be: z.infer<typeof BeHomeSchema>): HomeConfig {
+  const byKey = new Map(be.sections.map((s) => [s.key, s.config]));
+  const hero = byKey.get("hero") ?? {};
+  const promo = byKey.get("promo") ?? {};
+  const featured = byKey.get("featured") ?? {};
+  const categories = byKey.get("categories") ?? {};
+  return HomeConfigSchema.parse({
+    sections: [...be.sections].sort((a, b) => a.order - b.order).map((s) => ({ key: s.key, enabled: s.enabled })),
+    hero: {
+      image: cfgStr(hero, "imageUrl"),
+      title: cfgStr(hero, "title"),
+      subtitle: cfgStr(hero, "subtitle"),
+      ctaText: cfgStr(hero, "ctaText"),
+      ctaLink: cfgStr(hero, "ctaHref"),
+      showFrom: cfgStr(hero, "showFrom") || null,
+      showTo: cfgStr(hero, "showTo") || null,
+    },
+    promo: {
+      image: cfgStr(promo, "imageUrl"),
+      title: cfgStr(promo, "headline"),
+      subtitle: "",
+      ctaText: cfgStr(promo, "ctaText"),
+      ctaLink: cfgStr(promo, "ctaHref"),
+      showFrom: null,
+      showTo: null,
+    },
+    featured: { productIds: cfgIds(featured, "productIds") },
+    categories: { categoryIds: cfgIds(categories, "categoryIds") },
+  });
+}
+
+function mapHomeToBackend(c: HomeConfig) {
+  return {
+    sections: c.sections.map((s, i) => {
+      const base = { key: s.key, enabled: s.enabled, order: i };
+      switch (s.key) {
+        case "hero":
+          return {
+            ...base,
+            config: {
+              imageUrl: c.hero.image,
+              title: c.hero.title,
+              subtitle: c.hero.subtitle,
+              ctaText: c.hero.ctaText,
+              ctaHref: c.hero.ctaLink,
+              ...(c.hero.showFrom ? { showFrom: c.hero.showFrom } : {}),
+              ...(c.hero.showTo ? { showTo: c.hero.showTo } : {}),
+            },
+          };
+        case "promo":
+          return {
+            ...base,
+            config: { imageUrl: c.promo.image, headline: c.promo.title, ctaText: c.promo.ctaText, ctaHref: c.promo.ctaLink },
+          };
+        case "categories":
+          return { ...base, config: { categoryIds: c.categories.categoryIds } };
+        case "featured":
+          return { ...base, config: { productIds: c.featured.productIds } };
+        default:
+          return { ...base, config: {} }; // bestsellers, new — no editable config
+      }
+    }),
+  };
+}
 
 /** Thrown on any non-2xx admin response; carries the parsed error code. */
 export class AdminApiError extends Error {
@@ -147,8 +330,10 @@ export const adminApi = {
   },
 
   // ── Products ──
-  listProducts(params: ProductListParams = {}): Promise<ProductListItem[]> {
-    return req(`/admin/products${toQuery(params)}`, { schema: ProductListSchema });
+  listProducts(params: ProductListParams = {}): Promise<AdminListProduct[]> {
+    return req(`/admin/products${toQuery(params)}`, { schema: BeAdminProductList }).then((r) =>
+      r.items.map(mapAdminProduct),
+    );
   },
   getProduct(id: number): Promise<Product> {
     return req(`/admin/products/${id}`, { schema: ProductSchema });
@@ -177,12 +362,14 @@ export const adminApi = {
     return req(`/admin/categories/${id}`, { method: "DELETE" });
   },
 
-  // ── Home composer ──
+  // ── Home composer ── (translates the backend's discriminated-union layout)
   getHome(): Promise<HomeConfig> {
-    return req("/admin/home", { schema: HomeConfigSchema });
+    return req("/admin/home", { schema: BeHomeSchema }).then(mapHomeFromBackend);
   },
   putHome(config: HomeConfig): Promise<HomeConfig> {
-    return req("/admin/home", { method: "PUT", body: config, schema: HomeConfigSchema });
+    return req("/admin/home", { method: "PUT", body: mapHomeToBackend(config), schema: BeHomeSchema }).then(
+      mapHomeFromBackend,
+    );
   },
 
   // ── Settings ──
@@ -191,6 +378,37 @@ export const adminApi = {
   },
   updateSettings(patch: Partial<Settings>): Promise<Settings> {
     return req("/admin/settings", { method: "PATCH", body: patch, schema: SettingsSchema });
+  },
+
+  // ── Orders ──
+  listOrders(status?: string): Promise<AdminOrderItem[]> {
+    const q = status ? `?status=${encodeURIComponent(status)}` : "";
+    return req(`/admin/orders${q}`, { schema: AdminOrderListSchema }).then((r) => r.items);
+  },
+  getOrder(id: string): Promise<AdminOrderDetail> {
+    return req(`/admin/orders/${id}`, { schema: AdminOrderDetailSchema });
+  },
+  getOrderEvents(id: string): Promise<AdminOrderEvent[]> {
+    return req(`/admin/orders/${id}/events`, { schema: AdminOrderEventsSchema }).then((r) => r.events);
+  },
+  /**
+   * Append a tracking event; status-type events advance the order status.
+   * `occurredAt` (ISO string) backdates/forward-dates when the step happened —
+   * omit to use the server's "now".
+   */
+  addOrderEvent(
+    orderId: string,
+    eventType: string,
+    opts: { note?: string; occurredAt?: string } = {},
+  ): Promise<void> {
+    return req(`/admin/orders/${orderId}/events`, {
+      method: "POST",
+      body: {
+        eventType,
+        ...(opts.note ? { note: opts.note } : {}),
+        ...(opts.occurredAt ? { occurredAt: opts.occurredAt } : {}),
+      },
+    });
   },
 
   // ── Uploads ──

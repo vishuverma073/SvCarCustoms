@@ -5,9 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
 import { adminApi } from "@/lib/admin-api";
+import { backend } from "@/lib/backend";
 import Sidebar from "./Sidebar";
 import BottomNav from "./BottomNav";
 import TopBar from "./TopBar";
+import WelcomeSplash from "./WelcomeSplash";
 
 /**
  * Authenticated admin chrome: desktop sidebar + mobile bottom nav + top bar.
@@ -27,10 +29,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     }
   }, [hydrated, token, pathname, router]);
 
-  function handleLogout() {
-    adminApi.logout();
+  async function handleLogout() {
+    adminApi.logout(); // clear the admin session
+    // Also end the customer session you signed in with to reach admin, so you
+    // land on the storefront fully signed out (cleaner + more secure).
+    await backend.logout().catch(() => {});
     toast.success("Signed out");
-    router.replace("/admin/login");
+    router.replace("/");
   }
 
   // Hold the first paint until we know whether a session exists.
@@ -44,6 +49,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-surface-dim">
+      <WelcomeSplash />
       <Sidebar onLogout={handleLogout} />
       <div className="lg:pl-60 flex flex-col min-h-screen">
         <TopBar />

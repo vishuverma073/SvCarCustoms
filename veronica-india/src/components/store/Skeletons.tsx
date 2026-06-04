@@ -101,7 +101,7 @@ export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 
 export function ProductPageSkeleton() {
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        <div className="max-w-380 mx-auto px-4 py-8 md:py-12">
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
                 {/* Images */}
                 <div className="w-full lg:w-[55%] flex flex-col gap-4 opacity-70">
@@ -136,7 +136,7 @@ export function ProductPageSkeleton() {
 
 export function CategoryPageSkeleton() {
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-380 mx-auto px-4 py-8">
             {/* Breadcrumb Skeleton */}
             <div className="h-4 w-48 skeleton mb-8 rounded" />
 

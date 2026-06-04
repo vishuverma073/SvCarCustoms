@@ -41,6 +41,18 @@ describe("backend categories", () => {
   it("throws on an unknown category slug", async () => {
     await expect(backend.getCategoryBySlug("nope")).rejects.toThrow();
   });
+
+  it("builds the navbar: header roots with their header subcategories nested", async () => {
+    const nav = await backend.getNavbar();
+    // Only top-level (root) categories appear at the top level.
+    expect(nav.length).toBeGreaterThanOrEqual(1);
+    expect(nav.every((c) => c.parentId === null && c.showInHeader)).toBe(true);
+    // Kitchen Sinks is a header root and has header subcategories → a dropdown.
+    const kitchen = nav.find((c) => c.slug === "kitchen-sinks");
+    expect(kitchen).toBeTruthy();
+    expect(kitchen!.children.length).toBeGreaterThan(0);
+    expect(kitchen!.children.every((c) => c.showInHeader && c.parentId === kitchen!.id)).toBe(true);
+  });
 });
 
 describe("backend products", () => {

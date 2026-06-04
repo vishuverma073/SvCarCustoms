@@ -7,7 +7,6 @@ import {
   ProductSchema,
   CategoryListSchema,
   SettingsSchema,
-  HomeConfigSchema,
 } from "@veronica/contracts";
 
 const AUTH = { Authorization: "Bearer mock-token" };
@@ -42,12 +41,14 @@ describe("admin mock handlers", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns contract-shaped product list items when authed", async () => {
+  it("returns a contract-shaped product list envelope when authed", async () => {
     const res = await fetch(`${API_BASE}/admin/products`, { headers: AUTH });
     expect(res.status).toBe(200);
     const body = await res.json();
-    z.array(ProductListItemSchema).parse(body);
-    expect(body.length).toBeGreaterThanOrEqual(10);
+    // The deployed admin API returns an { items, nextCursor } envelope.
+    expect(Array.isArray(body.items)).toBe(true);
+    z.array(ProductListItemSchema).parse(body.items);
+    expect(body.items.length).toBeGreaterThanOrEqual(10);
   });
 
   it("returns a full product by id", async () => {
@@ -63,8 +64,16 @@ describe("admin mock handlers", () => {
     const settings = await (await fetch(`${API_BASE}/admin/settings`, { headers: AUTH })).json();
     SettingsSchema.parse(settings);
 
+    // Home config is served in the backend wire shape: an ordered list of
+    // { key, enabled, order, config } sections.
     const home = await (await fetch(`${API_BASE}/admin/home`, { headers: AUTH })).json();
-    HomeConfigSchema.parse(home);
+    expect(Array.isArray(home.sections)).toBe(true);
+    expect(home.sections).toHaveLength(6);
+    for (const s of home.sections) {
+      expect(typeof s.key).toBe("string");
+      expect(typeof s.enabled).toBe("boolean");
+      expect(typeof s.order).toBe("number");
+    }
   });
 
   it("blocks deleting a category that has products", async () => {

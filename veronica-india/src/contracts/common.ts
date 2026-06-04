@@ -21,7 +21,8 @@ export type Money = z.infer<typeof MoneySchema>;
 export const AdminUserSchema = z.object({
   id: z.string(),
   email: z.string().email(),
-  name: z.string(),
+  // API returns null for admins without a name set; coerce to "".
+  name: z.string().nullish().transform((v) => v ?? ""),
 });
 export type AdminUser = z.infer<typeof AdminUserSchema>;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Store, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,11 +13,11 @@ export default function Sidebar({ onLogout }: { onLogout: () => void }) {
 
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-60 admin-sidebar flex-col">
-      <div className="p-5 border-b border-white/10">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="text-brand-orange font-extrabold text-lg">V</span>
-          <span className="text-white font-bold text-sm tracking-wide">ERONICA</span>
-          <span className="text-white/40 text-xs ml-1">Admin</span>
+      {/* h-14 matches the TopBar height so the two bottom borders align. */}
+      <div className="h-14 px-5 flex items-center border-b border-white/10">
+        <Link href="/admin" className="flex items-center gap-2.5">
+          <Image src="/uploads/logo/logo.webp" alt="Veronica" width={30} height={30} className="rounded-lg" />
+          <span className="text-white/50 text-[11px] font-semibold tracking-[0.2em] uppercase">Admin</span>
         </Link>
       </div>
 

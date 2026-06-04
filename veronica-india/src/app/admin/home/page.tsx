@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronUp, ChevronDown, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
-import type { HomeConfig, HomeSectionKey, BannerConfig } from "@veronica/contracts";
+import type { HomeConfig, HomeSectionKey, BannerConfig, Category } from "@veronica/contracts";
 import { useHome, useProducts, useCategories } from "@/lib/admin-hooks";
 import { adminApi } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
@@ -20,10 +20,13 @@ const SECTION_LABELS: Record<HomeSectionKey, string> = {
 export default function HomeComposerPage() {
   const { data: loaded, isLoading } = useHome();
   const { data: products } = useProducts();
-  const { data: categories } = useCategories();
+  const { data: categories, mutate: mutateCategories } = useCategories();
   const [config, setConfig] = useState<HomeConfig | null>(null);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  // Staged navbar (showInHeader) changes, id → desired value. Persisted on Save
+  // (not instantly), like the rest of the composer.
+  const [navbarPending, setNavbarPending] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     if (loaded && !config) setConfig(loaded);
@@ -74,12 +77,34 @@ export default function HomeComposerPage() {
     });
   }
 
+  // Stage a navbar (showInHeader) change locally; persisted on Save. Dropping
+  // it back to the server's value clears it from the pending set.
+  function toggleNavbar(id: number, value: boolean) {
+    const serverVal = (categories ?? []).find((c) => c.id === id)?.showInHeader ?? false;
+    setNavbarPending((prev) => {
+      const next = { ...prev };
+      if (value === serverVal) delete next[id];
+      else next[id] = value;
+      return next;
+    });
+  }
+
   async function save() {
     setSaving(true);
     try {
-      const saved = await adminApi.putHome(config!);
-      setConfig(saved);
-      setDirty(false);
+      if (dirty) {
+        const saved = await adminApi.putHome(config!);
+        setConfig(saved);
+        setDirty(false);
+      }
+      const navEntries = Object.entries(navbarPending);
+      if (navEntries.length > 0) {
+        await Promise.all(
+          navEntries.map(([id, val]) => adminApi.updateCategory(Number(id), { showInHeader: val })),
+        );
+        setNavbarPending({});
+        mutateCategories();
+      }
       toast.success("Home page saved");
     } catch {
       toast.error("Save failed");
@@ -87,6 +112,8 @@ export default function HomeComposerPage() {
       setSaving(false);
     }
   }
+
+  const navbarDirty = Object.keys(navbarPending).length > 0;
 
   return (
     <div className="max-w-2xl pb-24">
@@ -167,17 +194,21 @@ export default function HomeComposerPage() {
         onToggle={toggleCategory}
       />
 
+      {/* Navbar builder — choose which top-level categories appear in the store
+          header and which subcategories show in each dropdown. Staged locally and
+          persisted together with the rest on Save. */}
+      <NavbarManager categories={categories ?? []} pending={navbarPending} onToggle={toggleNavbar} />
+
       {/* Sticky save */}
       <div
-        className="fixed bottom-0 inset-x-0 lg:left-60 z-30 bg-white border-t border-border px-4 py-3 flex items-center justify-between"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
+        className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 inset-x-0 lg:left-60 z-40 bg-white border-t border-border px-4 pt-3 pb-3 lg:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] flex items-center justify-between"
       >
         <span className="text-xs text-text-muted">
-          {saving ? "Saving…" : dirty ? "Unsaved changes" : "All changes saved"}
+          {saving ? "Saving…" : dirty || navbarDirty ? "Unsaved changes" : "All changes saved"}
         </span>
         <button
           onClick={save}
-          disabled={saving || !dirty}
+          disabled={saving || (!dirty && !navbarDirty)}
           className="btn btn-primary text-sm disabled:opacity-50"
         >
           <Save size={15} /> Save
@@ -238,6 +269,87 @@ function PickerCard({
         ))}
         {items.length === 0 && <span className="text-xs text-text-muted">Nothing to pick.</span>}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Store-navbar builder. Lists each top-level category with a "show in navbar"
+ * toggle and, nested beneath, its subcategories with "show in dropdown" toggles.
+ * Controlled: toggles are staged in the parent's `pending` map and persisted
+ * together with the rest of the composer when the admin clicks Save — so the
+ * store header only changes after an explicit save.
+ */
+function NavbarManager({
+  categories,
+  pending,
+  onToggle,
+}: {
+  categories: Category[];
+  pending: Record<number, boolean>;
+  onToggle: (id: number, value: boolean) => void;
+}) {
+  // Desired value = a staged change if present, else the saved server value.
+  const flag = (c: Category) => pending[c.id] ?? !!c.showInHeader;
+
+  const roots = categories
+    .filter((c) => c.parentId === null)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+  const childrenOf = (parentId: number) =>
+    categories
+      .filter((c) => c.parentId === parentId)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+
+  function Toggle({ cat, sub }: { cat: Category; sub?: boolean }) {
+    const checked = flag(cat);
+    return (
+      <label
+        className={cn(
+          "flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer hover:bg-surface-dim/70",
+          sub && "text-sm",
+        )}
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={() => onToggle(cat.id, !checked)}
+          className="w-4 h-4 accent-brand-orange"
+        />
+        <span className={cn("flex-1", sub ? "text-text-secondary" : "font-medium text-text-primary")}>
+          {cat.name}
+        </span>
+      </label>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-border-light shadow-sm p-4 mb-4">
+      <h2 className="text-sm font-semibold text-text-primary mb-1">Store navbar</h2>
+      <p className="text-xs text-text-muted mb-3">
+        Tick a category to show it in the header. Tick its subcategories to list them in that
+        item&rsquo;s dropdown menu. Click <span className="font-semibold">Save</span> to apply.
+      </p>
+      {roots.length === 0 ? (
+        <span className="text-xs text-text-muted">No categories yet.</span>
+      ) : (
+        <div className="space-y-1.5 max-h-96 overflow-y-auto">
+          {roots.map((root) => {
+            const kids = childrenOf(root.id);
+            return (
+              <div key={root.id} className="rounded-lg bg-surface-dim/40">
+                <Toggle cat={root} />
+                {flag(root) && kids.length > 0 && (
+                  <div className="ml-6 mb-1 border-l border-border/60 pl-2">
+                    {kids.map((kid) => (
+                      <Toggle key={kid.id} cat={kid} sub />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

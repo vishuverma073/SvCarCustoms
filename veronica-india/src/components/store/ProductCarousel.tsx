@@ -2,6 +2,7 @@
 
 import ProductCard from "./ProductCard";
 import Carousel from "./Carousel";
+import InfiniteCarousel from "./InfiniteCarousel";
 import type { ProductListItem } from "@veronica/contracts";
 
 interface ProductCarouselProps {
@@ -21,12 +22,9 @@ export default function ProductCarousel({
 }: ProductCarouselProps) {
   if (products.length === 0) return null;
 
-  const gridCols =
-    columns === 3 ? "md:grid-cols-3" : columns === 2 ? "md:grid-cols-2" : "md:grid-cols-4";
-
   return (
     <div className={className}>
-      {/* Mobile: Carousel */}
+      {/* Mobile: swipe carousel */}
       <div className="md:hidden">
         <Carousel itemWidth="72vw" gap={12} showArrows={false}>
           {products.map((product) => (
@@ -45,11 +43,12 @@ export default function ProductCarousel({
         </Carousel>
       </div>
 
-      {/* Desktop: Grid */}
-      <div className={`hidden md:grid ${gridCols} gap-4 stagger-children`}>
-        {products.map((product) => (
-          <div key={product.id} className="animate-fade-in" style={{ opacity: 0 }}>
+      {/* Desktop: arrow-controlled, seamlessly looping carousel */}
+      <div className="hidden md:block">
+        <InfiniteCarousel perView={columns} gap={16}>
+          {products.map((product) => (
             <ProductCard
+              key={product.id}
               slug={product.slug}
               name={product.name}
               image={product.image}
@@ -59,8 +58,8 @@ export default function ProductCarousel({
               isBestseller={product.isBestseller}
               isNew={product.isNew}
             />
-          </div>
-        ))}
+          ))}
+        </InfiniteCarousel>
       </div>
     </div>
   );

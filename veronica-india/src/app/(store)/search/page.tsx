@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
@@ -22,16 +22,22 @@ export default function SearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
+    // Latest-wins guard: ignore responses from superseded requests so a slow
+    // earlier search can't overwrite the results of a faster later one.
+    const reqRef = useRef(0);
 
     const search = useCallback(async (q: string) => {
+        const reqId = ++reqRef.current;
         if (!q.trim()) {
             setResults([]);
+            setLoading(false);
             return;
         }
 
         setLoading(true);
         try {
             const items = await backend.searchProducts(q);
+            if (reqId !== reqRef.current) return; // a newer query superseded this one
             setResults(
                 items.map((p) => ({
                     id: p.id,
@@ -44,9 +50,9 @@ export default function SearchPage() {
                 })),
             );
         } catch (err) {
-            console.error("Search error:", err);
+            if (reqId === reqRef.current) console.error("Search error:", err);
         } finally {
-            setLoading(false);
+            if (reqId === reqRef.current) setLoading(false);
         }
     }, []);
 
@@ -57,6 +63,7 @@ export default function SearchPage() {
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-8">
+            <h1 className="sr-only">Search products</h1>
             {/* Search Input */}
             <div className="relative mb-10">
                 <Search size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-text-muted" />
@@ -65,7 +72,7 @@ export default function SearchPage() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search products..."
-                    className="w-full pl-14 pr-5 py-4 text-base rounded-2xl bg-surface-card border border-border-light shadow-card focus:border-brand-orange focus:shadow-lg focus:bg-white transition-all duration-300 outline-none font-medium"
+                    className="w-full pl-14 pr-5 py-4 text-base rounded-2xl bg-surface-card border border-border-light shadow-card focus:border-brand-orange focus:shadow-lg transition-all duration-300 outline-none font-medium"
                     autoFocus
                 />
             </div>

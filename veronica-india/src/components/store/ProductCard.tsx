@@ -25,8 +25,15 @@ export default function ProductCard({
 }: ProductCardProps) {
     return (
         <Link href={`/product/${slug}`} className="card group block">
-            {/* Image Container — fixed aspect ratio for uniform cards */}
-            <div className="relative aspect-[4/3] bg-surface-dim overflow-hidden">
+            {/* Image Container — fixed aspect ratio for uniform cards. A soft
+                near-white (#f4f4f5, both themes) matches the product photos'
+                studio background so they blend in rather than the photo's square
+                popping against the dark card. Set via inline style so it always
+                applies (an arbitrary Tailwind bg class can miss a dev rebuild). */}
+            <div
+                className="relative aspect-[4/3] overflow-hidden"
+                style={{ backgroundColor: "#f4f4f5" }}
+            >
                 <Image
                     src={image}
                     alt={name}

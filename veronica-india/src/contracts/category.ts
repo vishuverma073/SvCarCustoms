@@ -8,8 +8,15 @@ export const CategorySchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
   description: z.string().default(""),
-  image: z.string().optional(),
+  // API returns null for categories without an image; coerce to undefined.
+  image: z.string().nullish().transform((v) => v ?? undefined),
   sortOrder: z.number().int().default(0),
+  // Admin-curated: which categories appear in the customer header nav. The footer
+  // shows every category; the header shows only the ones flagged here.
+  showInHeader: z.boolean().default(false),
+  // Admin list includes these read-only counts; public list + create payloads omit them.
+  childCount: z.number().int().optional(),
+  productCount: z.number().int().optional(),
 });
 export type Category = z.infer<typeof CategorySchema>;
 

@@ -6,10 +6,10 @@ export const settings: Settings = {
   storeName: "Veronica India",
   supportPhone: "+91 93505 29717",
   supportEmail: "support@veronicaindia.com",
-  address: "New Delhi, India",
+  storeAddress: { label: "", line1: "New Delhi", line2: "", city: "New Delhi", state: "Delhi", pincode: "110001", landmark: "" },
   gstRate: 18,
-  freeShippingAbove: 5000,
-  shippingFee: 200,
+  shippingFreeAbove: 5000,
+  shippingFlatFee: 200,
   whatsappNumber: "+919350529717",
 };
 

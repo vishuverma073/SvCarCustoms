@@ -27,7 +27,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 async function CategoryProductsSection({ slug }: { slug: string }) {
     // listProducts(category) returns the full subtree — for a leaf that's just
     // its own products, matching the old direct-category behaviour.
-    const items = await backend.getProductsByCategory(slug, 100);
+    // NOTE: the public /products endpoint hard-caps `limit` at 50, so requesting
+    // more than that 400s. Cap at 50 (the backend max for this endpoint).
+    const items = await backend.getProductsByCategory(slug, 50);
     const products = items.map((p) => ({
         slug: p.slug,
         name: p.name,
@@ -69,13 +71,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     const isRootNode = category.parentId === null;
     const parentCategory = isRootNode ? category : breadcrumb[breadcrumb.length - 2];
 
-    // Sibling pills = the parent's children (one extra fetch only for sub-pages).
-    const displaySubCategories = isRootNode
-        ? category.children
-        : (await backend.getCategoryBySlug(parentCategory.slug)).children;
+    // Sibling pills = the parent's children (one extra fetch only for sub-pages), alphabetical.
+    const displaySubCategories = [
+        ...(isRootNode
+            ? category.children
+            : (await backend.getCategoryBySlug(parentCategory.slug)).children),
+    ].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
     const hasSubCategories = displaySubCategories.length > 0;
 
-    const allRootCategories = await backend.getCategories();
+    // Sidebar + mobile tabs list every category, alphabetically (matching the header nav).
+    const allRootCategories = (await backend.getCategories()).sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
 
     const breadcrumbItems = breadcrumb.map((cat, i) => ({
         label: cat.name,
@@ -83,7 +90,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     }));
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-380 mx-auto px-4 py-8">
             <Breadcrumb items={breadcrumbItems} className="mb-8" />
 
             <div className="flex gap-10">

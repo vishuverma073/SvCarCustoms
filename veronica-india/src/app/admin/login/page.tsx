@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { adminApi, AdminApiError } from "@/lib/admin-api";
 
 function LoginForm() {
@@ -21,7 +20,9 @@ function LoginForm() {
     setError("");
     try {
       const { admin } = await adminApi.login(email, password);
-      toast.success(`Welcome back, ${admin.name}`);
+      // Stash the name for the one-time welcome splash on the admin panel.
+      const display = admin.name?.trim() || admin.email.split("@")[0] || "Admin";
+      sessionStorage.setItem("veronica-admin-welcome", display);
       router.replace(returnTo);
     } catch (err) {
       if (err instanceof AdminApiError && err.status === 401) {

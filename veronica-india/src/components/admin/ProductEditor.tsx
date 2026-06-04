@@ -123,7 +123,13 @@ function ChipInput({
   );
 }
 
-export default function ProductEditor({ productId }: { productId?: number }) {
+export default function ProductEditor({
+  productId,
+  defaultCategoryId,
+}: {
+  productId?: number;
+  defaultCategoryId?: number;
+}) {
   const router = useRouter();
   const { mutate } = useSWRConfig();
   const { data: categories } = useCategories();
@@ -143,7 +149,11 @@ export default function ProductEditor({ productId }: { productId?: number }) {
     // Schema defaults make zod's input type diverge from the output type; the
     // form operates on the resolved (output) shape, so cast the resolver.
     resolver: zodResolver(AdminProductCreateSchema) as unknown as Resolver<AdminProductCreate>,
-    defaultValues: emptyProduct(),
+    // Preselect the category when adding from a category page (so it isn't 0,
+    // which fails validation as "invalid request").
+    defaultValues: defaultCategoryId
+      ? { ...emptyProduct(), categoryId: defaultCategoryId }
+      : emptyProduct(),
   });
 
   // Load the product when editing.
@@ -226,7 +236,7 @@ export default function ProductEditor({ productId }: { productId?: number }) {
     .toUpperCase();
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl pb-24 space-y-3">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl pb-36 lg:pb-24 space-y-3">
       <h1 className="text-xl font-bold text-text-primary mb-1">
         {isEdit ? "Edit Product" : "Add New Product"}
       </h1>
@@ -412,10 +422,9 @@ export default function ProductEditor({ productId }: { productId?: number }) {
         </Section>
       )}
 
-      {/* Sticky save bar */}
-      <div className="fixed bottom-0 inset-x-0 lg:left-60 z-30 bg-white border-t border-border px-4 py-3 flex items-center justify-between"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
-      >
+      {/* Sticky save bar — sits above the mobile bottom nav (~56px + safe-area),
+          flush to the bottom on desktop where the nav is hidden. */}
+      <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 inset-x-0 lg:left-60 z-40 bg-white border-t border-border px-4 pt-3 pb-3 lg:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] flex items-center justify-between">
         <span className="text-xs text-text-muted">
           {isSubmitting ? "Saving…" : isDirty ? "Unsaved changes" : "All changes saved"}
         </span>

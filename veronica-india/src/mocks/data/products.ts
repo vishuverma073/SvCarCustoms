@@ -73,21 +73,23 @@ interface Seed {
   isNew?: boolean;
   isFeatured?: boolean;
   status?: Product["status"];
+  /** Real product photos under public/uploads/products/ (gallery order). */
+  images: string[];
 }
 
 const seeds: Seed[] = [
-  { name: "Lavender Imported Single Bowl", categoryId: 10, tags: ["Imported", "Premium", "DeepBowl"], basePrice: 3060, sale: 0.7, dims: [{ name: "Overall Size", values: ["18×16", "24×20", "32×20"] }], isBestseller: true },
-  { name: "Jasmine Single Bowl Sink", categoryId: 10, tags: ["Classic", "Versatile", "Durable"], basePrice: 2100, dims: [{ name: "Overall Size", values: ["18×16", "24×18"] }, { name: "Weight", values: ["Light", "Heavy"] }] },
-  { name: "Orchid Quartz Single Bowl", categoryId: 10, tags: ["QuartzStone", "UV-Resistant", "AcidResistant"], basePrice: 14999, sale: 0.6, dims: [{ name: "Size", values: ["18×16", "24×18"] }], isNew: true, isFeatured: true },
-  { name: "Veronica Double Bowl Sink", categoryId: 11, tags: ["DoubleBowl", "StainlessSteel"], basePrice: 6800, sale: 0.75, dims: [{ name: "Size", values: ["37×18", "45×20"] }], isBestseller: true },
-  { name: "Granite Drain Board Double Bowl", categoryId: 11, tags: ["DrainBoard", "QuartzStone"], basePrice: 28000, sale: 0.55, dims: [{ name: "Size", values: ["36×20", "40×20"] }], isNew: true },
-  { name: "Milano A.B.S. Health Faucet Set", categoryId: 20, tags: ["ABS", "FocusedFlow", "EasyClean"], basePrice: 850, sale: 0.7, dims: [{ name: "Color", values: ["Chrome", "Black"] }], isBestseller: true },
-  { name: "Sumo A.B.S. Health Faucet Set", categoryId: 20, tags: ["ABS", "Durable", "BrassFittings"], basePrice: 790, sale: 0.7, dims: [{ name: "Tube Type", values: ["Standard", "Nozzle"] }], isFeatured: true },
-  { name: "Veronica Brass Health Faucet Set", categoryId: 21, tags: ["SolidBrass", "BraidedTube", "HeavyDuty"], basePrice: 2800, sale: 0.5, isNew: true },
-  { name: "Royal Heavy Brass Faucet", categoryId: 21, tags: ["SolidBrass", "Premium"], basePrice: 3400, sale: 0.6 },
-  { name: "Veronica Square Floor Drain", categoryId: 3, tags: ["AntiCockroach", "StainlessSteel", "RemovableTrap"], basePrice: 850, sale: 0.5, dims: [{ name: "Size", values: ["5 inch", "6 inch"] }], isBestseller: true },
-  { name: "Veronica Stainless Steel Grating", categoryId: 3, tags: ["StainlessSteel", "AntiSlip", "HeavyDuty"], basePrice: 650, sale: 0.55, dims: [{ name: "Size", values: ["5 inch", "6 inch"] }] },
-  { name: "S.S. Braided Connection Pipe", categoryId: 4, tags: ["StainlessSteel", "BrassNuts", "HotAndCold"], basePrice: 340, sale: 0.65, dims: [{ name: "Length", values: ["1.0 Meter", "1.5 Meter"] }], isFeatured: true },
+  { name: "Lavender Imported Single Bowl", categoryId: 10, tags: ["Imported", "Premium", "DeepBowl"], basePrice: 3060, sale: 0.7, dims: [{ name: "Overall Size", values: ["18×16", "24×20", "32×20"] }], isBestseller: true, images: ["sink-1.webp", "sink-angle-1.png"] },
+  { name: "Jasmine Single Bowl Sink", categoryId: 10, tags: ["Classic", "Versatile", "Durable"], basePrice: 2100, dims: [{ name: "Overall Size", values: ["18×16", "24×18"] }, { name: "Weight", values: ["Light", "Heavy"] }], images: ["sink-2.jpeg", "sink-installed-1.png"] },
+  { name: "Orchid Quartz Single Bowl", categoryId: 10, tags: ["QuartzStone", "UV-Resistant", "AcidResistant"], basePrice: 14999, sale: 0.6, dims: [{ name: "Size", values: ["18×16", "24×18"] }], isNew: true, isFeatured: true, images: ["sink-3.webp", "sink-detail-drain.png"] },
+  { name: "Veronica Double Bowl Sink", categoryId: 11, tags: ["DoubleBowl", "StainlessSteel"], basePrice: 6800, sale: 0.75, dims: [{ name: "Size", values: ["37×18", "45×20"] }], isBestseller: true, images: ["sink-4.webp", "sink-hero-1.png"] },
+  { name: "Granite Drain Board Double Bowl", categoryId: 11, tags: ["DrainBoard", "QuartzStone"], basePrice: 28000, sale: 0.55, dims: [{ name: "Size", values: ["36×20", "40×20"] }], isNew: true, images: ["sink-drainboard.png", "sink-5.webp"] },
+  { name: "Milano A.B.S. Health Faucet Set", categoryId: 20, tags: ["ABS", "FocusedFlow", "EasyClean"], basePrice: 850, sale: 0.7, dims: [{ name: "Color", values: ["Chrome", "Black"] }], isBestseller: true, images: ["faucet-1.webp", "faucet-detail-1.png"] },
+  { name: "Sumo A.B.S. Health Faucet Set", categoryId: 20, tags: ["ABS", "Durable", "BrassFittings"], basePrice: 790, sale: 0.7, dims: [{ name: "Tube Type", values: ["Standard", "Nozzle"] }], isFeatured: true, images: ["faucet-2.webp", "faucet-spray-detail.png"] },
+  { name: "Veronica Brass Health Faucet Set", categoryId: 21, tags: ["SolidBrass", "BraidedTube", "HeavyDuty"], basePrice: 2800, sale: 0.5, isNew: true, images: ["faucet-brass-1.png", "faucet-set-1.png"] },
+  { name: "Royal Heavy Brass Faucet", categoryId: 21, tags: ["SolidBrass", "Premium"], basePrice: 3400, sale: 0.6, images: ["faucet-health-set.png", "faucet-1.png"] },
+  { name: "Veronica Square Floor Drain", categoryId: 3, tags: ["AntiCockroach", "StainlessSteel", "RemovableTrap"], basePrice: 850, sale: 0.5, dims: [{ name: "Size", values: ["5 inch", "6 inch"] }], isBestseller: true, images: ["floor-drain-square.png", "drain-1.webp"] },
+  { name: "Veronica Stainless Steel Grating", categoryId: 3, tags: ["StainlessSteel", "AntiSlip", "HeavyDuty"], basePrice: 650, sale: 0.55, dims: [{ name: "Size", values: ["5 inch", "6 inch"] }], images: ["floor-drain-detail.png", "drain-2.webp"] },
+  { name: "S.S. Braided Connection Pipe", categoryId: 4, tags: ["StainlessSteel", "BrassNuts", "HotAndCold"], basePrice: 340, sale: 0.65, dims: [{ name: "Length", values: ["1.0 Meter", "1.5 Meter"] }], isFeatured: true, images: ["braided-pipe.png", "pipe-coupling-1.png"] },
 ];
 
 function buildProduct(seed: Seed, index: number): Product {
@@ -116,10 +118,7 @@ function buildProduct(seed: Seed, index: number): Product {
     isFeatured: seed.isFeatured ?? false,
     status: seed.status ?? "active",
     tags: seed.tags,
-    images: [
-      `https://placehold.co/600x600/F5F5F4/57534E/png?text=${encodeURIComponent(seed.name)}`,
-      `https://placehold.co/600x600/EEEEEE/A8A29E/png?text=${encodeURIComponent(seed.name + " ▸ 2")}`,
-    ],
+    images: seed.images.map((file) => `/uploads/products/${file}`),
     dimensions,
     skus,
     specifications: [

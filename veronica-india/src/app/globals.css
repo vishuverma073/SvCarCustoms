@@ -28,6 +28,43 @@
   --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.06);
   --shadow-btn: 0 2px 8px rgba(232, 130, 42, 0.25);
   --shadow-glow-orange: 0 0 20px rgba(232, 130, 42, 0.15);
+
+  /* Announcement-bar ticker. Registering it here makes `animate-marquee` a real
+     Tailwind v4 utility (otherwise the class resolves to an empty animation). */
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+/* ─── Dark mode ─────────────────────────────────────────────────
+   Toggled by a `dark` class on <html> (see ThemeToggle + the pre-paint script
+   in layout.tsx). Components mostly use the semantic tokens below, so overriding
+   the CSS variables flips the whole UI. The two `.dark .bg-white` / `.text-brand-black`
+   remaps catch the handful of hardcoded literals without editing every file.
+   `--color-brand-black` stays dark (it's used as a background in places); only the
+   text utility is remapped to light. */
+.dark {
+  --color-surface: #0B0B0C;
+  --color-surface-dim: #18181B;
+  --color-surface-card: #1B1B1F;
+  --color-border: #2A2A2F;
+  --color-border-light: #232327;
+  --color-text-primary: #FAFAFA;
+  --color-text-secondary: #B4B4BC;
+  --color-text-muted: #8A8A93;
+  --color-brand-orange-light: #2A1C0F;
+}
+.dark .bg-white {
+  background-color: var(--color-surface-card);
+}
+/* Header dark-mode background. The header keeps its Tailwind `bg-white/NN`
+   class for the light frosted look (tweakable), and carries a stable
+   `site-header` hook so dark mode doesn't depend on the exact opacity value —
+   `.dark .site-header` (specificity 0,2,0) beats the `bg-white/NN` utility. */
+.dark .site-header {
+  background-color: rgb(27 27 31 / 0.92);
+}
+.dark .text-brand-black,
+.dark .hover\:text-brand-black:hover {
+  color: var(--color-text-primary);
 }
 
 /* ─── Base Styles ───────────────────────────────────────────── */
@@ -43,6 +80,10 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-surface);
   color: var(--color-text-primary);
+  /* Clip any stray horizontal overflow (full-bleed sections / 100vw children)
+     so there's no white gutter on the right. `clip` (not `hidden`) keeps the
+     sticky header working. */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -179,6 +220,20 @@ body {
 
 .animate-scale-in {
   animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Announcement-bar marquee — the track holds two identical halves, so sliding
+   from -50% to 0 drifts the text left→right and loops seamlessly. The
+   `animate-marquee` utility is wired up via --animate-marquee in @theme above;
+   the reduced-motion fallback is handled by `motion-reduce:` classes in the JSX. */
+@keyframes marquee {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* Stagger delays for child elements */
@@ -822,17 +877,25 @@ body {
   padding: 12px 16px;
   border: 1.5px solid var(--color-border);
   border-radius: 12px;
-  font-size: 14px;
+  /* 16px on mobile so iOS Safari doesn't auto-zoom the page on focus; the design's
+     14px is restored from the sm breakpoint up (see below). */
+  font-size: 16px;
   font-family: var(--font-sans);
   transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
   outline: none;
   background: var(--color-surface-card);
 }
 
+@media (min-width: 640px) {
+  .input {
+    font-size: 14px;
+  }
+}
+
 .input:focus {
   border-color: var(--color-brand-orange);
   box-shadow: 0 0 0 3px rgba(232, 130, 42, 0.1);
-  background: white;
+  background: var(--color-surface-card);
 }
 
 .input-label {
@@ -903,7 +966,9 @@ body {
 .pdp-hero-img {
   position: relative;
   aspect-ratio: 1;
-  background: var(--color-surface-dim);
+  /* Soft near-white (both themes) matching the product photos' studio
+     background so they blend in instead of the photo's square edge popping. */
+  background: #f4f4f5;
   border-radius: 16px;
   overflow: hidden;
 }
@@ -931,7 +996,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   border: 2px solid transparent;
-  background: var(--color-surface-dim);
+  background: #f4f4f5;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
   padding: 0;
@@ -955,7 +1020,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: white;
+  background: var(--color-surface-card);
   border: 1px solid var(--color-border-light);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -1010,6 +1075,10 @@ body {
   scroll-snap-align: start;
   position: relative;
   aspect-ratio: 1;
+  /* Match the desktop hero: soft near-white so the product photo blends. */
+  background: #f4f4f5;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 /* ─── Mobile: Dot Indicators ─────────────────────────────────── */
@@ -1088,7 +1157,7 @@ body {
 .pdp-variant.active {
   background: var(--color-text-primary);
   border-color: var(--color-text-primary);
-  color: white;
+  color: var(--color-surface);
 }
 
 /* ─── Feature Tags ───────────────────────────────────────────── */
@@ -1115,7 +1184,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: white;
+  color: var(--color-surface);
   background: var(--color-text-primary);
   border: none;
   border-radius: 12px;
@@ -1124,7 +1193,7 @@ body {
 }
 
 .pdp-atc-btn:hover {
-  background: #1a1a1a;
+  opacity: 0.9;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -1177,7 +1246,7 @@ body {
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 700;
-  color: white;
+  color: var(--color-surface);
   background: var(--color-text-primary);
   border: none;
   border-radius: 10px;
@@ -1186,5 +1255,5 @@ body {
 }
 
 .pdp-qty-update:hover {
-  background: #1a1a1a;
+  opacity: 0.9;
 }

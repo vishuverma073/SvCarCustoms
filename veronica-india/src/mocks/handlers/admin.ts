@@ -4,7 +4,6 @@ import { API_BASE } from "@/lib/api-config";
 import {
   AdminProductCreateSchema,
   AdminCategoryCreateSchema,
-  HomeConfigSchema,
   SettingsUpdateSchema,
   type Product,
   type Category,
@@ -71,7 +70,16 @@ export const adminHandlers = [
     if (flag === "new") result = result.filter((p) => p.isNew);
     if (flag === "featured") result = result.filter((p) => p.isFeatured);
 
-    return HttpResponse.json(result.map(toListItem));
+    // Mirror the deployed admin API: an `{ items, nextCursor }` envelope whose
+    // rows carry `primaryImage`/`categoryName` (the admin client maps these).
+    return HttpResponse.json({
+      items: result.map((p) => ({
+        ...toListItem(p),
+        primaryImage: p.images[0] ?? null,
+        categoryName: categories.find((c) => c.id === p.categoryId)?.name,
+      })),
+      nextCursor: null,
+    });
   }),
 
   http.post(`${A}/admin/products`, async ({ request }) => {
@@ -150,6 +158,7 @@ export const adminHandlers = [
       description: d.description ?? "",
       image: d.image,
       sortOrder: d.sortOrder ?? categories.length,
+      showInHeader: d.showInHeader ?? false,
     };
     categories.push(category);
     return HttpResponse.json(category, { status: 201 });
@@ -194,15 +203,13 @@ export const adminHandlers = [
   http.put(`${A}/admin/home`, async ({ request }) => {
     const denied = gate(request);
     if (denied) return denied;
-    const raw = await request.json();
-    const parsed = HomeConfigSchema.safeParse(raw);
-    if (!parsed.success) {
-      return HttpResponse.json(
-        { error: "validation", message: parsed.error.message },
-        { status: 422 },
-      );
+    // The admin client sends the backend wire shape ({ sections:[{key,enabled,
+    // order,config}] }), not the flat composer model — accept that.
+    const raw = (await request.json()) as { sections?: unknown };
+    if (!raw || !Array.isArray(raw.sections)) {
+      return HttpResponse.json({ error: "validation" }, { status: 422 });
     }
-    Object.assign(home, parsed.data);
+    home.sections = raw.sections as typeof home.sections;
     return HttpResponse.json(home);
   }),
 

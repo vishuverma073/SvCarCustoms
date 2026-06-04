@@ -55,7 +55,17 @@ export const ProductSchema = z.object({
   isFeatured: z.boolean().default(false),
   status: ProductStatusSchema.default("draft"),
   tags: z.array(z.string()).default([]),
-  images: z.array(z.string()),
+  // The real API returns image objects ({ url, sortOrder }); the MSW mocks use
+  // bare URL strings. Accept both and normalize to string[] so the UI (next/image
+  // src) is unchanged. Without this the PDP threw on parse and 404'd silently.
+  images: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({ url: z.string(), sortOrder: z.number().int().optional() }),
+      ]),
+    )
+    .transform((arr) => arr.map((img) => (typeof img === "string" ? img : img.url))),
   dimensions: z.array(VariantDimensionSchema).default([]),
   skus: z.array(ProductSKUSchema),
   specifications: z.array(SpecificationSchema).optional(),
@@ -80,7 +90,10 @@ export const ProductListItemSchema = z.object({
   isNew: z.boolean(),
   isFeatured: z.boolean().default(false),
   status: ProductStatusSchema,
-  skuCount: z.number().int().nonnegative(),
+  // Optional: the public /products list omits skuCount (only /admin/products
+  // returns it, where the admin UI shows "N SKUs"). Keeping it required broke
+  // every storefront grid (bestsellers/new arrivals/category) against the real API.
+  skuCount: z.number().int().nonnegative().optional(),
   tags: z.array(z.string()).default([]),
 });
 export type ProductListItem = z.infer<typeof ProductListItemSchema>;

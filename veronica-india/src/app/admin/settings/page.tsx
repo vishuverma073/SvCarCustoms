@@ -29,7 +29,9 @@ export default function SettingsPage() {
 
   async function onSubmit(values: Settings) {
     try {
-      const saved = await adminApi.updateSettings(values);
+      // `updatedAt` is server-managed — don't send it back on save.
+      const { updatedAt: _ignored, ...patch } = values;
+      const saved = await adminApi.updateSettings(patch);
       await mutate(["admin/settings"], saved, { revalidate: false });
       reset(saved);
       toast.success("Settings saved");
@@ -63,26 +65,49 @@ export default function SettingsPage() {
         <Field label="WhatsApp number (E.164)" error={errors.whatsappNumber?.message}>
           <input {...register("whatsappNumber")} className="input" placeholder="+919350529717" />
         </Field>
-        <Field label="Address">
-          <textarea {...register("address")} className="input min-h-20 resize-y" />
-        </Field>
+        <div className="pt-1">
+          <p className="text-xs font-bold uppercase tracking-wide text-text-secondary mb-2">Store address</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="sm:col-span-2">
+              <Field label="Address line 1">
+                <input {...register("storeAddress.line1")} className="input" />
+              </Field>
+            </div>
+            <div className="sm:col-span-2">
+              <Field label="Address line 2">
+                <input {...register("storeAddress.line2")} className="input" />
+              </Field>
+            </div>
+            <Field label="City">
+              <input {...register("storeAddress.city")} className="input" />
+            </Field>
+            <Field label="State">
+              <input {...register("storeAddress.state")} className="input" />
+            </Field>
+            <Field label="Pincode">
+              <input {...register("storeAddress.pincode")} className="input" />
+            </Field>
+            <Field label="Landmark">
+              <input {...register("storeAddress.landmark")} className="input" />
+            </Field>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Field label="GST rate (%)" error={errors.gstRate?.message}>
             <input {...register("gstRate", { valueAsNumber: true })} className="input" type="number" step="0.01" />
           </Field>
-          <Field label="Free shipping above (₹)" error={errors.freeShippingAbove?.message}>
-            <input {...register("freeShippingAbove", { valueAsNumber: true })} className="input" type="number" />
+          <Field label="Free shipping above (₹)" error={errors.shippingFreeAbove?.message}>
+            <input {...register("shippingFreeAbove", { valueAsNumber: true })} className="input" type="number" />
           </Field>
-          <Field label="Shipping fee (₹)" error={errors.shippingFee?.message}>
-            <input {...register("shippingFee", { valueAsNumber: true })} className="input" type="number" />
+          <Field label="Shipping fee (₹)" error={errors.shippingFlatFee?.message}>
+            <input {...register("shippingFlatFee", { valueAsNumber: true })} className="input" type="number" />
           </Field>
         </div>
       </div>
 
       <div
-        className="fixed bottom-0 inset-x-0 lg:left-60 z-30 bg-white border-t border-border px-4 py-3 flex items-center justify-between"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}
+        className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 inset-x-0 lg:left-60 z-40 bg-white border-t border-border px-4 pt-3 pb-3 lg:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] flex items-center justify-between"
       >
         <span className="text-xs text-text-muted">
           {isSubmitting ? "Saving…" : isDirty ? "Unsaved changes" : "All changes saved"}

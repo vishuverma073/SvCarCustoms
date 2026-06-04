@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, Plus, Package } from "lucide-react";
-import { useProducts } from "@/lib/admin-hooks";
+import { useProducts, useCategories } from "@/lib/admin-hooks";
 import { useDebouncedValue } from "@/lib/use-debounced-value";
 import { formatPrice, cn } from "@/lib/utils";
 import StatusPill from "@/components/admin/StatusPill";
@@ -66,13 +66,43 @@ export default function ProductsListPage() {
   );
 
   const { data: products, isLoading, error } = useProducts(params);
+  const { data: categories } = useCategories();
+  const [category, setCategory] = useState("");
+
+  // Category options: roots then their subcategories (indented). Products carry
+  // their category NAME on the admin list, so we filter by name.
+  const categoryOptions = useMemo(() => {
+    const cats = categories ?? [];
+    const roots = cats.filter((c) => c.parentId === null).sort((a, b) => a.name.localeCompare(b.name));
+    const out: { id: number; name: string; label: string }[] = [];
+    for (const r of roots) {
+      out.push({ id: r.id, name: r.name, label: r.name });
+      cats
+        .filter((c) => c.parentId === r.id)
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach((ch) => out.push({ id: ch.id, name: ch.name, label: `— ${ch.name}` }));
+    }
+    return out;
+  }, [categories]);
+
+  // Category filter is applied client-side over the loaded list (by category name).
+  const filtered = useMemo(
+    () => (category ? (products ?? []).filter((p) => p.categoryName === category) : products),
+    [products, category],
+  );
+
+  // When a category is filtered, pre-fill it on the "new product" page.
+  const selectedCatId = categoryOptions.find((c) => c.name === category)?.id;
+  const newProductHref = selectedCatId
+    ? `/admin/products/new?category=${selectedCatId}`
+    : "/admin/products/new";
 
   return (
     <div className="max-w-5xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-text-primary">Products</h1>
-        <Link href="/admin/products/new" className="hidden lg:inline-flex btn btn-primary text-sm">
+        <Link href={newProductHref} className="hidden lg:inline-flex btn btn-primary text-sm">
           <Plus size={16} /> Add Product
         </Link>
       </div>
@@ -87,7 +117,10 @@ export default function ProductsListPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products or tags…"
-          className="input pl-10"
+          // `!pl-10` wins over the `.input` padding shorthand (unlayered CSS
+          // otherwise beats the Tailwind utility) so the search icon never
+          // overlaps the placeholder/text.
+          className="input pl-10!"
           type="search"
         />
       </div>
@@ -108,6 +141,28 @@ export default function ProductsListPage() {
             </Chip>
           ))}
         </div>
+        {/* Category filter — manage products one category at a time. */}
+        {categoryOptions.length > 0 && (
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            // Match the filter chips: same pill shape + height, width fits content.
+            className={cn(
+              "rounded-full text-xs font-semibold min-h-[34px] px-3 py-1.5 cursor-pointer w-auto max-w-[240px] transition-colors",
+              category
+                ? "bg-brand-orange text-white border border-brand-orange"
+                : "bg-white text-text-secondary border border-border hover:border-brand-orange/50",
+            )}
+            aria-label="Filter by category"
+          >
+            <option value="">All categories</option>
+            {categoryOptions.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Grid */}
@@ -122,9 +177,9 @@ export default function ProductsListPage() {
             />
           ))}
         </div>
-      ) : products && products.length > 0 ? (
+      ) : filtered && filtered.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {products.map((p) => (
+          {filtered.map((p) => (
             <Link
               key={p.id}
               href={`/admin/products/${p.id}/edit`}

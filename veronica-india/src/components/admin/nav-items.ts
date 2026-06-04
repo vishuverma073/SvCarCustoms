@@ -21,6 +21,8 @@ export const adminNav: AdminNavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, mobile: true },
   { href: "/admin/products", label: "Products", icon: Package, mobile: true },
   { href: "/admin/categories", label: "Categories", icon: FolderTree, mobile: true },
+  // Home composer — drives the storefront homepage (order, enabled sections,
+  // hero/promo content, featured products, category showcase).
   { href: "/admin/home", label: "Home", icon: LayoutTemplate, mobile: true },
   { href: "/admin/settings", label: "Settings", icon: Settings, mobile: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart, mobile: false },

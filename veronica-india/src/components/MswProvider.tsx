@@ -18,10 +18,18 @@ export function MswProvider({ children }: { children: React.ReactNode }) {
     if (!USE_MOCKS) return;
     let cancelled = false;
     (async () => {
-      const { worker } = await import("@/mocks/browser");
-      if (cancelled) return;
-      await worker.start({ onUnhandledRequest: "bypass" });
-      signalMocksReady();
+      try {
+        const { worker } = await import("@/mocks/browser");
+        if (cancelled) return;
+        await worker.start({ onUnhandledRequest: "bypass" });
+      } catch (err) {
+        // If the worker fails to load/start, don't leave every fetch hanging on
+        // `mocksReady` forever — release the gate so requests proceed (and fail
+        // loudly) instead of the whole app stalling on a silent deadlock.
+        console.error("[MSW] worker failed to start; releasing mocksReady", err);
+      } finally {
+        if (!cancelled) signalMocksReady();
+      }
     })();
     return () => {
       cancelled = true;

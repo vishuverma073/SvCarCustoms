@@ -1,5 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone, MapPin } from "lucide-react";
+import { backend } from "@/lib/backend";
+import VisitorCount from "./VisitorCount";
 
 function InstagramIcon() {
     return (
@@ -25,7 +28,13 @@ function YouTubeIcon() {
     );
 }
 
-export default function StoreFooter() {
+export default async function StoreFooter() {
+    // Categories are dynamic (every category shows here); contact details below
+    // are intentionally hardcoded to the real business contact.
+    const categories = (await backend.getCategories().catch(() => [])).sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
+
     const socialLinks = [
         { icon: InstagramIcon, label: "Instagram", href: "#" },
         { icon: FacebookIcon, label: "Facebook", href: "#" },
@@ -37,13 +46,19 @@ export default function StoreFooter() {
             {/* Top accent line */}
             <div className="h-0.5 bg-gradient-to-r from-brand-orange via-brand-orange/40 to-transparent" />
 
-            <div className="max-w-7xl mx-auto px-4 py-14">
+            <div className="max-w-380 mx-auto px-4 py-14">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     {/* Brand */}
                     <div className="lg:col-span-1">
-                        <h3 className="text-xl font-extrabold tracking-tight mb-3">
-                            VERONICA
-                        </h3>
+                        <div className="flex items-center gap-2.5 mb-3">
+                            <Image src="/uploads/logo/logo.webp" alt="Veronica" width={36} height={36} className="rounded-lg" />
+                            <div className="flex flex-col leading-none">
+                                <span className="text-lg font-extrabold tracking-tight">VERONICA</span>
+                                <span className="text-[9px] font-medium tracking-[0.2em] text-white/40 uppercase mt-0.5">
+                                    Premium Sanitary
+                                </span>
+                            </div>
+                        </div>
                         <p className="text-[13px] text-white/50 leading-relaxed mb-6">
                             Quality · Durability · Reliability
                             <br />
@@ -69,18 +84,13 @@ export default function StoreFooter() {
                             Shop
                         </h4>
                         <ul className="space-y-2.5">
-                            {[
-                                { href: "/category/kitchen-sinks", label: "Kitchen Sinks" },
-                                { href: "/category/health-faucet-sets", label: "Health Faucets" },
-                                { href: "/category/bathroom-accessories", label: "Bathroom Accessories" },
-                                { href: "/category/plumbing-fittings", label: "Plumbing & Fittings" },
-                            ].map((link) => (
-                                <li key={link.href}>
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
                                     <Link
-                                        href={link.href}
+                                        href={`/category/${cat.slug}`}
                                         className="text-[13px] text-white/50 hover:text-white transition-colors duration-200 hover:pl-1"
                                     >
-                                        {link.label}
+                                        {cat.name}
                                     </Link>
                                 </li>
                             ))}
@@ -95,7 +105,9 @@ export default function StoreFooter() {
                         <ul className="space-y-2.5">
                             {[
                                 { href: "/about", label: "About Us" },
-                                // { href: "/search", label: "Search Products" },
+                                { href: "/contact", label: "Contact Us" },
+                                { href: "/privacy", label: "Privacy Policy" },
+                                { href: "/refund", label: "Refund Policy" },
                                 { href: "/cart", label: "Your Cart" },
                             ].map((link) => (
                                 <li key={link.href}>
@@ -140,6 +152,7 @@ export default function StoreFooter() {
                     <p className="text-[11px] text-white/30">
                         © {new Date().getFullYear()} Veronica India. All rights reserved.
                     </p>
+                    <VisitorCount />
                     <p className="text-[11px] text-white/20">
                         Crafted with care in New Delhi
                     </p>
