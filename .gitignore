@@ -1,0 +1,8 @@
+# OS junk
+.DS_Store
+
+# Node (per-project gitignores also cover these)
+node_modules/
+
+# Logs
+*.log

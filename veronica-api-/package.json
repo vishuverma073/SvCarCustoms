@@ -1,0 +1,20 @@
+{
+  "name": "veronica-api-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @veronica/api build",
+    "dev": "pnpm --filter @veronica/api dev",
+    "test": "pnpm --filter @veronica/api test",
+    "typecheck": "pnpm --filter @veronica/api typecheck",
+    "db:generate": "pnpm --filter @veronica/api db:generate",
+    "db:push": "pnpm --filter @veronica/api db:push",
+    "db:migrate": "pnpm --filter @veronica/api db:migrate",
+    "db:studio": "pnpm --filter @veronica/api db:studio",
+    "db:seed": "pnpm --filter @veronica/api db:seed"
+  }
+}

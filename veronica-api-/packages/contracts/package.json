@@ -1,0 +1,37 @@
+{
+  "name": "@veronica/contracts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Shared zod schemas and TypeScript types for the Veronica API and web client.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"no tests in @veronica/contracts\" && exit 0",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.23"
+  },
+  "devDependencies": {
+    "typescript": "^5.4"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ketan18710/veronica-api.git",
+    "directory": "packages/contracts"
+  }
+}

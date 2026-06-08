@@ -1,0 +1,71 @@
+{
+  "name": "veronica-catelog",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack --hostname 0.0.0.0",
+    "dev:lan": "node scripts/print-lan-url.mjs && next dev --turbopack --hostname 0.0.0.0",
+    "dummy-api": "tsx dummy-api/server.ts",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:seed": "npx tsx src/db/seed.ts",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@hookform/resolvers": "^5.4.0",
+    "@sentry/nextjs": "^10.55.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "better-sqlite3": "^12.6.2",
+    "drizzle-orm": "^0.45.1",
+    "lucide-react": "^0.576.0",
+    "nanoid": "^5.1.11",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.76.1",
+    "sonner": "^2.0.7",
+    "swr": "^2.4.1",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.4.0",
+    "@mswjs/http-middleware": "^0.10.3",
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "drizzle-kit": "^0.31.9",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "express": "^5.2.1",
+    "msw": "^2.14.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.22.3",
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.0"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
