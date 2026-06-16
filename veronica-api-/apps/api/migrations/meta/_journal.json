@@ -57,6 +57,13 @@
       "when": 1780472754787,
       "tag": "0008_normalize_empty_category_images",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780472754788,
+      "tag": "0009_email_auth",
+      "breakpoints": true
     }
   ]
 }

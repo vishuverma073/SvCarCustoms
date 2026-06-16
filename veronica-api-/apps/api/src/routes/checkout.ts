@@ -117,6 +117,10 @@ export function makeCheckoutRouter(db: DbClient) {
       shippingAddress = body.address!;
     }
 
+    // Delivery phone comes from the shipping address (login is email-based, so
+    // the user row may have no phone); fall back to any phone on the user.
+    const customerPhone = shippingAddress.phone ?? user.phone ?? "";
+
     // Order number is hashed from the row UUID — atomic, no sequence, no volume leak.
     const orderId = crypto.randomUUID();
     const orderNumber = orderNumberFromId(orderId);
@@ -128,7 +132,7 @@ export function makeCheckoutRouter(db: DbClient) {
         orderNumber,
         userId,
         customerName: user.name ?? "Customer",
-        customerPhone: user.phone,
+        customerPhone,
         customerEmail: user.email,
         shippingAddress,
         subtotal: String(pricing.subtotal),
@@ -171,7 +175,7 @@ export function makeCheckoutRouter(db: DbClient) {
       orderId,
       orderNumber,
       userId,
-      customer: { name: user.name ?? "Customer", phone: user.phone, email: user.email },
+      customer: { name: user.name ?? "Customer", phone: customerPhone, email: user.email },
       shippingAddress,
       totals: {
         subtotal: pricing.subtotal,

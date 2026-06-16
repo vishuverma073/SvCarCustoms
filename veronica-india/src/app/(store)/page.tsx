@@ -72,53 +72,63 @@ function HeroSection({ hero, shopHref }: { hero: HomeBanner; shopHref: string })
     })();
 
     return (
-        <section className="relative min-h-[78vh] md:min-h-[85vh] overflow-hidden bg-brand-black flex flex-col justify-end">
+        <section className="relative min-h-[92svh] md:min-h-[85vh] overflow-hidden bg-brand-black flex flex-col justify-end">
             <SafeBannerImage
                 src={h.image}
                 fallbackSrc={DEFAULT_HERO.image}
                 alt="Veronica Premium Sanitary Goods"
-                className="object-cover object-[65%_center] md:object-[right_center] scale-[1.02] md:scale-105"
+                className="object-cover object-[center_30%] sm:object-[55%_center] md:object-[right_center] scale-100 sm:scale-[1.02] md:scale-105"
                 priority
                 quality={90}
             />
-            {/* Image-integrated gradients — no text panel or card */}
+            {/* Mobile: bottom-weighted scrim so stacked copy stays legible */}
             <div
-                className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,0.35)_0%,transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.60)_0%,rgba(0,0,0,0.45)_25%,rgba(0,0,0,0.20)_50%,rgba(0,0,0,0.05)_70%,transparent_100%)]"
+                className="absolute inset-0 md:hidden bg-[linear-gradient(to_top,rgba(10,10,10,0.94)_0%,rgba(10,10,10,0.82)_28%,rgba(10,10,10,0.45)_52%,rgba(10,10,10,0.12)_72%,transparent_100%)]"
                 aria-hidden
             />
-            <div className="relative z-10 w-full max-w-380 mx-auto px-5 sm:px-6 md:px-16 lg:px-20 pb-10 md:pb-16 lg:pb-20 pt-24 md:pt-28">
+            {/* Desktop: image-integrated side gradient — no text panel or card */}
+            <div
+                className="absolute inset-0 hidden md:block bg-[linear-gradient(0deg,rgba(0,0,0,0.35)_0%,transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.60)_0%,rgba(0,0,0,0.45)_25%,rgba(0,0,0,0.20)_50%,rgba(0,0,0,0.05)_70%,transparent_100%)]"
+                aria-hidden
+            />
+            <div className="relative z-10 w-full max-w-380 mx-auto px-4 sm:px-6 md:px-16 lg:px-20 pb-[max(1.75rem,env(safe-area-inset-bottom))] md:pb-16 lg:pb-20 pt-0 md:pt-28">
                 <div className="animate-slide-up max-w-3xl">
-                    {/* Brand first */}
-                    <h1 className="mb-4 md:mb-5">
-                        <span className="block text-[2.75rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-extrabold text-white leading-[0.92] tracking-[0.14em] md:tracking-[0.18em]">
+                    {/* Brand first — "Sanitary Goods" flanked by an orange rule on
+                        each side, the pair spanning the full VERONICA wordmark width */}
+                    <h1 className="mb-3 sm:mb-4 md:mb-5 inline-block">
+                        <span className="block text-[2.125rem] min-[400px]:text-[2.375rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-extrabold text-white leading-[0.94] tracking-[0.08em] sm:tracking-[0.14em] md:tracking-[0.18em]">
                             VERONICA
                         </span>
-                        <span className="block mt-2 md:mt-3 text-[10px] sm:text-xs md:text-sm font-semibold uppercase text-white/65 tracking-[0.32em] md:tracking-[0.42em]">
-                            Sanitary Goods
+                        <span className="mt-2.5 sm:mt-3 md:mt-3.5 flex items-center gap-3">
+                            <span className="h-px sm:h-0.5 flex-1 bg-brand-orange" aria-hidden />
+                            <span className="shrink-0 text-[9px] sm:text-xs md:text-sm font-semibold uppercase text-white/75 tracking-[0.22em] sm:tracking-[0.32em] md:tracking-[0.42em]">
+                                Sanitary Goods
+                            </span>
+                            <span className="h-px sm:h-0.5 flex-1 bg-brand-orange" aria-hidden />
                         </span>
                     </h1>
 
                     {/* Technology / supporting statement second */}
-                    <p className="text-lg sm:text-xl md:text-2xl font-semibold text-white/90 leading-snug mb-4 md:mb-5 max-w-xl">
+                    <p className="text-base sm:text-xl md:text-2xl font-semibold text-white/90 leading-snug mb-3 sm:mb-4 md:mb-5 max-w-xl">
                         {secondaryHeadline}
                     </p>
 
                     {/* Product category copy third */}
-                    <div className="space-y-1 mb-6 md:mb-8 max-w-xl">
-                        <p className="text-sm sm:text-base md:text-lg text-white/75 leading-relaxed">
+                    <div className="space-y-1 mb-5 sm:mb-6 md:mb-8 max-w-xl">
+                        <p className="text-[13px] sm:text-base md:text-lg text-white/75 leading-relaxed">
                             {supportLineOne}
                         </p>
-                        <p className="text-sm sm:text-base text-white/55 leading-relaxed">
+                        <p className="hidden sm:block text-sm sm:text-base text-white/55 leading-relaxed">
                             {supportLineTwo}
                         </p>
                     </div>
 
                     {/* Trust row */}
-                    <ul className="flex flex-wrap gap-x-4 gap-y-2 sm:gap-x-6 mb-7 md:mb-9">
+                    <ul className="grid grid-cols-2 gap-x-3 gap-y-2.5 sm:flex sm:flex-wrap sm:gap-x-6 mb-6 sm:mb-7 md:mb-9">
                         {HERO_TRUST_ITEMS.map((item) => (
                             <li
                                 key={item}
-                                className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-white/80"
+                                className="flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-white/80"
                             >
                                 <Check
                                     size={14}
@@ -132,17 +142,17 @@ function HeroSection({ hero, shopHref }: { hero: HomeBanner; shopHref: string })
                     </ul>
 
                     {/* CTAs */}
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3">
                         <Link
                             href={primaryHref}
-                            className="btn btn-primary text-[14px] sm:text-[15px] px-7 sm:px-8 py-3 sm:py-3.5"
+                            className="btn btn-primary w-full sm:w-auto justify-center text-[14px] sm:text-[15px] px-6 sm:px-8 py-3 sm:py-3.5"
                         >
                             {primaryLabel}
                             <ArrowRight size={18} />
                         </Link>
                         <Link
                             href="#shop-categories"
-                            className="btn border border-white/20 text-white hover:bg-white/10 text-[14px] sm:text-[15px] px-7 sm:px-8 py-3 sm:py-3.5"
+                            className="btn border border-white/20 text-white hover:bg-white/10 w-full sm:w-auto justify-center text-[14px] sm:text-[15px] px-6 sm:px-8 py-3 sm:py-3.5"
                         >
                             Explore Categories
                         </Link>

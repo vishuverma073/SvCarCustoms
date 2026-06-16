@@ -129,13 +129,13 @@ export function makeMeRouter(db: DbClient) {
     );
   });
 
-  // PATCH /me — update the customer's profile (name / email).
+  // PATCH /me — update the customer's profile (name). Email is the login
+  // identity and is not editable here.
   router.patch("/", async (c) => {
     const userId = c.get("userId")!;
     const parsed = z
       .object({
         name: z.string().max(120).optional(),
-        email: z.string().email().or(z.literal("")).optional(),
       })
       .safeParse(await c.req.json().catch(() => null));
     if (!parsed.success) {
@@ -146,7 +146,6 @@ export function makeMeRouter(db: DbClient) {
       .update(users)
       .set({
         ...(patch.name !== undefined ? { name: patch.name } : {}),
-        ...(patch.email !== undefined ? { email: patch.email || null } : {}),
       })
       .where(eq(users.id, userId))
       .returning();

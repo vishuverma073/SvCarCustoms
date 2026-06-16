@@ -180,10 +180,12 @@ export const skus = pgTable(
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  phone: text("phone").notNull().unique(),
+  // Email is the login identity (email-OTP auth). Unique; stored lowercase.
+  email: text("email").unique(),
+  // Collected at checkout for delivery, not at login — so it's nullable.
+  phone: text("phone").unique(),
   name: text("name"),
-  email: text("email"),
-  // bcrypt hash for admin email+password login; null for customers (OTP auth, Phase 3).
+  // bcrypt hash for admin email+password login; null for customers (OTP auth).
   passwordHash: text("password_hash"),
   isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -193,13 +195,13 @@ export const otpCodes = pgTable(
   "otp_codes",
   {
     id: serial("id").primaryKey(),
-    phone: text("phone").notNull(),
+    email: text("email").notNull(),
     codeHash: text("code_hash").notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     attempts: integer("attempts").default(0).notNull(),
     consumedAt: timestamp("consumed_at", { withTimezone: true }),
   },
-  (t) => [index("otp_codes_phone_expires_idx").on(t.phone, t.expiresAt)],
+  (t) => [index("otp_codes_email_expires_idx").on(t.email, t.expiresAt)],
 );
 
 export const addresses = pgTable(

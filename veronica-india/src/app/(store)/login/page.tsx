@@ -12,14 +12,15 @@ function LoginFlow() {
   const params = useSearchParams();
   const returnTo = params.get("returnTo") || "/";
 
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [digits, setDigits] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendIn, setResendIn] = useState(0);
 
-  const phone = `+91${digits}`;
+  const normalizedEmail = email.trim().toLowerCase();
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
 
   // Resend countdown
   useEffect(() => {
@@ -32,19 +33,19 @@ function LoginFlow() {
     setLoading(true);
     setError("");
     try {
-      await backend.sendOtp(phone);
+      await backend.sendOtp(normalizedEmail);
       setStep("otp");
       setResendIn(45); // resend unlocks after a 45s countdown
     } catch (err) {
       if (err instanceof BackendAuthError && err.status === 429) {
         setError("Too many attempts. Try again in a minute.");
       } else {
-        setError("Couldn’t send the code. Check the number and try again.");
+        setError("Couldn’t send the code. Check the email and try again.");
       }
     } finally {
       setLoading(false);
     }
-  }, [phone, router]);
+  }, [normalizedEmail]);
 
   async function verify(submittedCode?: string) {
     const otp = submittedCode ?? code;
@@ -52,7 +53,7 @@ function LoginFlow() {
     setLoading(true);
     setError("");
     try {
-      await backend.verifyOtp(phone, otp);
+      await backend.verifyOtp(normalizedEmail, otp);
       await useCartStore.getState().syncWithServer(); // merge guest cart into server
       router.replace(returnTo);
     } catch (err) {
@@ -74,41 +75,37 @@ function LoginFlow() {
           Sign in to <span className="text-brand-orange">Veronica</span>
         </h1>
         <p className="text-sm text-text-muted mt-1">
-          {step === "phone" ? "We’ll text you a one-time code" : `Code sent to ${phone}`}
+          {step === "email" ? "We’ll email you a one-time code" : `Code sent to ${normalizedEmail}`}
         </p>
       </div>
 
-      {step === "phone" ? (
+      {step === "email" ? (
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (digits.length === 10) sendOtp();
+            if (emailValid) sendOtp();
           }}
           className="space-y-4"
         >
           <div>
-            <label className="input-label">Phone number</label>
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-3 rounded-xl bg-surface-dim text-text-secondary font-semibold text-sm">
-                +91
-              </span>
-              <input
-                type="tel"
-                inputMode="numeric"
-                autoFocus
-                value={digits}
-                onChange={(e) => setDigits(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                placeholder="10-digit number"
-                className="input flex-1"
-              />
-            </div>
+            <label className="input-label">Email address</label>
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="input w-full"
+            />
           </div>
 
           {error && <p className="text-sm text-danger font-medium">{error}</p>}
 
           <button
             type="submit"
-            disabled={digits.length !== 10 || loading}
+            disabled={!emailValid || loading}
             className="btn btn-primary w-full py-3 disabled:opacity-50"
           >
             {loading ? <Loader2 className="animate-spin" size={18} /> : "Continue"}
@@ -142,13 +139,13 @@ function LoginFlow() {
             <button
               type="button"
               onClick={() => {
-                setStep("phone");
+                setStep("email");
                 setCode("");
                 setError("");
               }}
               className="flex items-center gap-1 text-text-muted hover:text-brand-black"
             >
-              <ArrowLeft size={14} /> Change number
+              <ArrowLeft size={14} /> Change email
             </button>
             <button
               type="button"
@@ -161,7 +158,7 @@ function LoginFlow() {
           </div>
 
           <p className="text-center text-[11px] text-text-muted">
-            We’ll try to autofill from SMS on supported phones.
+            Didn’t get it? Check your spam folder.
           </p>
         </form>
       )}

@@ -202,12 +202,12 @@ function buildProductQuery(params: ListProductsParams): string {
 //
 // Real auth: short-lived access token in memory + httpOnly refresh cookie
 // (sent via credentials:"include"). Mocks can't set a cross-origin httpOnly
-// cookie, so the client keeps a localStorage marker (the phone) as a stand-in
+// cookie, so the client keeps a localStorage marker (the email) as a stand-in
 // and replays it to /auth/refresh. Dropping the marker = real-API behaviour.
 const MOCK_REFRESH_MARKER = "veronica-mock-refresh";
 
-function writeMarker(phone: string) {
-  if (typeof window !== "undefined") localStorage.setItem(MOCK_REFRESH_MARKER, phone);
+function writeMarker(email: string) {
+  if (typeof window !== "undefined") localStorage.setItem(MOCK_REFRESH_MARKER, email);
 }
 function readMarker(): string | null {
   return typeof window !== "undefined" ? localStorage.getItem(MOCK_REFRESH_MARKER) : null;
@@ -254,8 +254,8 @@ function doRefresh(): Promise<boolean> {
   if (refreshInFlight) return refreshInFlight;
   refreshInFlight = (async () => {
     try {
-      // Mock replays the marker as `phone`; real backend ignores it and uses the cookie.
-      const body = USE_MOCKS ? { phone: readMarker() } : {};
+      // Mock replays the marker as `email`; real backend ignores it and uses the cookie.
+      const body = USE_MOCKS ? { email: readMarker() } : {};
       if (USE_MOCKS && !readMarker()) {
         useAuthStore.getState().setStatus("unauthenticated");
         return false;
@@ -666,16 +666,16 @@ export const backend = {
   },
 
   // ── Auth (Phase 3) ──
-  /** Request an OTP for a phone (E.164, e.g. +919350529717). */
-  sendOtp(phone: string): Promise<{ sent: boolean }> {
-    return postJson("/auth/otp/send", { phone });
+  /** Request a login OTP for an email address. */
+  sendOtp(email: string): Promise<{ sent: boolean }> {
+    return postJson("/auth/otp/send", { email });
   },
 
   /** Verify the OTP; on success sets the session + persists the refresh marker. */
-  async verifyOtp(phone: string, code: string): Promise<AuthSession> {
-    const session = await postJson("/auth/otp/verify", { phone, code }, AuthSessionSchema);
+  async verifyOtp(email: string, code: string): Promise<AuthSession> {
+    const session = await postJson("/auth/otp/verify", { email, code }, AuthSessionSchema);
     useAuthStore.getState().setAuth(session.accessToken, session.user);
-    writeMarker(phone);
+    writeMarker(email);
     return session;
   },
 
@@ -697,7 +697,7 @@ export const backend = {
   getMe(): Promise<User> {
     return authedFetch("/me", { schema: UserSchema });
   },
-  updateMe(patch: { name?: string; email?: string }): Promise<User> {
+  updateMe(patch: { name?: string }): Promise<User> {
     return authedFetch("/me", { method: "PATCH", body: patch, schema: UserSchema });
   },
 

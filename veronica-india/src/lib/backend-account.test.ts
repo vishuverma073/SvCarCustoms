@@ -12,21 +12,21 @@ beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterAll(() => server.close());
 beforeEach(() => useAuthStore.getState().clearAuth());
 
-const PHONE = "+919350529717";
+const EMAIL = "asha@example.com";
 
 async function login() {
-  await backend.sendOtp(PHONE);
-  await backend.verifyOtp(PHONE, "123456");
+  await backend.sendOtp(EMAIL);
+  await backend.verifyOtp(EMAIL, "123456");
 }
 
 describe("auth", () => {
   it("sends an OTP", async () => {
-    const res = await backend.sendOtp(PHONE);
+    const res = await backend.sendOtp(EMAIL);
     expect(res.sent).toBe(true);
   });
 
   it("rejects a wrong OTP with 401", async () => {
-    await expect(backend.verifyOtp(PHONE, "000000")).rejects.toMatchObject({
+    await expect(backend.verifyOtp(EMAIL, "000000")).rejects.toMatchObject({
       name: "BackendAuthError",
       status: 401,
     });
@@ -34,9 +34,9 @@ describe("auth", () => {
   });
 
   it("verifies the OTP and sets the in-memory session", async () => {
-    const session = await backend.verifyOtp(PHONE, "123456");
+    const session = await backend.verifyOtp(EMAIL, "123456");
     expect(session.accessToken).toBe("mock-user-token");
-    expect(session.user.phone).toBe(PHONE);
+    expect(session.user.email).toBe(EMAIL);
     expect(useAuthStore.getState().status).toBe("authenticated");
     expect(useAuthStore.getState().accessToken).toBe("mock-user-token");
   });
@@ -44,10 +44,9 @@ describe("auth", () => {
   it("fetches and updates the profile", async () => {
     await login();
     const me = await backend.getMe();
-    expect(me.phone).toBe(PHONE);
-    const updated = await backend.updateMe({ name: "Ketan", email: "k@example.com" });
+    expect(me.email).toBe(EMAIL);
+    const updated = await backend.updateMe({ name: "Ketan" });
     expect(updated.name).toBe("Ketan");
-    expect(updated.email).toBe("k@example.com");
   });
 
   it("rejects /me without a token", async () => {

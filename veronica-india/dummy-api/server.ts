@@ -26,7 +26,7 @@ import {
   MOCK_OTP,
   MOCK_USER_TOKEN,
   getOrCreateUser,
-  setCurrentPhone,
+  setCurrentEmail,
   serverCart,
 } from "@/mocks/data/account";
 
@@ -38,7 +38,7 @@ const DEV_LAN_ORIGIN =
   /^https?:\/\/(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?$/;
 const REFRESH_COOKIE = "veronica_refresh";
 
-/** refreshToken -> phone. The httpOnly cookie carries the opaque refresh token. */
+/** refreshToken -> email. The httpOnly cookie carries the opaque refresh token. */
 const sessions = new Map<string, string>();
 function newRefreshToken() {
   return `rt_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
@@ -70,14 +70,14 @@ app.get("/health", (_req, res) => res.json({ ok: true, backend: "dummy" }));
 // middleware still receives raw bodies for the other POST/PATCH routes.
 
 app.post("/auth/otp/verify", express.json(), (req, res) => {
-  const { phone, code } = (req.body ?? {}) as { phone?: string; code?: string };
-  if (!phone || code !== MOCK_OTP) {
+  const { email, code } = (req.body ?? {}) as { email?: string; code?: string };
+  if (!email || code !== MOCK_OTP) {
     return res.status(401).json({ error: "invalid_otp" });
   }
-  const user = getOrCreateUser(phone);
-  setCurrentPhone(user.phone);
+  const user = getOrCreateUser(email);
+  setCurrentEmail(user.email);
   const token = newRefreshToken();
-  sessions.set(token, user.phone);
+  sessions.set(token, user.email);
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -89,17 +89,17 @@ app.post("/auth/otp/verify", express.json(), (req, res) => {
 
 app.post("/auth/refresh", (req, res) => {
   const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
-  const phone = token ? sessions.get(token) : undefined;
-  if (!phone) return res.status(401).json({ error: "unauthorized" });
-  const user = getOrCreateUser(phone);
-  setCurrentPhone(user.phone);
+  const email = token ? sessions.get(token) : undefined;
+  if (!email) return res.status(401).json({ error: "unauthorized" });
+  const user = getOrCreateUser(email);
+  setCurrentEmail(user.email);
   res.json({ accessToken: MOCK_USER_TOKEN, user });
 });
 
 app.post("/auth/logout", (req, res) => {
   const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
   if (token) sessions.delete(token);
-  setCurrentPhone(null);
+  setCurrentEmail(null);
   serverCart.length = 0; // mirror the mock's logout cart-clear
   res.clearCookie(REFRESH_COOKIE, { path: "/" });
   res.json({ ok: true });

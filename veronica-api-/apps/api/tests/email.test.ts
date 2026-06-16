@@ -1,10 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 process.env.NODE_ENV = "test"; // forces email stub mode
 
 import {
   renderOrderConfirmationHtml,
+  renderOtpEmailHtml,
   sendOrderConfirmation,
+  sendOtpEmail,
   type OrderConfirmationData,
 } from "../src/lib/email.js";
 
@@ -69,5 +71,36 @@ describe("sendOrderConfirmation", () => {
     await expect(
       sendOrderConfirmation({ ...ORDER, customerEmail: null }),
     ).resolves.toBeUndefined();
+  });
+});
+
+describe("renderOtpEmailHtml", () => {
+  it("includes the code", () => {
+    expect(renderOtpEmailHtml("123456")).toContain("123456");
+  });
+});
+
+describe("sendOtpEmail (stub mode)", () => {
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    warnSpy.mockRestore();
+    logSpy.mockRestore();
+  });
+
+  it("prints a visible dev OTP line and structured otp_stub log", async () => {
+    await sendOtpEmail("asha@example.com", "123456");
+
+    expect(warnSpy.mock.calls.some((c) => String(c[0]).includes("🔐 DEV OTP"))).toBe(true);
+    expect(warnSpy.mock.calls.some((c) => String(c[0]).includes("123456"))).toBe(true);
+
+    const line = logSpy.mock.calls.map((c) => String(c[0])).find((s) => s.includes("otp_stub"));
+    expect(line).toBeTruthy();
+    expect(JSON.parse(line!).code).toBe("123456");
   });
 });

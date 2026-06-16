@@ -19,11 +19,11 @@ beforeEach(() => {
   __resetCheckoutState();
 });
 
-const PHONE = "+919350529717";
+const EMAIL = "asha@example.com";
 
 async function login() {
-  await backend.sendOtp(PHONE);
-  await backend.verifyOtp(PHONE, "123456");
+  await backend.sendOtp(EMAIL);
+  await backend.verifyOtp(EMAIL, "123456");
 }
 
 const SAMPLE_ADDRESS: AddressInput = {

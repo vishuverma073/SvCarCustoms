@@ -22,11 +22,11 @@ function send(db: DbClient, body: unknown) {
 }
 
 // ─── /otp/verify ───
-const USER = { id: "11111111-1111-1111-1111-111111111111", phone: "+919350529717", name: null, email: null, isAdmin: false };
+const USER = { id: "11111111-1111-1111-1111-111111111111", email: "asha@example.com", phone: null, name: null, isAdmin: false };
 function otpRow(over: Partial<{ attempts: number; codeFor: string }> = {}) {
   return {
     id: 1,
-    phone: "+919350529717",
+    email: "asha@example.com",
     codeHash: bcrypt.hashSync(over.codeFor ?? "123456", 10),
     attempts: over.attempts ?? 0,
     expiresAt: new Date(Date.now() + 60_000),
@@ -49,27 +49,27 @@ function verify(db: DbClient, body: unknown) {
 }
 
 describe("POST /auth/otp/send", () => {
-  it("accepts a valid phone, stores a hashed OTP, returns 200", async () => {
+  it("accepts a valid email, stores a hashed OTP, returns 200", async () => {
     const values = vi.fn().mockResolvedValue(undefined);
-    const res = await send(mockSendDb(values), { phone: "+919350529717" });
+    const res = await send(mockSendDb(values), { email: "asha@example.com" });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true, expiresInSeconds: 300 });
     const row = values.mock.calls[0]![0] as { codeHash: string };
     expect(row.codeHash).toMatch(/^\$2[aby]\$/);
   });
 
-  it("rejects a malformed phone with 400", async () => {
+  it("rejects a malformed email with 400", async () => {
     const values = vi.fn();
-    const res = await send(mockSendDb(values), { phone: "12345" });
+    const res = await send(mockSendDb(values), { email: "not-an-email" });
     expect(res.status).toBe(400);
     expect(values).not.toHaveBeenCalled();
   });
 
-  it("rate limits: 2nd send to the same phone within 60s → 429 + Retry-After", async () => {
+  it("rate limits: 2nd send to the same email within 60s → 429 + Retry-After", async () => {
     const db = mockSendDb(vi.fn().mockResolvedValue(undefined));
-    const phone = "+919876543210"; // distinct phone to avoid cross-test limiter state
-    expect((await send(db, { phone })).status).toBe(200);
-    const second = await send(db, { phone });
+    const email = "ratelimit@example.com"; // distinct email to avoid cross-test limiter state
+    expect((await send(db, { email })).status).toBe(200);
+    const second = await send(db, { email });
     expect(second.status).toBe(429);
     expect(second.headers.get("retry-after")).toBeTruthy();
   });
@@ -78,7 +78,7 @@ describe("POST /auth/otp/send", () => {
 describe("POST /auth/otp/verify", () => {
   it("verifies a correct code → 200 with accessToken + user + refresh cookie", async () => {
     const res = await verify(mockVerifyDb({ otpRow: otpRow(), user: USER }), {
-      phone: "+919350529717",
+      email: "asha@example.com",
       code: "123456",
     });
     expect(res.status).toBe(200);
@@ -90,20 +90,20 @@ describe("POST /auth/otp/verify", () => {
 
   it("wrong code → 401", async () => {
     const res = await verify(mockVerifyDb({ otpRow: otpRow({ codeFor: "123456" }), user: USER }), {
-      phone: "+919350529717",
+      email: "asha@example.com",
       code: "000000",
     });
     expect(res.status).toBe(401);
   });
 
   it("no valid OTP → 401", async () => {
-    const res = await verify(mockVerifyDb({ user: USER }), { phone: "+919350529717", code: "123456" });
+    const res = await verify(mockVerifyDb({ user: USER }), { email: "asha@example.com", code: "123456" });
     expect(res.status).toBe(401);
   });
 
   it("too many attempts → 429", async () => {
     const res = await verify(mockVerifyDb({ otpRow: otpRow({ attempts: 5 }), user: USER }), {
-      phone: "+919350529717",
+      email: "asha@example.com",
       code: "123456",
     });
     expect(res.status).toBe(429);

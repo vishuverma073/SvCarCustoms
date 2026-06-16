@@ -23,11 +23,13 @@ export const home: HomeWire = {
       enabled: true,
       order: 0,
       config: {
-        imageUrl: "/uploads/categories/hero-1.webp",
-        title: "Premium Sanitaryware, Trusted Since 2004",
-        subtitle: "Kitchen sinks, health faucets & bath solutions built to last.",
-        ctaText: "Shop Kitchen Sinks",
-        ctaHref: "/category/kitchen-sinks",
+        // hero-1.webp shipped as a broken ~196B placeholder; use a real image and
+        // mirror the production default hero copy so local matches the live site.
+        imageUrl: "/uploads/categories/kitchen-sinks.webp",
+        title: "Crafted with Modern Technology",
+        subtitle: "Premium Quartz Sinks, Faucets & Sanitary Solutions. Designed for Modern Indian Homes.",
+        ctaText: "Shop Sanitary Goods",
+        ctaHref: "/search",
       },
     },
     { key: "categories", enabled: true, order: 1, config: { categoryIds: [1, 2, 3, 4] } },
@@ -39,7 +41,8 @@ export const home: HomeWire = {
       enabled: true,
       order: 5,
       config: {
-        imageUrl: "/uploads/categories/hero-2.webp",
+        // hero-2.webp shipped as a broken ~234B placeholder; use a real image.
+        imageUrl: "/uploads/categories/plumbing-fittings.webp",
         headline: "Monsoon Sale — Up to 40% Off",
         ctaText: "View Offers",
         ctaHref: "/category/health-faucet-sets",

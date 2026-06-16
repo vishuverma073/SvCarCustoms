@@ -31,9 +31,9 @@ const GUEST_ITEM = {
   qty: 2,
 };
 
-async function login(phone = "+919350529717") {
-  await backend.sendOtp(phone);
-  await backend.verifyOtp(phone, "123456");
+async function login(email = "asha@example.com") {
+  await backend.sendOtp(email);
+  await backend.verifyOtp(email, "123456");
 }
 
 describe("cartStore.syncWithServer", () => {
@@ -95,7 +95,7 @@ describe("cartStore.syncWithServer", () => {
 describe("logout cart isolation", () => {
   it("clears the server cart on logout so the next user doesn't inherit it", async () => {
     useCartStore.setState({ items: [{ ...GUEST_ITEM }] });
-    await login("+919350529717");
+    await login("asha@example.com");
     await useCartStore.getState().syncWithServer();
     expect(serverCart).toHaveLength(1);
 
@@ -104,7 +104,7 @@ describe("logout cart isolation", () => {
 
     // A different user signing in starts from a clean server cart.
     useCartStore.setState({ items: [] });
-    await login("+919999999999");
+    await login("bina@example.com");
     const cart = await backend.getCart();
     expect(cart.items).toHaveLength(0);
   });

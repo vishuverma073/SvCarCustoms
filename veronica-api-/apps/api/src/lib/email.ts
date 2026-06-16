@@ -42,6 +42,58 @@ function inr(n: number): string {
   return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/** Render the login OTP email body. Exported for tests. */
+export function renderOtpEmailHtml(code: string): string {
+  return `<!doctype html>
+<html><body style="font-family:Arial,Helvetica,sans-serif;color:#222;max-width:480px;margin:0 auto;padding:24px">
+  <h1 style="font-size:20px">Your Veronica login code</h1>
+  <p>Use the code below to sign in. It expires in 5 minutes.</p>
+  <p style="font-size:34px;font-weight:bold;letter-spacing:8px;margin:24px 0;color:#E8822A">${code}</p>
+  <p style="color:#888;font-size:12px">If you didn't request this, you can safely ignore this email.</p>
+  <p style="color:#888;font-size:12px;margin-top:24px">Veronica India</p>
+</body></html>`;
+}
+
+/** Echo the OTP to the dev server terminal — never in production. */
+function logDevOtpEmail(email: string, code: string): void {
+  if (process.env.NODE_ENV === "production") return;
+  console.warn(`\n🔐 DEV OTP for ${email}: ${code}  (expires in 5 min — copy from this terminal)\n`);
+  console.log(
+    JSON.stringify({ ts: new Date().toISOString(), level: "info", msg: "otp_stub", email, code }),
+  );
+}
+
+/**
+ * Email OTP dispatch via Resend.
+ *
+ * Stub mode (logs the code instead of sending) is used when RESEND_API_KEY is
+ * unset or under NODE_ENV=test, so the whole login flow runs locally without an
+ * email provider. In all non-production environments the code is also printed to
+ * the server terminal so local login works without inbox access.
+ */
+export async function sendOtpEmail(email: string, code: string): Promise<void> {
+  if (process.env.NODE_ENV !== "production") logDevOtpEmail(email, code);
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || process.env.NODE_ENV === "test") return;
+
+  const from = process.env.RESEND_FROM_EMAIL || "login@veronicaindia.com";
+  const res = await fetch(RESEND_API, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: email,
+      subject: `${code} is your Veronica login code`,
+      html: renderOtpEmailHtml(code),
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Resend OTP send failed: ${res.status} ${body}`);
+  }
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

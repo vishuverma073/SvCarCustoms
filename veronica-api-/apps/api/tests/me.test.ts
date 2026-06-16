@@ -8,9 +8,9 @@ import type { DbClient } from "../src/db/client.js";
 
 const USER = {
   id: "11111111-1111-1111-1111-111111111111",
+  email: "asha@example.com",
   phone: "+919350529717",
   name: "Asha",
-  email: null,
   isAdmin: false,
 };
 

@@ -18,7 +18,7 @@ export const categories: Category[] = [
 
   // ── Health Faucet Sets → children ── (shown in the Health Faucet Sets dropdown)
   { id: 20, parentId: 2, name: "ABS Faucets", slug: "abs-faucets", description: "Lightweight ABS body health faucets", image: "/uploads/categories/health-faucets.webp", sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 21, parentId: 2, name: "Brass Faucets", slug: "brass-faucets", description: "Heavy-duty solid brass health faucets", image: "/uploads/categories/cat-2.webp", sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 21, parentId: 2, name: "Brass Faucets", slug: "brass-faucets", description: "Heavy-duty solid brass health faucets", image: "/uploads/categories/health-faucets.webp", sortOrder: 1, showInHeader: true, status: "active" },
 
   // ── Third-level examples (nested tree) ──
   { id: 100, parentId: 10, name: "18×16", slug: "18x16", description: "Compact single bowl size", image: "/uploads/categories/kitchen-sinks.webp", sortOrder: 0, showInHeader: true, status: "active" },

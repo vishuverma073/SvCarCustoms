@@ -9,18 +9,12 @@ import { useAuthStore } from "@/store/authStore";
 import { useCartStore } from "@/store/cartStore";
 import { backend } from "@/lib/backend";
 
-function formatPhone(phone: string): string {
-  const m = phone.replace(/^\+91/, "");
-  return m.length === 10 ? `+91 ${m.slice(0, 5)} ${m.slice(5)}` : phone;
-}
-
 export default function AccountPage() {
   const router = useRouter();
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
 
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [saved, setSaved] = useState(false);
 
   // Redirect guests to login once auth has resolved.
@@ -34,7 +28,6 @@ export default function AccountPage() {
   useEffect(() => {
     if (user) {
       setName(user.name ?? "");
-      setEmail(user.email ?? "");
     }
   }, [user]);
 
@@ -51,11 +44,11 @@ export default function AccountPage() {
     const prev = user;
     // Optimistic: reflect instantly in the header + form, persist in the
     // background so the button never sits on a spinner waiting for the network.
-    useAuthStore.getState().setUser({ ...user, name, email });
+    useAuthStore.getState().setUser({ ...user, name });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     try {
-      const updated = await backend.updateMe({ name, email });
+      const updated = await backend.updateMe({ name });
       useAuthStore.getState().setUser(updated);
     } catch {
       useAuthStore.getState().setUser(prev); // revert on failure
@@ -76,24 +69,13 @@ export default function AccountPage() {
 
       <div className="bg-white rounded-2xl border border-border-light shadow-card p-5 space-y-4">
         <div>
-          <label className="input-label">Phone</label>
-          <p className="text-sm font-semibold text-text-primary">{formatPhone(user.phone)}</p>
+          <label className="input-label">Email</label>
+          <p className="text-sm font-semibold text-text-primary">{user.email}</p>
         </div>
 
         <div>
           <label className="input-label">Name</label>
           <input value={name} onChange={(e) => setName(e.target.value)} className="input" placeholder="Your name" />
-        </div>
-
-        <div>
-          <label className="input-label">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input"
-            placeholder="you@example.com"
-          />
         </div>
 
         <button onClick={save} className="btn btn-primary text-sm">

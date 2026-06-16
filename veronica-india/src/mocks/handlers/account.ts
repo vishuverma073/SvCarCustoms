@@ -11,7 +11,7 @@ import {
   MOCK_OTP,
   MOCK_USER_TOKEN,
   getOrCreateUser,
-  setCurrentPhone,
+  setCurrentEmail,
   getCurrentUser,
   serverCart,
   nextLineId,
@@ -30,11 +30,11 @@ const unauthorized = () => HttpResponse.json({ error: "unauthorized" }, { status
 export const accountHandlers = [
   // ── Auth ──
   http.post(`${A}/auth/otp/send`, async ({ request }) => {
-    const body = (await request.json()) as { phone?: string };
-    if (!body.phone || body.phone.replace(/\D/g, "").length < 10) {
-      return HttpResponse.json({ error: "invalid_phone" }, { status: 400 });
+    const body = (await request.json()) as { email?: string };
+    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return HttpResponse.json({ error: "invalid_email" }, { status: 400 });
     }
-    // Real backend sends an SMS; the mock just acknowledges (code is MOCK_OTP).
+    // Real backend emails the code; the mock just acknowledges (code is MOCK_OTP).
     return HttpResponse.json({ sent: true, devHint: MOCK_OTP });
   }),
 
@@ -44,22 +44,22 @@ export const accountHandlers = [
     if (parsed.data.code !== MOCK_OTP) {
       return HttpResponse.json({ error: "invalid_otp" }, { status: 401 });
     }
-    const user = getOrCreateUser(parsed.data.phone);
-    setCurrentPhone(user.phone);
+    const user = getOrCreateUser(parsed.data.email);
+    setCurrentEmail(user.email);
     return HttpResponse.json({ accessToken: MOCK_USER_TOKEN, user });
   }),
 
-  // Mock silent-refresh: the client replays its localStorage marker as `phone`.
+  // Mock silent-refresh: the client replays its localStorage marker as `email`.
   http.post(`${A}/auth/refresh`, async ({ request }) => {
-    const body = (await request.json().catch(() => ({}))) as { phone?: string };
-    if (!body.phone) return unauthorized();
-    const user = getOrCreateUser(body.phone);
-    setCurrentPhone(user.phone);
+    const body = (await request.json().catch(() => ({}))) as { email?: string };
+    if (!body.email) return unauthorized();
+    const user = getOrCreateUser(body.email);
+    setCurrentEmail(user.email);
     return HttpResponse.json({ accessToken: MOCK_USER_TOKEN, user });
   }),
 
   http.post(`${A}/auth/logout`, () => {
-    setCurrentPhone(null);
+    setCurrentEmail(null);
     // The mock keeps a single in-memory cart for "one logged-in user at a time".
     // Clear it on logout so the next user who signs in on this session doesn't
     // inherit the previous user's cart.
@@ -79,7 +79,6 @@ export const accountHandlers = [
     const parsed = UpdateMeSchema.safeParse(await request.json());
     if (!parsed.success) return HttpResponse.json({ error: "bad_request" }, { status: 400 });
     if (parsed.data.name !== undefined) user.name = parsed.data.name;
-    if (parsed.data.email !== undefined) user.email = parsed.data.email;
     return HttpResponse.json(user);
   }),
 
