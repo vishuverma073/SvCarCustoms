@@ -1,9 +1,9 @@
-# Veronica
+# Svcar
 
 Monorepo with two apps:
 
-- `veronica-api-` — backend API (Hono + Drizzle), runs on **:8787**. Uses a remote Supabase Postgres, so no local DB needed.
-- `veronica-india` — frontend (Next.js), runs on **:3000**. Already pointed at the backend via `.env.local`.
+- `svcar-api` — backend API (Hono + Drizzle), runs on **:8787**. Uses a remote Supabase Postgres, so no local DB needed.
+- `svcar-india` — frontend (Next.js), runs on **:3000**. Already pointed at the backend via `.env.local`.
 
 ## Run locally (both)
 
@@ -11,19 +11,19 @@ Open two terminals from the repo root:
 
 ```bash
 # 1. Backend  → http://localhost:8787
-cd veronica-api- && pnpm install && pnpm dev
+cd svcar-api && pnpm install && pnpm dev
 
 # 2. Frontend → http://localhost:3000
-cd veronica-india && npm install && npm run dev
+cd svcar-india && npm install && npm run dev
 ```
 
 Then open http://localhost:3000 (admin at http://localhost:3000/admin).
 
 ## Notes
 
-- Env files already exist: `veronica-api-/apps/api/.env` and `veronica-india/.env.local`. Copy from the matching `.example` if missing.
+- Env files already exist: `svcar-api/apps/api/.env` and `svcar-india/.env.local`. Copy from the matching `.example` if missing.
 - `pnpm install` / `npm install` can be skipped once dependencies are installed.
-- Frontend without the backend: set `NEXT_PUBLIC_USE_MOCKS=true` in `veronica-india/.env.local` to use in-browser mocks.
+- Frontend without the backend: set `NEXT_PUBLIC_USE_MOCKS=true` in `svcar-india/.env.local` to use in-browser mocks.
 - "Port already in use" just means the app is already running — open the URL above.
 
 ## Local dev notes
@@ -36,7 +36,7 @@ Then open http://localhost:3000 (admin at http://localhost:3000/admin).
 
 Everything below the site/admin baseline. Skip Resend, Inngest, Sentry, Slack, etc. until later.
 
-**API** (`veronica-api-/apps/api/.env`):
+**API** (`svcar-api/apps/api/.env`):
 
 | Variable | Why |
 |----------|-----|
@@ -50,7 +50,7 @@ Everything below the site/admin baseline. Skip Resend, Inngest, Sentry, Slack, e
 
 Register Razorpay webhook: `POST https://<api-host>/webhooks/razorpay`
 
-**Frontend** (`veronica-india/.env.local` on Vercel):
+**Frontend** (`svcar-india/.env.local` on Vercel):
 
 ```
 NEXT_PUBLIC_API_URL=https://<api-host>

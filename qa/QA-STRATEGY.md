@@ -1,10 +1,10 @@
-# Veronica QA & Test Strategy
+# Svcar QA & Test Strategy
 
 > **Goal:** a layered, automated test system that exercises every feature — down to the
 > smallest — across functional, integration, end-to-end, security, performance and
 > accessibility spectrums, so the suite (not a manual QA team) is the release gate.
 >
-> **Scope:** two repos — `veronica-api-` (Hono + Postgres backend) and `veronica-india`
+> **Scope:** two repos — `svcar-api` (Hono + Postgres backend) and `svcar-india`
 > (Next.js 16 storefront + admin). They are currently **mock-first and not yet
 > integrated** (`NEXT_PUBLIC_USE_MOCKS=true`); this plan covers both the per-repo
 > mocked layer *and* the real integrated stack.
@@ -19,9 +19,9 @@
 
 | Repo | Test runner | Count | What it covers | Hits real DB / network? |
 |---|---|---|---|---|
-| `veronica-api-` | Vitest | **31 files** | Every route handler via `createApp().request(...)`, JWT, pricing, OTP, webhooks, cache, audit | **No** — all use a hand-mocked `DbClient`; no Postgres |
-| `veronica-api-` | tsx script | `scripts/e2e-checkout.ts` | OTP → cart → Razorpay order → forged-signature verify → order listing, against a *running* API + real DB | Yes (manual, staging) |
-| `veronica-india` | Vitest | **101 tests** | `lib/*` (money, sku, backend client), `store/*` (cart/auth), MSW handler contracts | **No** — all against MSW mocks |
+| `svcar-api` | Vitest | **31 files** | Every route handler via `createApp().request(...)`, JWT, pricing, OTP, webhooks, cache, audit | **No** — all use a hand-mocked `DbClient`; no Postgres |
+| `svcar-api` | tsx script | `scripts/e2e-checkout.ts` | OTP → cart → Razorpay order → forged-signature verify → order listing, against a *running* API + real DB | Yes (manual, staging) |
+| `svcar-india` | Vitest | **101 tests** | `lib/*` (money, sku, backend client), `store/*` (cart/auth), MSW handler contracts | **No** — all against MSW mocks |
 
 **Hard gaps (what this plan fills):**
 
@@ -30,8 +30,8 @@
 - ❌ No **React component** tests and no **browser/E2E** automation (Playwright/Cypress) — browser "smokes" are run by hand and documented in `PHASE-CHECKLIST.md`.
 - ❌ No **security** test suite (the auth/IDOR/payment-integrity checks exist in code but are not adversarially tested) and **no security tooling** in CI.
 - ❌ No **load/performance** tests and **Lighthouse / Core Web Vitals** never run.
-- ❌ **CI is thin:** backend [`ci.yml`](veronica-api-/.github/workflows/ci.yml) is only `install → build contracts → typecheck → test`; **the frontend has no CI workflow at all**.
-- ⚠️ **Contract drift risk:** the FE integration spec expects `POST /admin/login`, `POST /admin/upload`, `GET /admin/audit`, but the backend mounts `/admin/auth/login`, `/admin/uploads`, `/admin/audit-log` ([app.ts:80-89](veronica-api-/apps/api/src/app.ts#L80-L89)). Contract tests (§4.4) must catch exactly this class of bug at integration.
+- ❌ **CI is thin:** backend [`ci.yml`](svcar-api/.github/workflows/ci.yml) is only `install → build contracts → typecheck → test`; **the frontend has no CI workflow at all**.
+- ⚠️ **Contract drift risk:** the FE integration spec expects `POST /admin/login`, `POST /admin/upload`, `GET /admin/audit`, but the backend mounts `/admin/auth/login`, `/admin/uploads`, `/admin/audit-log` ([app.ts:80-89](svcar-api/apps/api/src/app.ts#L80-L89)). Contract tests (§4.4) must catch exactly this class of bug at integration.
 
 ---
 
@@ -88,7 +88,7 @@ Three runnable environments. The whole point of "test everything like production
 | **C — full E2E** | `USE_MOCKS=false` → real API | real Hono app (running) | real Postgres (seeded) | Playwright E2E, ZAP DAST, k6 load, Lighthouse |
 
 **Env C wiring** — a `docker-compose.e2e.yml` brings up: `postgres` → run migrations + seed
-(`pnpm db:migrate` + `pnpm db:seed`) → `backend` (`pnpm --filter @veronica/api start`) →
+(`pnpm db:migrate` + `pnpm db:seed`) → `backend` (`pnpm --filter @svcar/api start`) →
 `frontend` (`next start` with `NEXT_PUBLIC_USE_MOCKS=false`, `NEXT_PUBLIC_API_URL=http://backend:8787`).
 Third-party services stay in **stub mode** (Razorpay/Resend/MSG91/Inngest already stub when
 their env vars are unset — see the existing `e2e-checkout.ts`), so E2E is hermetic and free.
@@ -96,7 +96,7 @@ their env vars are unset — see the existing `e2e-checkout.ts`), so E2E is herm
 **Test-data strategy:**
 
 - **Seeding:** reuse the existing `scripts/seed-from-data.ts` (8 categories / 12 products / ~25 SKUs) as the deterministic catalog baseline for Env C.
-- **Factories:** add typed builders (`makeProduct()`, `makeOrder()`, `makeUser()`) backed by `@faker-js/faker` (already a FE dep) for per-test data, so tests don't depend on seed ordering. Recommended: lightweight builder functions (or `fishery`) that emit valid `@veronica/contracts` shapes.
+- **Factories:** add typed builders (`makeProduct()`, `makeOrder()`, `makeUser()`) backed by `@faker-js/faker` (already a FE dep) for per-test data, so tests don't depend on seed ordering. Recommended: lightweight builder functions (or `fishery`) that emit valid `@svcar/contracts` shapes.
 - **Isolation (Env B):** Testcontainers `snapshot()` after migrate+seed, then `restoreSnapshot()` between tests² — *or* wrap each test in a transaction that rolls back. Default: **transaction-rollback per test** for speed; snapshot/restore for tests that need committed state (e.g. webhook idempotency across connections).
 
 ---
@@ -121,7 +121,7 @@ Already in both repos. Add `@vitest/coverage-v8` gating (FE already has it). No 
 - *(Alternative: Playwright Component Testing — viable, but a second browser-test toolchain; prefer one. Revisit if RSC support in Vitest lags.)*
 
 ### 4.4 Contract — **shared zod, verified both ways** **[judgment]**
-The repos already share `@veronica/contracts` and the FE client `zod.parse()`s every response.
+The repos already share `@svcar/contracts` and the FE client `zod.parse()`s every response.
 Make this a real gate:
 - **Provider side (BE):** in integration tests, parse every handler response through the contract schema (several routes already do, e.g. `OrderDetailSchema.parse`). Add a test that asserts *every* mounted route's response validates.
 - **Consumer side (FE):** the MSW handlers must validate against the *same* contracts (catches the `/admin/login` vs `/admin/auth/login` drift).

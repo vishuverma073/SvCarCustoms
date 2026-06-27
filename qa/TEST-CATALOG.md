@@ -1,4 +1,4 @@
-# Veronica Functional Test Catalog
+# Svcar Functional Test Catalog
 
 > The executable spec. Every case has a **stable ID**, a **layer**, a **priority**, and a
 > **Given/When/Then**. Security cases live in [SECURITY-TEST-CATALOG.md](SECURITY-TEST-CATALOG.md);
@@ -9,7 +9,7 @@
 >
 > Many U-layer cases already exist (31 BE + 101 FE). They are listed for completeness and marked
 > **(exists)**; everything else is to-build. Source of truth for rules is cited inline, e.g.
-> [pricing.ts:53](veronica-api-/apps/api/src/lib/pricing.ts#L53).
+> [pricing.ts:53](svcar-api/apps/api/src/lib/pricing.ts#L53).
 
 ## How the cases were enumerated
 
@@ -40,7 +40,7 @@ Endpoints: `GET /categories`, `GET /categories/:slug`, `GET /products`, storefro
 | BE-CATALOG-010 | I | P2 | **When** `GET /products/:slug` with 0 images **Then** no crash; `image` null-safe (regression: FE PDP crashed on 0-image). |
 | FE-CATALOG-011 | E | P1 | **When** visiting `/` **Then** hero + category grid + bestseller/new/featured carousels render from live data, 0 console errors. |
 | FE-CATALOG-012 | E | P1 | **When** visiting `/category/[slug]` **Then** breadcrumb + product grid render; grid is 1/2/3-col at 360/`sm`/`lg`. |
-| CON-CATALOG-013 | CON | P1 | **Then** every `/categories`,`/products` response validates against `@veronica/contracts` schemas (provider + consumer). |
+| CON-CATALOG-013 | CON | P1 | **Then** every `/categories`,`/products` response validates against `@svcar/contracts` schemas (provider + consumer). |
 
 ---
 
@@ -55,7 +55,7 @@ Rules: min/max price across SKUs, best discount, resolve SKU by selected dimensi
 | FE-SKU-003 | C | P1 | **Given** a product with dims Size×Finish **When** user picks values **Then** the matching SKU's price/stock/image update; **pairwise** over all value pairs. |
 | FE-SKU-004 | C | P2 | **Given** a sparse matrix (some combos missing) **When** user selects an unavailable combo **Then** UI disables it / shows unavailable (no stranded selection, no fallback-price bug). |
 | FE-SKU-005 | C | P2 | **When** only one dimension value is left selectable **Then** it's auto-resolvable; available-value filtering correct. |
-| BE-SKU-006 | I | P1 | **Given** SKU with `salePrice` set **Then** `unitPrice` everywhere uses `salePrice ?? price` ([me.ts:55](veronica-api-/apps/api/src/routes/me.ts#L55)). |
+| BE-SKU-006 | I | P1 | **Given** SKU with `salePrice` set **Then** `unitPrice` everywhere uses `salePrice ?? price` ([me.ts:55](svcar-api/apps/api/src/routes/me.ts#L55)). |
 | FE-SKU-007 **(exists)** | U | P2 | Admin SKU-matrix sync: add/remove dimension values preserves prices for surviving combos, drops orphans (regression: variant price wipe on rename). |
 
 ---
@@ -83,12 +83,12 @@ Endpoints: `GET/POST /me/cart/items`, `PATCH/DELETE /me/cart/items/:id`. Upsert 
 | ID | Layer | Pri | Given / When / Then |
 |---|---|---|---|
 | BE-CART-001 **(exists)** | U | P1 | Add item → cart returns items, subtotal, itemCount. |
-| BE-CART-002 | I | P1 | **Given** SKU already in cart **When** POST same SKU again **Then** qty **increments** via `onConflictDoUpdate` ([me.ts:181-187](veronica-api-/apps/api/src/routes/me.ts#L181-L187)), not duplicate line. |
+| BE-CART-002 | I | P1 | **Given** SKU already in cart **When** POST same SKU again **Then** qty **increments** via `onConflictDoUpdate` ([me.ts:181-187](svcar-api/apps/api/src/routes/me.ts#L181-L187)), not duplicate line. |
 | BE-CART-003 | I | P1 | **When** POST non-existent `skuId` **Then** `404` "SKU not found". |
-| BE-CART-004 | I | P1 | **When** `PATCH /me/cart/items/:id {qty:0}` **Then** the line is **deleted** ([me.ts:204-205](veronica-api-/apps/api/src/routes/me.ts#L204-L205)). |
+| BE-CART-004 | I | P1 | **When** `PATCH /me/cart/items/:id {qty:0}` **Then** the line is **deleted** ([me.ts:204-205](svcar-api/apps/api/src/routes/me.ts#L204-L205)). |
 | BE-CART-005 | I | P0 | **Given** user A owns cart line X **When** user B PATCH/DELETEs line X **Then** `404` (owner-scoped) — see SEC-AUTHZ-002. |
 | BE-CART-006 | I | P2 | **When** `:id` is non-integer **Then** `400` "Invalid id" (BVA: `abc`, `1.5`, `-1`, huge). |
-| BE-CART-007 | I | P1 | **Given** no cart yet **When** GET/POST cart **Then** cart is lazily created exactly once; concurrent create race re-reads (no dup cart) ([me.ts:22-34](veronica-api-/apps/api/src/routes/me.ts#L22-L34)). |
+| BE-CART-007 | I | P1 | **Given** no cart yet **When** GET/POST cart **Then** cart is lazily created exactly once; concurrent create race re-reads (no dup cart) ([me.ts:22-34](svcar-api/apps/api/src/routes/me.ts#L22-L34)). |
 | BE-CART-008 | I | P1 | **When** adding qty that exceeds stock / qty ≤ 0 / non-int qty **Then** validated per `AddCartItemRequestSchema` (EP+BVA on qty). |
 | FE-CART-009 **(exists)** | U | P0 | Guest cart persists on reload (rehydrate strips `serverId`); not wiped (regression). |
 | FE-CART-010 **(exists)** | U | P0 | On login, guest items merge to server cart idempotently; on logout server cart cleared, no bleed to next user. |
@@ -100,7 +100,7 @@ Endpoints: `GET/POST /me/cart/items`, `PATCH/DELETE /me/cart/items/:id`. Upsert 
 
 ## 5. Checkout & money math  — `*-CHECKOUT-*`
 
-Rules ([pricing.ts](veronica-api-/apps/api/src/lib/pricing.ts), [checkout.ts](veronica-api-/apps/api/src/lib/checkout.ts), FE [checkout.ts](veronica-india/src/lib/checkout.ts)):
+Rules ([pricing.ts](svcar-api/apps/api/src/lib/pricing.ts), [checkout.ts](svcar-api/apps/api/src/lib/checkout.ts), FE [checkout.ts](svcar-india/src/lib/checkout.ts)):
 GST **inclusive** (18% default), shipping **₹99** below **₹5000** else free (also free when subtotal 0), all math in **paise** integers, `gst = round(subtotal − subtotal/(1+rate))`, **`total = subtotal + shippingFee`** (GST never added on top). Settings can override (`gstRate` stored as %).
 
 ### Money decision table (shipping)
@@ -116,15 +116,15 @@ GST **inclusive** (18% default), shipping **₹99** below **₹5000** else free 
 | ID | Layer | Pri | Given / When / Then |
 |---|---|---|---|
 | BE-CHECKOUT-006 **(exists)** | U | P0 | Subtotal 3000 + ₹99 = total **3099** (309900 paise); GST inside, not added. |
-| BE-CHECKOUT-007 | U | P0 | **Given** price 999.50 × qty 3 **Then** no float drift (paise rounding) — assert exact integer paise ([pricing.ts:56](veronica-api-/apps/api/src/lib/pricing.ts#L56)). |
+| BE-CHECKOUT-007 | U | P0 | **Given** price 999.50 × qty 3 **Then** no float drift (paise rounding) — assert exact integer paise ([pricing.ts:56](svcar-api/apps/api/src/lib/pricing.ts#L56)). |
 | BE-CHECKOUT-008 | U | P1 | **Given** admin sets `gstRate=12`, `flatFee=49`, `freeAbove=2000` **Then** pricing honours settings (config override path). |
 | BE-CHECKOUT-009 | U | P1 | **Then** FE `computeTotals` and BE `calculatePricing` agree on the same lines+settings (cross-repo money parity) — prevents customer-vs-charged drift. |
-| BE-CHECKOUT-010 | I | P0 | **When** `POST /checkout/order` **Then** order total is computed from **current SKU prices**, never the client's number ([checkout.ts:63-94](veronica-api-/apps/api/src/routes/checkout.ts#L63-L94)) — see SEC-PAY-001. |
-| BE-CHECKOUT-011 | I | P1 | **When** order created **Then** `orders`+`orderItems` persist **atomically** in one transaction; Razorpay order id patched after ([checkout.ts:125-165](veronica-api-/apps/api/src/routes/checkout.ts#L125-L165)). |
+| BE-CHECKOUT-010 | I | P0 | **When** `POST /checkout/order` **Then** order total is computed from **current SKU prices**, never the client's number ([checkout.ts:63-94](svcar-api/apps/api/src/routes/checkout.ts#L63-L94)) — see SEC-PAY-001. |
+| BE-CHECKOUT-011 | I | P1 | **When** order created **Then** `orders`+`orderItems` persist **atomically** in one transaction; Razorpay order id patched after ([checkout.ts:125-165](svcar-api/apps/api/src/routes/checkout.ts#L125-L165)). |
 | BE-CHECKOUT-012 | I | P1 | **When** a cart SKU vanished **Then** `400` "no longer available" (fail-fast, don't silently drop). |
 | BE-CHECKOUT-013 | I | P1 | **When** `addressId` given **Then** ownership verified (other user's address → `400`); else inline `address` used. |
 | BE-CHECKOUT-014 | I | P1 | **When** neither `addressId` nor `address` **Then** `400`; empty cart **Then** `400`. |
-| BE-CHECKOUT-015 | I | P1 | **Then** cart is **not** cleared on order-create, only on verify success ([checkout.ts:204](veronica-api-/apps/api/src/routes/checkout.ts#L204), [checkout.ts:262-268](veronica-api-/apps/api/src/routes/checkout.ts#L262-L268)). |
+| BE-CHECKOUT-015 | I | P1 | **Then** cart is **not** cleared on order-create, only on verify success ([checkout.ts:204](svcar-api/apps/api/src/routes/checkout.ts#L204), [checkout.ts:262-268](svcar-api/apps/api/src/routes/checkout.ts#L262-L268)). |
 | FE-CHECKOUT-016 | C | P1 | **When** entering a 6-digit pincode **Then** city/state autofill (debounced); unknown pincode is non-blocking. |
 | FE-CHECKOUT-017 | C | P1 | Address form validation: state dropdown (Indian states), `pincode` regex `^[1-9][0-9]{5}$` (BVA: `000000`, `12345`, `1234567`, `110001`). |
 | E2E-CHECKOUT-018 | E | P0 | Full path: login → address → pay (stub modal) → success → order in history → cart cleared (the golden journey). |
@@ -148,7 +148,7 @@ State machine: `pending → paid → confirmed → shipped → out_for_delivery 
 
 | ID | Layer | Pri | Given / When / Then |
 |---|---|---|---|
-| BE-ORDER-007 | I | P0 | **Given** user A's order **When** user B `GET /me/orders/:orderNumber` **Then** `404` (owner-scoped, [me.ts:367-371](veronica-api-/apps/api/src/routes/me.ts#L367-L371)) — see SEC-AUTHZ-001. |
+| BE-ORDER-007 | I | P0 | **Given** user A's order **When** user B `GET /me/orders/:orderNumber` **Then** `404` (owner-scoped, [me.ts:367-371](svcar-api/apps/api/src/routes/me.ts#L367-L371)) — see SEC-AUTHZ-001. |
 | BE-ORDER-008 | I | P1 | **When** `GET /me/orders` paginates by `createdAt` cursor **Then** newest-first, no dup/skip; invalid cursor → `400`. |
 | BE-ORDER-009 | I | P1 | **Then** order detail totals (`subtotal/shippingFee/gstAmount/total`) match what was charged; line items immutable snapshot (productName/skuCode captured at order time). |
 | BE-ORDER-010 | I | P1 | **When** `GET /:orderNumber/events` **Then** timeline ordered by `createdAt` asc, includes `placed` + `paid` after a paid order. |
@@ -170,7 +170,7 @@ Customer: phone OTP → access (15min) + refresh (30d, httpOnly cookie, JTI revo
 | BE-AUTH-004 | I | P1 | **When** expired OTP **Then** `401` (BVA around `expiresAt`). |
 | BE-AUTH-005 | I | P0 | **When** `POST /auth/refresh` with valid cookie **Then** new access + **rotated** refresh; old JTI usable? → see SEC-AUTH-005 (replay). |
 | BE-AUTH-006 | I | P0 | **When** logout **Then** refresh JTI blacklisted (`token_revocations`); subsequent refresh with it → `401`. |
-| BE-AUTH-007 **(exists)** | U | P1 | `GET /me` returns profile; `PATCH /me` updates name/email; `email:''` clears to null ([me.ts:131-161](veronica-api-/apps/api/src/routes/me.ts#L131-L161)). |
+| BE-AUTH-007 **(exists)** | U | P1 | `GET /me` returns profile; `PATCH /me` updates name/email; `email:''` clears to null ([me.ts:131-161](svcar-api/apps/api/src/routes/me.ts#L131-L161)). |
 | BE-AUTH-008 | I | P2 | `PATCH /me` with invalid email / name > 120 chars → `400` (BVA). |
 | FE-AUTH-009 **(exists/regression)** | C | P1 | OTP 6-box: auto-advance, paste, autofill; auto-submit fires (regression: stale-closure bug). |
 | E2E-AUTH-010 | E | P1 | Full login: phone → OTP → authenticated; `returnTo` redirect honoured; session survives reload (silent refresh). |
@@ -191,7 +191,7 @@ Resources: products, categories, home, settings, uploads, orders, audit-log. RBA
 | no token | `401` | BE-ADMIN-00x.a |
 | valid **customer** token | `403` | BE-ADMIN-00x.b |
 | valid **admin** token | `200/201` | BE-ADMIN-00x.c |
-| admin token whose `is_admin` was revoked | `403` within 60s (cache TTL, [auth.ts:48-67](veronica-api-/apps/api/src/middleware/auth.ts#L48-L67)) | BE-ADMIN-00x.d |
+| admin token whose `is_admin` was revoked | `403` within 60s (cache TTL, [auth.ts:48-67](svcar-api/apps/api/src/middleware/auth.ts#L48-L67)) | BE-ADMIN-00x.d |
 
 | ID | Layer | Pri | Given / When / Then |
 |---|---|---|---|
@@ -207,7 +207,7 @@ Resources: products, categories, home, settings, uploads, orders, audit-log. RBA
 | BE-ADMIN-010 | I | P1 | `GET /admin/audit-log` filters by actor/resource/date, paginates; entries include actor name/email. |
 | FE-ADMIN-011 | E | P1 | Admin login → create product → product visible on storefront (cross-surface); 0 console errors. |
 | FE-ADMIN-012 | C | P2 | Product editor + variants editor: slug auto-gen, image reorder, danger-zone delete. |
-| CON-ADMIN-013 | CON | P0 | FE-expected admin routes match BE-mounted routes — **catches `/admin/login`↔`/admin/auth/login`, `/admin/upload`↔`/admin/uploads`, `/admin/audit`↔`/admin/audit-log` drift** ([app.ts:80-89](veronica-api-/apps/api/src/app.ts#L80-L89)). |
+| CON-ADMIN-013 | CON | P0 | FE-expected admin routes match BE-mounted routes — **catches `/admin/login`↔`/admin/auth/login`, `/admin/upload`↔`/admin/uploads`, `/admin/audit`↔`/admin/audit-log` drift** ([app.ts:80-89](svcar-api/apps/api/src/app.ts#L80-L89)). |
 
 ---
 
