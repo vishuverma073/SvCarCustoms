@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780160172984,
+      "tag": "0000_steep_major_mapleleaf",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780172069257,
+      "tag": "0001_rich_preak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780172609724,
+      "tag": "0002_worthless_black_widow",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780190047811,
+      "tag": "0003_fast_rick_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780233317465,
+      "tag": "0004_abnormal_kree",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780472754785,
+      "tag": "0005_order_backups",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780472754786,
+      "tag": "0006_category_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780472754787,
+      "tag": "0008_normalize_empty_category_images",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780472754788,
+      "tag": "0009_email_auth",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780472754789,
+      "tag": "0010_vehicle_fitment",
+      "breakpoints": true
+    }
+  ]
+}

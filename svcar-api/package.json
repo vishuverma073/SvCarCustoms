@@ -1,0 +1,20 @@
+{
+  "name": "svcar-api-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter @svcar/api build",
+    "dev": "pnpm --filter @svcar/api dev",
+    "test": "pnpm --filter @svcar/api test",
+    "typecheck": "pnpm --filter @svcar/api typecheck",
+    "db:generate": "pnpm --filter @svcar/api db:generate",
+    "db:push": "pnpm --filter @svcar/api db:push",
+    "db:migrate": "pnpm --filter @svcar/api db:migrate",
+    "db:studio": "pnpm --filter @svcar/api db:studio",
+    "db:seed": "pnpm --filter @svcar/api db:seed"
+  }
+}
