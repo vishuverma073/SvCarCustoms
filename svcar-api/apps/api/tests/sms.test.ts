@@ -23,14 +23,14 @@ describe("orderTrackingUrl", () => {
 
   it("falls back to the production domain when unset", () => {
     delete process.env.STOREFRONT_URL;
-    expect(orderTrackingUrl("VEXYZ")).toBe("https://svcarindia.com/orders/VEXYZ");
+    expect(orderTrackingUrl("VEXYZ")).toBe("https://www.svcarcustoms.com/orders/VEXYZ");
   });
 });
 
 describe("order SMS (stub mode)", () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
   beforeEach(() => {
-    process.env.STOREFRONT_URL = "https://svcarindia.com";
+    process.env.STOREFRONT_URL = "https://www.svcarcustoms.com";
     logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
   });
   afterEach(() => logSpy.mockRestore());
@@ -45,7 +45,7 @@ describe("order SMS (stub mode)", () => {
     const payload = JSON.parse(line!);
     expect(payload.phone).toBe("+919350529717");
     expect(payload.body).toContain("VE7K3PQ2M8AB");
-    expect(payload.body).toContain("https://svcarindia.com/orders/VE7K3PQ2M8AB");
+    expect(payload.body).toContain("https://www.svcarcustoms.com/orders/VE7K3PQ2M8AB");
   });
 
   it("sendTransactionalSms resolves in stub mode", async () => {

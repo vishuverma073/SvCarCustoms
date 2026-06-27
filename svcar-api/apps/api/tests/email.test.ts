@@ -51,7 +51,7 @@ describe("renderOrderConfirmationHtml", () => {
   });
 
   it("renders a tracking-link CTA when a trackingUrl is provided", () => {
-    const url = "https://svcarindia.com/orders/VE7K3PQ2M8AB";
+    const url = "https://www.svcarcustoms.com/orders/VE7K3PQ2M8AB";
     const html = renderOrderConfirmationHtml({ ...ORDER, trackingUrl: url });
     expect(html).toContain("Track your order");
     expect(html).toContain(url);

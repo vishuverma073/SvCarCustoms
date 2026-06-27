@@ -20,7 +20,7 @@ const EnvSchema = z.object({
   MSG91_ORDER_TEMPLATE_ID: z.string().min(1).optional(),
   // Customer-facing storefront origin used to build order tracking links sent
   // by email/SMS. Defaults to the production domain.
-  STOREFRONT_URL: z.string().url().default("https://svcarindia.com"),
+  STOREFRONT_URL: z.string().url().default("https://www.svcarcustoms.com"),
   // Customer auth JWTs (Phase 3). Generate via: openssl rand -hex 32
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),

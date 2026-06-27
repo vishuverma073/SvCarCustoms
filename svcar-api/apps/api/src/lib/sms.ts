@@ -1,6 +1,6 @@
 /** Customer-facing storefront origin used to build order links (no trailing slash). */
 function storefrontUrl(): string {
-  return (process.env.STOREFRONT_URL || "https://svcarindia.com").replace(/\/+$/, "");
+  return (process.env.STOREFRONT_URL || "https://www.svcarcustoms.com").replace(/\/+$/, "");
 }
 
 /** The customer-facing tracking URL for an order (its detail + timeline page). */

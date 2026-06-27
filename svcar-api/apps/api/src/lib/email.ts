@@ -46,7 +46,7 @@ function inr(n: number): string {
 export function renderOtpEmailHtml(code: string): string {
   return `<!doctype html>
 <html><body style="font-family:Arial,Helvetica,sans-serif;color:#222;max-width:480px;margin:0 auto;padding:24px">
-  <h1 style="font-size:20px">Your Svcar login code</h1>
+  <h1 style="font-size:20px">Your SV Car Customs login code</h1>
   <p>Use the code below to sign in. It expires in 5 minutes.</p>
   <p style="font-size:34px;font-weight:bold;letter-spacing:8px;margin:24px 0;color:#E8822A">${code}</p>
   <p style="color:#888;font-size:12px">If you didn't request this, you can safely ignore this email.</p>
@@ -77,14 +77,14 @@ export async function sendOtpEmail(email: string, code: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || process.env.NODE_ENV === "test") return;
 
-  const from = process.env.RESEND_FROM_EMAIL || "login@svcarindia.com";
+  const from = process.env.RESEND_FROM_EMAIL || "login@svcarcustoms.com";
   const res = await fetch(RESEND_API, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
       to: email,
-      subject: `${code} is your Svcar login code`,
+      subject: `${code} is your SV Car Customs login code`,
       html: renderOtpEmailHtml(code),
     }),
   });
@@ -139,7 +139,7 @@ export function renderOrderConfirmationHtml(o: OrderConfirmationData): string {
   <table style="width:100%;border-collapse:collapse;margin-top:16px">
     <tr><td style="padding:2px 0">Subtotal</td><td style="text-align:right">${inr(o.subtotal)}</td></tr>
     <tr><td style="padding:2px 0">Shipping</td><td style="text-align:right">${o.shippingFee === 0 ? "FREE" : inr(o.shippingFee)}</td></tr>
-    <tr><td style="padding:2px 0;color:#888">Incl. GST (18%)</td><td style="text-align:right;color:#888">${inr(o.gstAmount)}</td></tr>
+    <tr><td style="padding:2px 0;color:#888">Incl. GST (28%)</td><td style="text-align:right;color:#888">${inr(o.gstAmount)}</td></tr>
     <tr><td style="padding:6px 0;font-weight:bold;border-top:2px solid #222">Total</td>
         <td style="text-align:right;font-weight:bold;border-top:2px solid #222">${inr(o.total)}</td></tr>
   </table>
@@ -176,7 +176,7 @@ export async function sendOrderConfirmation(o: OrderConfirmationData): Promise<v
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL || "orders@svcarindia.com";
+  const from = process.env.RESEND_FROM_EMAIL || "orders@svcarcustoms.com";
   const subject = `Order Confirmed — ${o.orderNumber}`;
 
   if (!apiKey || process.env.NODE_ENV === "test") {

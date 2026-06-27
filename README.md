@@ -28,13 +28,13 @@ Then open http://localhost:3000 (admin at http://localhost:3000/admin).
 
 ## Local dev notes
 
-- **Login / OTP**: SMS is in stub mode (no MSG91 keys), so the one-time code is **printed in the backend terminal** instead of texted. After you tap “Send code”, look for **`🔐 DEV OTP for +91…: 123456`** in the terminal running `pnpm dev`.
+- **Login / OTP**: login uses **email OTP** (via Resend). Without a `RESEND_API_KEY` the code runs in stub mode and is **printed in the backend terminal** instead of emailed. After you tap “Send code”, look for **`🔐 DEV OTP for <email>: 123456`** in the terminal running `pnpm dev`.
 - **Cart**: in dev the cart is stored in `sessionStorage`, so each fresh browser session starts empty (reloads within a session keep it). Production uses `localStorage`.
 - The backend allows CORS from `localhost`/`127.0.0.1` automatically; add deployed frontend origins via `CORS_ORIGINS` (comma-separated) in the API `.env`.
 
 ## Online orders — production minimum
 
-Everything below the site/admin baseline. Skip Resend, Inngest, Sentry, Slack, etc. until later.
+Everything below the site/admin baseline. Skip Inngest, Sentry, Slack, etc. until later.
 
 **API** (`svcar-api/apps/api/.env`):
 
@@ -42,11 +42,14 @@ Everything below the site/admin baseline. Skip Resend, Inngest, Sentry, Slack, e
 |----------|-----|
 | `DATABASE_URL` | Cart, orders, users |
 | `JWT_ACCESS_SECRET` + `JWT_REFRESH_SECRET` | Customer login session |
-| `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_TEMPLATE_ID` | Phone OTP (required in production — no SMS = no login) |
+| `JWT_ADMIN_SECRET` | Admin login session |
+| `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Email OTP login (required in production — no email = no customer login) + order confirmation emails |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Payment modal + webhook |
 | `CORS_ORIGINS=https://yourdomain.com` | Browser → API |
 | `STOREFRONT_URL=https://yourdomain.com` | Order tracking links |
 | `NODE_ENV=production` | Disables dev OTP/payment shortcuts |
+
+Optional (order-update SMS): `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_ORDER_TEMPLATE_ID`. When unset, order SMS runs in stub mode (logged, not sent) — login does **not** depend on SMS.
 
 Register Razorpay webhook: `POST https://<api-host>/webhooks/razorpay`
 
@@ -59,4 +62,4 @@ NEXT_PUBLIC_MOCK_PAYMENTS=false
 NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ```
 
-**Local test flow (no MSG91 yet):** keep `ENABLE_DEV_AUTH_BYPASS=1` on the API, use Razorpay **test** keys, OTP appears in the API terminal (`🔐 DEV OTP`).
+**Local test flow (no Resend yet):** keep `ENABLE_DEV_AUTH_BYPASS=1` on the API, use Razorpay **test** keys, OTP appears in the API terminal (`🔐 DEV OTP`).
