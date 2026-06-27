@@ -52,6 +52,19 @@ function treeIds(categoryId: number): number[] {
   return ids;
 }
 
+/** Every category a product belongs to: primary `categoryId` + any cross-listed `categoryIds`. */
+function productCategoryIds(p: { categoryId: number; categoryIds?: number[] }): number[] {
+  return [p.categoryId, ...(p.categoryIds ?? [])];
+}
+
+/** True when any of the product's categories is within the requested category-tree ids. */
+function inCategoryTree(
+  p: { categoryId: number; categoryIds?: number[] },
+  ids: number[],
+): boolean {
+  return productCategoryIds(p).some((id) => ids.includes(id));
+}
+
 export const storefrontHandlers = [
   http.get(`${API_BASE}/home`, () => HttpResponse.json(home)),
 
@@ -94,7 +107,7 @@ export const storefrontHandlers = [
 
     const ids = treeIds(cat.id);
     let list = applyFitment(
-      products.filter((x) => x.status === "active" && ids.includes(x.categoryId)),
+      products.filter((x) => x.status === "active" && inCategoryTree(x, ids)),
       url.searchParams,
     ).sort((a, b) => a.id - b.id);
     const total = list.length;
@@ -124,7 +137,7 @@ export const storefrontHandlers = [
         return HttpResponse.json({ items: [], nextCursor: null });
       }
       const ids = treeIds(cat.id);
-      list = list.filter((x) => ids.includes(x.categoryId));
+      list = list.filter((x) => inCategoryTree(x, ids));
     }
     if (p.get("bestseller") === "1") list = list.filter((x) => x.isBestseller);
     if (p.get("new") === "1") list = list.filter((x) => x.isNew);

@@ -5,49 +5,87 @@ const img = (text: string) =>
   `https://placehold.co/600x600/0A0A0A/E11D2A/png?text=${encodeURIComponent(text)}`;
 
 /**
- * Mock category tree for SV Car Customs — 7 roots + children. IDs/slugs match
- * the production seed so handlers and product mocks can reference them.
+ * Mock category tree for SV Car Customs — 9 roots + children. The roots mirror
+ * the Shop mega-menu taxonomy (VAG parts, exterior/interior mods, lighting,
+ * performance, audio/electronics, universal mods, 4×4, merchandise). IDs/slugs
+ * match the production seed so handlers and product mocks can reference them.
+ *
+ * Root id scheme: 1–9. Child id scheme: rootId*100 + n.
  */
 export const categories: Category[] = [
-  // ── Roots ── (shown in the header nav)
-  { id: 1, parentId: null, name: "Body Kits", slug: "body-kits", description: "Full body kits, splitters and diffusers to transform your car's stance", image: img("Body Kits"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 2, parentId: null, name: "Spoilers", slug: "spoilers", description: "Lip spoilers and GT wings for a sportier rear", image: img("Spoilers"), sortOrder: 1, showInHeader: true, status: "active" },
-  { id: 3, parentId: null, name: "Lighting", slug: "lighting", description: "Ambient lights, headlights, DRLs and tail lights", image: img("Lighting"), sortOrder: 2, showInHeader: true, status: "active" },
-  { id: 4, parentId: null, name: "Exhausts & Tips", slug: "exhausts", description: "Cat-back systems and stainless exhaust tips", image: img("Exhausts"), sortOrder: 3, showInHeader: true, status: "active" },
-  { id: 5, parentId: null, name: "Interior", slug: "interior", description: "Paddle shifters, custom interiors and trims", image: img("Interior"), sortOrder: 4, showInHeader: true, status: "active" },
-  { id: 6, parentId: null, name: "Exterior", slug: "exterior", description: "Custom exteriors and complete styling kits", image: img("Exterior"), sortOrder: 5, showInHeader: true, status: "active" },
-  { id: 7, parentId: null, name: "Audio", slug: "audio", description: "Speakers and subwoofers for premium in-car sound", image: img("Audio"), sortOrder: 6, showInHeader: true, status: "active" },
+  // ── Roots ──
+  { id: 1, parentId: null, name: "Volkswagen Audi Group Parts", slug: "vag-parts", description: "OEM-style and upgrade parts for VW, Audi, Škoda & SEAT", image: img("VAG Parts"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 2, parentId: null, name: "Exterior Mods", slug: "exterior-mods", description: "Body kits, spoilers, splitters and diffusers for an aggressive stance", image: img("Exterior Mods"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 3, parentId: null, name: "Interior Mods", slug: "interior-mods", description: "Paddle shifters, steering wheels, trims and cabin upgrades", image: img("Interior Mods"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 4, parentId: null, name: "Car Lighting", slug: "car-lighting", description: "Headlights, tail lights, DRLs and ambient lighting", image: img("Car Lighting"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 5, parentId: null, name: "Performance Parts", slug: "performance-parts", description: "Exhausts, intakes, suspension and brakes engineered for performance", image: img("Performance Parts"), sortOrder: 4, showInHeader: true, status: "active" },
+  { id: 6, parentId: null, name: "Car Audio, Electronics & Utility", slug: "car-audio-electronics", description: "Speakers, subwoofers, stereos, dash cams and in-car tech", image: img("Audio & Electronics"), sortOrder: 5, showInHeader: true, status: "active" },
+  { id: 7, parentId: null, name: "Universal Exterior Mods", slug: "universal-exterior-mods", description: "Wraps, badges, mirror covers and bolt-on styling for any car", image: img("Universal Mods"), sortOrder: 6, showInHeader: true, status: "active" },
+  { id: 8, parentId: null, name: "4×4 Accessories", slug: "4x4-accessories", description: "Roof racks, bull bars, off-road lights and recovery gear", image: img("4x4 Accessories"), sortOrder: 7, showInHeader: true, status: "active" },
+  { id: 9, parentId: null, name: "Merchandise", slug: "merchandise", description: "SV Car Customs apparel, caps, keychains and stickers", image: img("Merchandise"), sortOrder: 8, showInHeader: true, status: "active" },
 
-  // ── Body Kits → children ──
-  { id: 10, parentId: 1, name: "Full Body Kits", slug: "full-body-kits", description: "Complete bumper-to-bumper styling kits", image: img("Full Body Kits"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 11, parentId: 1, name: "Front Splitters", slug: "front-splitters", description: "Front lip splitters for aggressive looks", image: img("Front Splitters"), sortOrder: 1, showInHeader: true, status: "active" },
-  { id: 12, parentId: 1, name: "Rear Diffusers", slug: "rear-diffusers", description: "Rear diffusers with a motorsport edge", image: img("Rear Diffusers"), sortOrder: 2, showInHeader: true, status: "active" },
+  // ── Volkswagen Audi Group Parts → children ──
+  { id: 101, parentId: 1, name: "VW Parts", slug: "vw-parts", description: "Volkswagen-specific parts and upgrades", image: img("VW Parts"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 102, parentId: 1, name: "Audi Parts", slug: "audi-parts", description: "Audi-specific parts and upgrades", image: img("Audi Parts"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 103, parentId: 1, name: "Škoda Parts", slug: "skoda-parts", description: "Škoda-specific parts and upgrades", image: img("Skoda Parts"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 104, parentId: 1, name: "Front Grilles", slug: "vag-grilles", description: "OEM-style and RS/R-line grilles", image: img("Grilles"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 105, parentId: 1, name: "OEM-Style Upgrades", slug: "vag-oem-upgrades", description: "Factory-look upgrade parts", image: img("OEM Upgrades"), sortOrder: 4, showInHeader: true, status: "active" },
 
-  // ── Spoilers → children ──
-  { id: 20, parentId: 2, name: "Lip Spoilers", slug: "lip-spoilers", description: "Subtle boot-lip spoilers", image: img("Lip Spoilers"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 21, parentId: 2, name: "GT Wings", slug: "gt-wings", description: "Bold GT-style rear wings", image: img("GT Wings"), sortOrder: 1, showInHeader: true, status: "active" },
+  // ── Exterior Mods → children ──
+  { id: 201, parentId: 2, name: "Body Kits", slug: "body-kits", description: "Complete bumper-to-bumper styling kits", image: img("Body Kits"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 202, parentId: 2, name: "Spoilers & Wings", slug: "spoilers-wings", description: "Lip spoilers and GT wings", image: img("Spoilers & Wings"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 203, parentId: 2, name: "Splitters & Diffusers", slug: "splitters-diffusers", description: "Front splitters and rear diffusers", image: img("Splitters & Diffusers"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 204, parentId: 2, name: "Side Skirts", slug: "side-skirts", description: "Side skirt extensions", image: img("Side Skirts"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 205, parentId: 2, name: "Bonnets & Hoods", slug: "bonnets-hoods", description: "Vented and carbon bonnets", image: img("Bonnets"), sortOrder: 4, showInHeader: true, status: "active" },
 
-  // ── Lighting → children ──
-  { id: 30, parentId: 3, name: "Ambient Lights", slug: "ambient-lights", description: "Interior ambient lighting kits", image: img("Ambient Lights"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 31, parentId: 3, name: "Headlights & DRLs", slug: "headlights-drls", description: "Projector headlights and DRLs", image: img("Headlights"), sortOrder: 1, showInHeader: true, status: "active" },
-  { id: 32, parentId: 3, name: "Tail Lights", slug: "tail-lights", description: "LED tail light upgrades", image: img("Tail Lights"), sortOrder: 2, showInHeader: true, status: "active" },
+  // ── Interior Mods → children ──
+  { id: 301, parentId: 3, name: "Paddle Shifters", slug: "paddle-shifters", description: "Aluminium paddle shifter extensions", image: img("Paddle Shifters"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 302, parentId: 3, name: "Steering Wheels", slug: "steering-wheels", description: "Flat-bottom and sport steering wheels", image: img("Steering Wheels"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 303, parentId: 3, name: "Pedals & Footrests", slug: "pedals-footrests", description: "Aluminium pedal covers and footrests", image: img("Pedals"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 304, parentId: 3, name: "Gear Knobs", slug: "gear-knobs", description: "Custom gear knobs and boots", image: img("Gear Knobs"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 305, parentId: 3, name: "Interior Trims", slug: "interior-trims", description: "Carbon and piano-black trim accents", image: img("Interior Trims"), sortOrder: 4, showInHeader: true, status: "active" },
+  { id: 306, parentId: 3, name: "Floor Mats", slug: "floor-mats", description: "Custom-fit and 7D floor mats", image: img("Floor Mats"), sortOrder: 5, showInHeader: true, status: "active" },
 
-  // ── Exhausts & Tips → children ──
-  { id: 40, parentId: 4, name: "Exhaust Systems", slug: "exhaust-systems", description: "Cat-back and axle-back exhaust systems", image: img("Exhaust Systems"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 41, parentId: 4, name: "Exhaust Tips", slug: "exhaust-tips", description: "Bolt-on stainless exhaust tips", image: img("Exhaust Tips"), sortOrder: 1, showInHeader: true, status: "active" },
+  // ── Car Lighting → children ──
+  { id: 401, parentId: 4, name: "Headlights", slug: "headlights", description: "Projector and LED headlights", image: img("Headlights"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 402, parentId: 4, name: "Tail Lights", slug: "tail-lights", description: "LED and smoked tail lights", image: img("Tail Lights"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 403, parentId: 4, name: "DRLs", slug: "drls", description: "Daytime running lights and indicators", image: img("DRLs"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 404, parentId: 4, name: "Ambient Lighting", slug: "ambient-lighting", description: "Interior ambient lighting kits", image: img("Ambient Lighting"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 405, parentId: 4, name: "Fog Lights", slug: "fog-lights", description: "Fog lamps and auxiliary lights", image: img("Fog Lights"), sortOrder: 4, showInHeader: true, status: "active" },
 
-  // ── Interior → children ──
-  { id: 50, parentId: 5, name: "Paddle Shifters", slug: "paddle-shifters", description: "Aluminium paddle shifter extensions", image: img("Paddle Shifters"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 51, parentId: 5, name: "Custom Interiors", slug: "custom-interiors", description: "Custom upholstery and interior makeovers", image: img("Custom Interiors"), sortOrder: 1, showInHeader: true, status: "active" },
-  { id: 52, parentId: 5, name: "Interior Trims", slug: "interior-trims", description: "Carbon and piano-black trim accents", image: img("Interior Trims"), sortOrder: 2, showInHeader: true, status: "active" },
+  // ── Performance Parts → children ──
+  { id: 501, parentId: 5, name: "Exhausts & Tips", slug: "exhausts-tips", description: "Cat-back systems and stainless exhaust tips", image: img("Exhausts & Tips"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 502, parentId: 5, name: "Air Intakes", slug: "air-intakes", description: "Cold-air and performance intakes", image: img("Air Intakes"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 503, parentId: 5, name: "Suspension", slug: "suspension", description: "Lowering springs and coilovers", image: img("Suspension"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 504, parentId: 5, name: "Blow-off Valves", slug: "blow-off-valves", description: "BOVs and diverter valves", image: img("Blow-off Valves"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 505, parentId: 5, name: "Brakes", slug: "brakes", description: "Performance pads, discs and calipers", image: img("Brakes"), sortOrder: 4, showInHeader: true, status: "active" },
 
-  // ── Exterior → children ──
-  { id: 60, parentId: 6, name: "Custom Exteriors", slug: "custom-exteriors", description: "Wraps, badges and exterior styling", image: img("Custom Exteriors"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 61, parentId: 6, name: "Custom Kits", slug: "custom-kits", description: "Bespoke build-to-order styling kits", image: img("Custom Kits"), sortOrder: 1, showInHeader: true, status: "active" },
+  // ── Car Audio, Electronics & Utility → children ──
+  { id: 601, parentId: 6, name: "Speakers", slug: "speakers", description: "Component and coaxial speaker upgrades", image: img("Speakers"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 602, parentId: 6, name: "Subwoofers", slug: "subwoofers", description: "Subwoofers and bass enclosures", image: img("Subwoofers"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 603, parentId: 6, name: "Amplifiers", slug: "amplifiers", description: "Mono and multi-channel amplifiers", image: img("Amplifiers"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 604, parentId: 6, name: "Android Stereos", slug: "android-stereos", description: "Android infotainment head units", image: img("Android Stereos"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 605, parentId: 6, name: "Dash Cams", slug: "dash-cams", description: "Front and rear dash cameras", image: img("Dash Cams"), sortOrder: 4, showInHeader: true, status: "active" },
 
-  // ── Audio → children ──
-  { id: 70, parentId: 7, name: "Speakers", slug: "speakers", description: "Component and coaxial speaker upgrades", image: img("Speakers"), sortOrder: 0, showInHeader: true, status: "active" },
-  { id: 71, parentId: 7, name: "Subwoofers", slug: "subwoofers", description: "Subwoofers and bass enclosures", image: img("Subwoofers"), sortOrder: 1, showInHeader: true, status: "active" },
+  // ── Universal Exterior Mods → children ──
+  { id: 701, parentId: 7, name: "Wraps & Films", slug: "wraps-films", description: "Vinyl wraps and PPF films", image: img("Wraps & Films"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 702, parentId: 7, name: "Badges & Emblems", slug: "badges-emblems", description: "Custom badges and emblems", image: img("Badges"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 703, parentId: 7, name: "Mirror Covers", slug: "mirror-covers", description: "Carbon and gloss mirror caps", image: img("Mirror Covers"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 704, parentId: 7, name: "Spoiler Lips", slug: "spoiler-lips", description: "Universal flexible spoiler lips", image: img("Spoiler Lips"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 705, parentId: 7, name: "Number Plates", slug: "number-plates", description: "Custom and IND number plates", image: img("Number Plates"), sortOrder: 4, showInHeader: true, status: "active" },
+
+  // ── 4×4 Accessories → children ──
+  { id: 801, parentId: 8, name: "Roof Racks", slug: "roof-racks", description: "Roof racks and cross bars", image: img("Roof Racks"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 802, parentId: 8, name: "Bull Bars", slug: "bull-bars", description: "Front bull bars and nudge guards", image: img("Bull Bars"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 803, parentId: 8, name: "Off-road Lights", slug: "off-road-lights", description: "Light bars and spot lights", image: img("Off-road Lights"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 804, parentId: 8, name: "Recovery Gear", slug: "recovery-gear", description: "Snatch straps, shackles and recovery kits", image: img("Recovery Gear"), sortOrder: 3, showInHeader: true, status: "active" },
+  { id: 805, parentId: 8, name: "Snorkels", slug: "snorkels", description: "Raised air intake snorkels", image: img("Snorkels"), sortOrder: 4, showInHeader: true, status: "active" },
+
+  // ── Merchandise → children ──
+  { id: 901, parentId: 9, name: "Apparel", slug: "apparel", description: "T-shirts and hoodies", image: img("Apparel"), sortOrder: 0, showInHeader: true, status: "active" },
+  { id: 902, parentId: 9, name: "Caps", slug: "caps", description: "Caps and beanies", image: img("Caps"), sortOrder: 1, showInHeader: true, status: "active" },
+  { id: 903, parentId: 9, name: "Keychains", slug: "keychains", description: "Metal and leather keychains", image: img("Keychains"), sortOrder: 2, showInHeader: true, status: "active" },
+  { id: 904, parentId: 9, name: "Stickers", slug: "stickers", description: "Decals and sticker packs", image: img("Stickers"), sortOrder: 3, showInHeader: true, status: "active" },
 ];
 
 /** Root categories (parentId === null), sorted — the storefront's primary nav. */

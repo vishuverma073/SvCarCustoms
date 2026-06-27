@@ -8,8 +8,10 @@ import SectionHeader from "@/components/store/SectionHeader";
 import CategoryCard from "@/components/store/CategoryCard";
 import SafeBannerImage from "@/components/store/SafeBannerImage";
 import ProductCarousel from "@/components/store/ProductCarousel";
+import HeroCarousel from "@/components/store/HeroCarousel";
+import InstagramSection from "@/components/store/InstagramSection";
 import { CategoryGridSkeleton, ProductCarouselSkeleton } from "@/components/store/Skeletons";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 // The home page reads live catalog data from the backend client. With mocks the
 // API isn't reachable during build-time static generation, so render on demand.
@@ -28,13 +30,6 @@ const DEFAULT_HERO: HomeBanner = {
     ctaText: "Shop Car Accessories",
     ctaLink: "/search",
 };
-
-const HERO_TRUST_ITEMS = [
-    "Pan India Delivery",
-    "Premium Quality",
-    "Custom Fitment",
-    "Enthusiast Approved",
-] as const;
 
 const DEFAULT_PROMO: HomeBanner = {
     image: "https://placehold.co/1600x600/0A0A0A/E11D2A/png?text=Up+to+55%25+Off",
@@ -56,112 +51,6 @@ function withDefaults(b: HomeBanner, d: HomeBanner): HomeBanner {
 }
 
 // ─── Section components ──────────────────────────────────────────────
-
-function HeroSection({ hero, shopHref }: { hero: HomeBanner; shopHref: string }) {
-    const h = withDefaults(hero, DEFAULT_HERO);
-    const primaryHref = h.ctaLink || shopHref;
-    const primaryLabel = h.ctaText || "Shop Car Accessories";
-    const secondaryHeadline = h.title;
-    const [supportLineOne, supportLineTwo] = (() => {
-        const parts = h.subtitle.split(".").map((s) => s.trim()).filter(Boolean);
-        if (parts.length >= 2) return [parts[0] + ".", parts.slice(1).join(". ") + "."];
-        return [
-            "Body Kits, Lighting, Audio & Custom Interiors",
-            "Built for Indian Roads & Enthusiasts.",
-        ];
-    })();
-
-    return (
-        <section className="relative min-h-[92svh] md:min-h-[85vh] overflow-hidden bg-brand-black flex flex-col justify-end">
-            <SafeBannerImage
-                src={h.image}
-                fallbackSrc={DEFAULT_HERO.image}
-                alt="SV Car Customs Premium Car Accessories"
-                className="object-cover object-[center_30%] sm:object-[55%_center] md:object-[right_center] scale-100 sm:scale-[1.02] md:scale-105"
-                priority
-                quality={90}
-            />
-            {/* Mobile: bottom-weighted scrim so stacked copy stays legible */}
-            <div
-                className="absolute inset-0 md:hidden bg-[linear-gradient(to_top,rgba(10,10,10,0.94)_0%,rgba(10,10,10,0.82)_28%,rgba(10,10,10,0.45)_52%,rgba(10,10,10,0.12)_72%,transparent_100%)]"
-                aria-hidden
-            />
-            {/* Desktop: image-integrated side gradient — no text panel or card */}
-            <div
-                className="absolute inset-0 hidden md:block bg-[linear-gradient(0deg,rgba(0,0,0,0.35)_0%,transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.60)_0%,rgba(0,0,0,0.45)_25%,rgba(0,0,0,0.20)_50%,rgba(0,0,0,0.05)_70%,transparent_100%)]"
-                aria-hidden
-            />
-            <div className="relative z-10 w-full max-w-380 mx-auto px-4 sm:px-6 md:px-16 lg:px-20 pb-[max(1.75rem,env(safe-area-inset-bottom))] md:pb-16 lg:pb-20 pt-0 md:pt-28">
-                <div className="animate-slide-up max-w-3xl">
-                    {/* Brand first — "Car Customs" flanked by an orange rule on
-                        each side, the pair spanning the full SV CAR CUSTOMS wordmark width */}
-                    <h1 className="mb-3 sm:mb-4 md:mb-5 inline-block">
-                        <span className="block text-[2.125rem] min-[400px]:text-[2.375rem] sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.25rem] font-extrabold text-white leading-[0.94] tracking-[0.08em] sm:tracking-[0.14em] md:tracking-[0.18em]">
-                            SV CAR CUSTOMS
-                        </span>
-                        <span className="mt-2.5 sm:mt-3 md:mt-3.5 flex items-center gap-3">
-                            <span className="h-px sm:h-0.5 flex-1 bg-brand-orange" aria-hidden />
-                            <span className="shrink-0 text-[9px] sm:text-xs md:text-sm font-semibold uppercase text-white/75 tracking-[0.22em] sm:tracking-[0.32em] md:tracking-[0.42em]">
-                                Car Accessories
-                            </span>
-                            <span className="h-px sm:h-0.5 flex-1 bg-brand-orange" aria-hidden />
-                        </span>
-                    </h1>
-
-                    {/* Technology / supporting statement second */}
-                    <p className="text-base sm:text-xl md:text-2xl font-semibold text-white/90 leading-snug mb-3 sm:mb-4 md:mb-5 max-w-xl">
-                        {secondaryHeadline}
-                    </p>
-
-                    {/* Product category copy third */}
-                    <div className="space-y-1 mb-5 sm:mb-6 md:mb-8 max-w-xl">
-                        <p className="text-[13px] sm:text-base md:text-lg text-white/75 leading-relaxed">
-                            {supportLineOne}
-                        </p>
-                        <p className="hidden sm:block text-sm sm:text-base text-white/55 leading-relaxed">
-                            {supportLineTwo}
-                        </p>
-                    </div>
-
-                    {/* Trust row */}
-                    <ul className="grid grid-cols-2 gap-x-3 gap-y-2.5 sm:flex sm:flex-wrap sm:gap-x-6 mb-6 sm:mb-7 md:mb-9">
-                        {HERO_TRUST_ITEMS.map((item) => (
-                            <li
-                                key={item}
-                                className="flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-white/80"
-                            >
-                                <Check
-                                    size={14}
-                                    className="text-brand-orange shrink-0"
-                                    strokeWidth={2.5}
-                                    aria-hidden
-                                />
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* CTAs */}
-                    <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3">
-                        <Link
-                            href={primaryHref}
-                            className="btn btn-primary w-full sm:w-auto justify-center text-[14px] sm:text-[15px] px-6 sm:px-8 py-3 sm:py-3.5"
-                        >
-                            {primaryLabel}
-                            <ArrowRight size={18} />
-                        </Link>
-                        <Link
-                            href="#shop-categories"
-                            className="btn border border-white/20 text-white hover:bg-white/10 w-full sm:w-auto justify-center text-[14px] sm:text-[15px] px-6 sm:px-8 py-3 sm:py-3.5"
-                        >
-                            Explore Categories
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-}
 
 async function CategoriesSection({ categoryIds }: { categoryIds?: number[] }) {
     // A catalog read failure should degrade to "no section", never crash the
@@ -391,7 +280,7 @@ export default async function HomePage() {
             {order.map((key) => {
                 switch (key) {
                     case "hero":
-                        return <HeroSection key="hero" hero={hero} shopHref={browseAllHref} />;
+                        return <HeroCarousel key="hero" hero={hero} shopHref={browseAllHref} />;
                     case "categories":
                         return (
                             <Suspense key="categories" fallback={<CategoriesFallback />}>
@@ -431,6 +320,7 @@ export default async function HomePage() {
                         return null;
                 }
             })}
+            <InstagramSection />
         </div>
     );
 }

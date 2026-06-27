@@ -51,6 +51,9 @@ export const ProductSchema = z.object({
   slug: z.string().min(1),
   description: z.string().default(""),
   categoryId: IdSchema,
+  /** Additional categories this product is cross-listed under (besides categoryId).
+   *  Lets one product appear in several categories, e.g. Spoilers + VW Parts. */
+  categoryIds: z.array(IdSchema).optional(),
   isBestseller: z.boolean().default(false),
   isNew: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
@@ -93,6 +96,8 @@ export const ProductListItemSchema = z.object({
   name: z.string(),
   slug: z.string(),
   categoryId: IdSchema,
+  /** Extra categories this product is cross-listed under (besides categoryId). */
+  categoryIds: z.array(IdSchema).optional(),
   // Real API returns null when there is no primary image; normalize to "" so
   // grids still render and thumbnail helpers can show a placeholder.
   image: z
@@ -151,6 +156,8 @@ export const SkuInputSchema = z.object({
 /** Admin create payload — product, SKU, and dimension ids are server-assigned. */
 export const AdminProductCreateSchema = z.object({
   categoryId: IdSchema,
+  /** Additional categories to cross-list this product under (besides categoryId). */
+  categoryIds: z.array(IdSchema).optional(),
   name: z.string().min(1),
   slug: z.string().optional(),
   description: z.string().default(""),

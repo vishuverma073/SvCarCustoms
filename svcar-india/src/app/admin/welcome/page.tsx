@@ -31,8 +31,8 @@ function WelcomeContent() {
 
   return (
     <AdminWelcomeTransition
-      welcomeTitle="Welcome back, Vinod"
-      adminName="Vinod"
+      welcomeTitle="Welcome back, Shivam"
+      adminName="Shivam"
       onComplete={handleComplete}
     />
   );

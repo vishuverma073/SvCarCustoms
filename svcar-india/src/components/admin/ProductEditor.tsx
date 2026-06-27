@@ -71,6 +71,7 @@ function emptyProduct(): ProductFormValues {
     slug: "",
     description: "",
     categoryId: 0,
+    categoryIds: [],
     isBestseller: false,
     isNew: false,
     isFeatured: false,
@@ -234,6 +235,7 @@ export default function ProductEditor({
   const name = watch("name");
   const slug = watch("slug");
   const status = watch("status");
+  const primaryCategoryId = watch("categoryId");
   const fitsAllVehicles = watch("fitsAllVehicles");
   const fitments = watch("fitments");
 
@@ -460,6 +462,52 @@ export default function ProductEditor({
             {errors.categoryId && (
               <p className="text-xs text-danger mt-1">Please select a category.</p>
             )}
+          </div>
+          <div>
+            <label className="input-label">Also list under (optional)</label>
+            <p className="text-xs text-text-muted mb-1.5">
+              Cross-list this product in additional categories (e.g. a Virtus spoiler under
+              both Spoilers and VW Parts).
+            </p>
+            <Controller
+              control={control}
+              name="categoryIds"
+              render={({ field }) => {
+                const selected = (field.value ?? []).filter((id) => id !== primaryCategoryId);
+                const opts = buildProductCategoryOptions(
+                  (categories ?? []).filter((c) => c.status !== "archived"),
+                ).filter((c) => c.id !== primaryCategoryId);
+                return (
+                  <div className="max-h-44 overflow-y-auto rounded-lg border border-border-light p-2 space-y-0.5">
+                    {opts.length === 0 ? (
+                      <p className="text-xs text-text-muted">No other categories available.</p>
+                    ) : (
+                      opts.map((c) => {
+                        const checked = selected.includes(c.id);
+                        return (
+                          <label
+                            key={c.id}
+                            className="flex items-center gap-2 text-sm cursor-pointer py-0.5"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={(e) => {
+                                const next = e.target.checked
+                                  ? [...selected, c.id]
+                                  : selected.filter((id) => id !== c.id);
+                                field.onChange(next);
+                              }}
+                            />
+                            <span>{c.label}</span>
+                          </label>
+                        );
+                      })
+                    )}
+                  </div>
+                );
+              }}
+            />
           </div>
           <div>
             <label className="input-label">Description</label>
