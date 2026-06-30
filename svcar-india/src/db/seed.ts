@@ -91,49 +91,49 @@ const categoryData = [
         name: "Body Kits",
         slug: "body-kits",
         description: "Full body kits, front splitters and rear diffusers",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Body+Kits",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Body+Kits",
         sortOrder: 1,
     },
     {
         name: "Spoilers",
         slug: "spoilers",
         description: "Lip spoilers and GT wings for added downforce and style",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Spoilers",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Spoilers",
         sortOrder: 2,
     },
     {
         name: "Lighting",
         slug: "lighting",
         description: "Ambient lights, headlights, DRLs and tail lights",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Lighting",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Lighting",
         sortOrder: 3,
     },
     {
         name: "Exhausts & Tips",
         slug: "exhausts",
         description: "Performance exhaust systems and stainless exhaust tips",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Exhausts+%26+Tips",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Exhausts+%26+Tips",
         sortOrder: 4,
     },
     {
         name: "Interior",
         slug: "interior",
         description: "Paddle shifters, custom interiors and interior trims",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Interior",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Interior",
         sortOrder: 5,
     },
     {
         name: "Exterior",
         slug: "exterior",
         description: "Custom exteriors and complete styling kits",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Exterior",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Exterior",
         sortOrder: 6,
     },
     {
         name: "Audio",
         slug: "audio",
         description: "Component speakers and subwoofers for car audio upgrades",
-        image: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Audio",
+        image: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Audio",
         sortOrder: 7,
     },
 ];
@@ -160,8 +160,8 @@ const productData = [
         isNew: false,
         tags: '["BoltOn","OEMFit","AeroKit","ABSPlastic"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Apex+Aero+Full+Body+Kit", alt: "Apex Aero Full Body Kit" },
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Apex+Aero+Front+Bumper", alt: "Apex Aero front bumper" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Apex+Aero+Full+Body+Kit", alt: "Apex Aero Full Body Kit" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Apex+Aero+Front+Bumper", alt: "Apex Aero front bumper" },
         ],
         variants: [
             { name: "Finish", value: "Gloss Black", priceAdjustment: 0 },
@@ -182,7 +182,7 @@ const productData = [
         isNew: false,
         tags: '["WideBody","BoltOn","OEMFit","ABSPlastic"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Street+Stance+Wide+Body+Kit", alt: "Street Stance Wide Body Kit" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Street+Stance+Wide+Body+Kit", alt: "Street Stance Wide Body Kit" },
         ],
         variants: [
             { name: "Fitment", value: "Universal", priceAdjustment: 0 },
@@ -202,8 +202,8 @@ const productData = [
         isNew: true,
         tags: '["CarbonFibre","Universal","BoltOn","Aero"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Carbon+Fibre+Front+Splitter", alt: "Carbon Fibre Front Splitter" },
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Front+Splitter+Detail", alt: "Front Splitter detail" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Carbon+Fibre+Front+Splitter", alt: "Carbon Fibre Front Splitter" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Front+Splitter+Detail", alt: "Front Splitter detail" },
         ],
         variants: [
             { name: "Finish", value: "Carbon Fibre", priceAdjustment: 0 },
@@ -224,7 +224,7 @@ const productData = [
         isNew: false,
         tags: '["BoltOn","OEMFit","Universal","Adhesive"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Ducktail+Boot+Lip+Spoiler", alt: "Ducktail Boot Lip Spoiler" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Ducktail+Boot+Lip+Spoiler", alt: "Ducktail Boot Lip Spoiler" },
         ],
         variants: [
             { name: "Finish", value: "Gloss Black", priceAdjustment: 0 },
@@ -244,7 +244,7 @@ const productData = [
         isNew: true,
         tags: '["CarbonFibre","BoltOn","Adjustable","Aero"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Pro+GT+Wing+Spoiler", alt: "Pro GT Wing Spoiler" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Pro+GT+Wing+Spoiler", alt: "Pro GT Wing Spoiler" },
         ],
         variants: [
             { name: "Finish", value: "Gloss Black", priceAdjustment: 0 },
@@ -265,7 +265,7 @@ const productData = [
         isNew: false,
         tags: '["RGB","AppControl","Universal","PlugAndPlay"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=RGB+Ambient+Interior+Light+Kit", alt: "RGB Ambient Interior Light Kit" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=RGB+Ambient+Interior+Light+Kit", alt: "RGB Ambient Interior Light Kit" },
         ],
         variants: [
             { name: "Fitment", value: "4 Strip Kit", priceAdjustment: 0 },
@@ -285,7 +285,7 @@ const productData = [
         isNew: true,
         tags: '["LED","Sequential","OEMFit","PlugAndPlay"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Smoked+LED+Sequential+Tail+Lights", alt: "Smoked LED Sequential Tail Lights" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Smoked+LED+Sequential+Tail+Lights", alt: "Smoked LED Sequential Tail Lights" },
         ],
         variants: [
             { name: "Finish", value: "Smoked", priceAdjustment: 0 },
@@ -306,7 +306,7 @@ const productData = [
         isNew: false,
         tags: '["StainlessSteel","BoltOn","CatBack","Performance"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Cat-Back+Performance+Exhaust+System", alt: "Cat-Back Performance Exhaust System" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Cat-Back+Performance+Exhaust+System", alt: "Cat-Back Performance Exhaust System" },
         ],
         variants: [
             { name: "Tip Finish", value: "Polished Steel", priceAdjustment: 0 },
@@ -326,7 +326,7 @@ const productData = [
         isNew: false,
         tags: '["CarbonFibre","Universal","BoltOn","ClampOn"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Carbon+Fibre+Slant-Cut+Exhaust+Tip", alt: "Carbon Fibre Slant-Cut Exhaust Tip" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Carbon+Fibre+Slant-Cut+Exhaust+Tip", alt: "Carbon Fibre Slant-Cut Exhaust Tip" },
         ],
         variants: [
             { name: "Length", value: "120mm", priceAdjustment: 0 },
@@ -347,7 +347,7 @@ const productData = [
         isNew: false,
         tags: '["Aluminium","BoltOn","OEMFit","ClipOn"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Aluminium+Paddle+Shifter+Extensions", alt: "Aluminium Paddle Shifter Extensions" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Aluminium+Paddle+Shifter+Extensions", alt: "Aluminium Paddle Shifter Extensions" },
         ],
         variants: [
             { name: "Finish", value: "Red", priceAdjustment: 0 },
@@ -368,7 +368,7 @@ const productData = [
         isNew: true,
         tags: '["CarbonFibre","BoltOn","OEMFit","Adhesive"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Carbon+Fibre+Interior+Trim+Kit", alt: "Carbon Fibre Interior Trim Kit" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Carbon+Fibre+Interior+Trim+Kit", alt: "Carbon Fibre Interior Trim Kit" },
         ],
         variants: [
             { name: "Fitment", value: "Vehicle-Specific", priceAdjustment: 0 },
@@ -388,7 +388,7 @@ const productData = [
         isNew: false,
         tags: '["BoltOn","Universal","BlackoutKit","ChromeDelete"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Murdered-Out+Blackout+Styling+Kit", alt: "Murdered-Out Blackout Styling Kit" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Murdered-Out+Blackout+Styling+Kit", alt: "Murdered-Out Blackout Styling Kit" },
         ],
         variants: [
             { name: "Fitment", value: "Universal", priceAdjustment: 0 },
@@ -409,7 +409,7 @@ const productData = [
         isNew: false,
         tags: '["BoltOn","OEMFit","Universal","Audio"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Pro+Component+Speaker+System", alt: "Pro Component Speaker System" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Pro+Component+Speaker+System", alt: "Pro Component Speaker System" },
         ],
         variants: [
             { name: "Size", value: "6.5 inch", priceAdjustment: 0 },
@@ -429,7 +429,7 @@ const productData = [
         isNew: true,
         tags: '["Active","Universal","Slim","Audio"]',
         images: [
-            { url: "https://placehold.co/800x800/0A0A0A/E11D2A/png?text=Active+Underseat+Subwoofer", alt: "Active Underseat Subwoofer" },
+            { url: "https://placehold.co/800x800/0C0C0D/C8A24B/png?text=Active+Underseat+Subwoofer", alt: "Active Underseat Subwoofer" },
         ],
         variants: [
             { name: "Size", value: "8 inch", priceAdjustment: 0 },

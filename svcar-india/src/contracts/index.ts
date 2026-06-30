@@ -20,3 +20,5 @@ export * from "./auth";
 export * from "./cart";
 export * from "./address";
 export * from "./order";
+export * from "./lead";
+export * from "./subscriber";

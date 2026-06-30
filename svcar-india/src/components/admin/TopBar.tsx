@@ -31,7 +31,7 @@ export default function TopBar({ onLogout }: { onLogout: () => void }) {
   return (
     <header className="bg-white border-b border-border h-14 px-4 lg:px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
       <Link href="/admin" className="lg:hidden flex items-center">
-        <Image src="/uploads/logo/logo.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
+        <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
       </Link>
       <span className="hidden lg:block" aria-hidden />
 

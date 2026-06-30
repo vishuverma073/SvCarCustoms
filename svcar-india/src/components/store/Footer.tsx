@@ -4,6 +4,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { backend } from "@/lib/backend";
 import { getSocialLinks } from "@/lib/social-links";
 import VisitorCount from "./VisitorCount";
+import NewsletterSignup from "./NewsletterSignup";
 
 function InstagramIcon() {
     return (
@@ -52,11 +53,15 @@ export default async function StoreFooter() {
             <div className="h-0.5 bg-gradient-to-r from-brand-orange via-brand-orange/40 to-transparent" />
 
             <div className="max-w-380 mx-auto px-4 py-14">
+                <div className="mb-12">
+                    <NewsletterSignup />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     {/* Brand */}
                     <div className="lg:col-span-1">
                         <div className="flex items-center gap-2.5 mb-3">
-                            <Image src="/uploads/logo/logo.webp" alt="SV Car Customs" width={36} height={36} className="rounded-lg" />
+                            <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={36} height={36} className="rounded-lg" />
                             <div className="flex flex-col leading-none">
                                 <span className="text-lg font-extrabold tracking-tight">
                                     SV<span className="text-brand-orange">CAR</span>CUSTOMS

@@ -17,7 +17,7 @@ const nextId = () => ++idSeq;
 
 /** On-brand dark placeholder image for a product photo. */
 const img = (text: string, n = 1) =>
-  `https://placehold.co/800x800/0A0A0A/E11D2A/png?text=${encodeURIComponent(text + (n > 1 ? ` ${n}` : ""))}`;
+  `https://placehold.co/800x800/0C0C0D/C8A24B/png?text=${encodeURIComponent(text + (n > 1 ? ` ${n}` : ""))}`;
 
 interface DimSpec {
   name: string;

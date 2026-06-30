@@ -88,7 +88,7 @@ describe("admin mock handlers", () => {
       await (await fetch(`${API_BASE}/admin/categories`, { headers: AUTH })).json(),
     );
     expect(catsAfterArchive.find((c) => c.id === 1)?.status).toBe("archived");
-    expect(catsAfterArchive.find((c) => c.id === 10)?.status).toBe("archived");
+    expect(catsAfterArchive.find((c) => c.id === 101)?.status).toBe("archived");
 
     const storefrontRoots = await (await fetch(`${API_BASE}/categories`)).json();
     expect(storefrontRoots.some((c: { id: number }) => c.id === 1)).toBe(false);
@@ -155,10 +155,10 @@ describe("admin mock handlers", () => {
     const before = CategoryListSchema.parse(
       await (await fetch(`${API_BASE}/admin/categories`, { headers: AUTH })).json(),
     );
-    const target = before.find((c) => c.id === 10);
+    const target = before.find((c) => c.id === 201);
     expect(target).toBeTruthy();
 
-    const res = await fetch(`${API_BASE}/admin/categories/10`, {
+    const res = await fetch(`${API_BASE}/admin/categories/201`, {
       method: "DELETE",
       headers: AUTH,
     });
@@ -167,6 +167,6 @@ describe("admin mock handlers", () => {
     const after = CategoryListSchema.parse(
       await (await fetch(`${API_BASE}/admin/categories`, { headers: AUTH })).json(),
     );
-    expect(after.find((c) => c.id === 10)).toBeUndefined();
+    expect(after.find((c) => c.id === 201)).toBeUndefined();
   });
 });

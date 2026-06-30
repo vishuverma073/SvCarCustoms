@@ -27,15 +27,15 @@ describe("backend categories", () => {
   });
 
   it("returns a category with children + breadcrumb by slug", async () => {
-    const cat = await backend.getCategoryBySlug("body-kits");
+    const cat = await backend.getCategoryBySlug("exterior-mods");
     CategoryWithBreadcrumbSchema.parse(cat);
     expect(cat.children.length).toBeGreaterThan(0);
-    expect(cat.breadcrumb[cat.breadcrumb.length - 1].slug).toBe("body-kits");
+    expect(cat.breadcrumb[cat.breadcrumb.length - 1].slug).toBe("exterior-mods");
   });
 
   it("returns a child category with a root→self breadcrumb by id", async () => {
-    const cat = await backend.getCategoryById(10); // full-body-kits
-    expect(cat.breadcrumb.map((c) => c.slug)).toEqual(["body-kits", "full-body-kits"]);
+    const cat = await backend.getCategoryById(201); // body-kits under exterior-mods
+    expect(cat.breadcrumb.map((c) => c.slug)).toEqual(["exterior-mods", "body-kits"]);
   });
 
   it("throws on an unknown category slug", async () => {
@@ -46,10 +46,12 @@ describe("backend categories", () => {
     const nav = await backend.getNavbar();
     expect(nav.length).toBeGreaterThanOrEqual(1);
     expect(nav.every((c) => c.parentId === null)).toBe(true);
-    const bodyKits = nav.find((c) => c.slug === "body-kits");
-    expect(bodyKits).toBeTruthy();
-    expect(bodyKits!.children.length).toBeGreaterThan(0);
-    expect(bodyKits!.children.every((c) => c.showInHeader && c.parentId === bodyKits!.id)).toBe(true);
+    const exteriorMods = nav.find((c) => c.slug === "exterior-mods");
+    expect(exteriorMods).toBeTruthy();
+    expect(exteriorMods!.children.length).toBeGreaterThan(0);
+    expect(
+      exteriorMods!.children.every((c) => c.showInHeader && c.parentId === exteriorMods!.id),
+    ).toBe(true);
   });
 
   it("orders header roots to match the home category showcase", async () => {

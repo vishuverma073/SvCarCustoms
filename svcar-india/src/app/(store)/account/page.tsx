@@ -16,6 +16,8 @@ export default function AccountPage() {
 
   const [name, setName] = useState("");
   const [saved, setSaved] = useState(false);
+  const [password, setPassword] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
 
   // Redirect guests to login once auth has resolved.
   useEffect(() => {
@@ -57,6 +59,23 @@ export default function AccountPage() {
     }
   }
 
+  async function savePassword() {
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    setPwSaving(true);
+    try {
+      await backend.setPassword(password);
+      setPassword("");
+      toast.success("Password saved. You can now sign in with it.");
+    } catch {
+      toast.error("Couldn’t save your password. Please try again.");
+    } finally {
+      setPwSaving(false);
+    }
+  }
+
   async function logout() {
     await backend.logout();
     useCartStore.getState().clearCart();
@@ -80,6 +99,32 @@ export default function AccountPage() {
 
         <button onClick={save} className="btn btn-primary text-sm">
           {saved ? <><Check size={16} /> Saved</> : "Save changes"}
+        </button>
+      </div>
+
+      <div className="mt-4 bg-white rounded-2xl border border-border-light shadow-card p-5 space-y-3">
+        <div>
+          <label className="input-label">{user.hasPassword ? "Change password" : "Set a password"}</label>
+          <p className="text-xs text-text-muted mb-2">
+            {user.hasPassword
+              ? "Update the password you use to sign in."
+              : "Add a password so you can sign in without an OTP each time."}
+          </p>
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="New password (min 6 characters)"
+            className="input"
+          />
+        </div>
+        <button
+          onClick={savePassword}
+          disabled={pwSaving || password.length < 6}
+          className="btn btn-primary text-sm disabled:opacity-50"
+        >
+          {pwSaving ? <Loader2 size={16} className="animate-spin" /> : user.hasPassword ? "Update password" : "Set password"}
         </button>
       </div>
 

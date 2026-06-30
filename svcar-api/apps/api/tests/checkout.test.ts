@@ -103,7 +103,7 @@ describe("POST /checkout/order", () => {
     // GST-inclusive pricing: subtotal 3000 + ₹99 shipping = total 3099 → 309900
     // paise (GST is already inside the price, not added on top).
     expect(body).toMatchObject({ amount: 309900, currency: "INR" });
-    expect(String(body.orderNumber)).toMatch(/^VE[0-9A-Z]{10}$/);
+    expect(String(body.orderNumber)).toMatch(/^SV[0-9A-Z]{10}$/);
     expect(String(body.razorpayOrderId)).toContain("order_stub_");
   });
 });

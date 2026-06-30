@@ -8,6 +8,7 @@ import { Search, ShoppingBag, Menu, X, User, LogOut, ChevronDown, Shield } from 
 import { useCartStore } from "@/store/cartStore";
 import { useUIStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
+import { useAdminAuthStore } from "@/store/adminAuthStore";
 import { backend } from "@/lib/backend";
 import { useShopNav } from "@/lib/use-shop-nav";
 import ThemeToggle from "./ThemeToggle";
@@ -65,6 +66,23 @@ export default function StoreHeader() {
     router.push("/");
   }
 
+  const [enteringAdmin, setEnteringAdmin] = useState(false);
+  async function enterAdmin() {
+    if (enteringAdmin) return;
+    setEnteringAdmin(true);
+    try {
+      // Exchange the customer session for an admin session, then go straight in.
+      const { accessToken, admin } = await backend.enterAdmin();
+      useAdminAuthStore.getState().setSession(accessToken, admin);
+      router.push("/admin");
+    } catch {
+      // Not an admin / endpoint unavailable → fall back to the admin login.
+      router.push("/admin/login");
+    } finally {
+      setEnteringAdmin(false);
+    }
+  }
+
   const isActive = useCallback(
     (href: string) => {
       if (href === "/") return pathname === "/";
@@ -88,7 +106,7 @@ export default function StoreHeader() {
         <div className="max-w-400 mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <Image
-              src="/uploads/logo/logo.webp"
+              src="/uploads/logo/logo-v2.webp"
               alt="SV Car Customs"
               width={36}
               height={36}
@@ -188,13 +206,15 @@ export default function StoreHeader() {
             <GarageSelector className="hidden md:block mr-1" />
 
             {isMounted && authStatus === "authenticated" && authUser?.isAdmin && (
-              <Link
-                href="/admin/login"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-brand-orange font-semibold text-sm hover:bg-brand-orange/10 transition-all duration-200"
+              <button
+                type="button"
+                onClick={enterAdmin}
+                disabled={enteringAdmin}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-brand-orange font-semibold text-sm hover:bg-brand-orange/10 transition-all duration-200 disabled:opacity-60"
                 aria-label="Admin panel"
               >
                 <Shield size={18} strokeWidth={2} /> <span className="hidden sm:inline">Admin</span>
-              </Link>
+              </button>
             )}
 
             <Link

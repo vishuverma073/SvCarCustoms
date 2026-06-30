@@ -12,8 +12,9 @@ function LoginFlow() {
   const params = useSearchParams();
   const returnTo = params.get("returnTo") || "/";
 
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const [step, setStep] = useState<"email" | "password" | "otp">("email");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,6 +69,27 @@ function LoginFlow() {
     }
   }
 
+  async function passwordSignIn() {
+    if (!password) return;
+    setLoading(true);
+    setError("");
+    try {
+      await backend.passwordLogin(normalizedEmail, password);
+      await useCartStore.getState().syncWithServer();
+      router.replace(returnTo);
+    } catch (err) {
+      if (err instanceof BackendAuthError && err.status === 403) {
+        setError("No password set for this account yet. Use a one-time code instead, then add a password in your account.");
+      } else if (err instanceof BackendAuthError && err.status === 401) {
+        setError("Incorrect password. Try again, or use a one-time code.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="max-w-sm mx-auto px-4 py-16">
       <div className="text-center mb-8">
@@ -75,7 +97,11 @@ function LoginFlow() {
           Sign in to <span className="text-brand-orange">SV Car Customs</span>
         </h1>
         <p className="text-sm text-text-muted mt-1">
-          {step === "email" ? "We’ll email you a one-time code" : `Code sent to ${normalizedEmail}`}
+          {step === "email"
+            ? "Sign in with your email"
+            : step === "password"
+              ? `Signing in as ${normalizedEmail}`
+              : `Code sent to ${normalizedEmail}`}
         </p>
       </div>
 
@@ -83,7 +109,10 @@ function LoginFlow() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (emailValid) sendOtp();
+            if (emailValid) {
+              setError("");
+              setStep("password");
+            }
           }}
           className="space-y-4"
         >
@@ -114,6 +143,62 @@ function LoginFlow() {
           <Link href="/" className="block text-center text-sm text-text-muted hover:text-brand-black">
             Continue as guest
           </Link>
+        </form>
+      ) : step === "password" ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            passwordSignIn();
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label className="input-label">Password</label>
+            <input
+              type="password"
+              autoComplete="current-password"
+              autoFocus
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Your password"
+              className="input w-full"
+            />
+          </div>
+
+          {error && <p className="text-sm text-danger font-medium">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={!password || loading}
+            className="btn btn-primary w-full py-3 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" size={18} /> : "Sign in"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setError("");
+              setPassword("");
+              sendOtp();
+            }}
+            disabled={loading}
+            className="block w-full text-center text-sm font-medium text-brand-orange hover:underline disabled:opacity-50"
+          >
+            Use a one-time code (OTP) instead
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setStep("email");
+              setPassword("");
+              setError("");
+            }}
+            className="mx-auto flex items-center gap-1 text-sm text-text-muted hover:text-brand-black"
+          >
+            <ArrowLeft size={14} /> Change email
+          </button>
         </form>
       ) : (
         <form

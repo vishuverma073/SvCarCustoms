@@ -36,6 +36,9 @@ import {
   type CreateOrderResponse,
   type VerifyOrderRequest,
   type PincodeLookup,
+  type AdminUser,
+  NewsletterSubscribeResponseSchema,
+  type NewsletterSubscribeResponse,
 } from "@svcar/contracts";
 import { type RawTrackingEvent } from "@/lib/order-tracking";
 import { useAuthStore, getAccessToken } from "@/store/authStore";
@@ -696,6 +699,23 @@ export const backend = {
     return session;
   },
 
+  /** Email + password login; on success sets the session + refresh marker. */
+  async passwordLogin(email: string, password: string): Promise<AuthSession> {
+    const session = await postJson("/auth/password/login", { email, password }, AuthSessionSchema);
+    useAuthStore.getState().setAuth(session.accessToken, session.user);
+    writeMarker(email);
+    return session;
+  },
+
+  /** Set/change the signed-in customer's password. Updates the cached user. */
+  async setPassword(password: string): Promise<void> {
+    const user = await authedFetch<User>("/auth/password/set", {
+      method: "POST",
+      body: { password },
+    });
+    useAuthStore.getState().setUser(user);
+  },
+
   /** Silent refresh on app load (restores the in-memory access token). */
   refresh(): Promise<boolean> {
     return doRefresh();
@@ -835,6 +855,25 @@ export const backend = {
   /** Count a visit (call once per browser session); returns the new total. */
   recordVisit(): Promise<{ total: number }> {
     return postJson("/metrics/visits", {}, VisitsSchema);
+  },
+
+  /** Subscribe an email to the newsletter (public). */
+  subscribeNewsletter(
+    email: string,
+    opts: { name?: string; phone?: string; source?: string } = {},
+  ): Promise<NewsletterSubscribeResponse> {
+    return postJson("/newsletter/subscribe", { email, ...opts }, NewsletterSubscribeResponseSchema);
+  },
+
+  /**
+   * Exchange the signed-in customer session for an admin session. Only succeeds
+   * for admin users (server enforces the role). Used by the header "Admin" button
+   * so an allowlisted user lands in /admin without a separate admin login.
+   */
+  enterAdmin(): Promise<{ accessToken: string; admin: AdminUser }> {
+    return authedFetch<{ accessToken: string; admin: AdminUser }>("/admin/auth/exchange", {
+      method: "POST",
+    });
   },
 
   // ── Pincode autofill (Phase 6, public) ──

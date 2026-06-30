@@ -16,7 +16,7 @@ export default function Sidebar({ onLogout }: { onLogout: () => void }) {
       {/* h-14 matches the TopBar height so the two bottom borders align. */}
       <div className="h-14 px-5 flex items-center border-b border-white/10">
         <Link href="/admin" className="flex items-center gap-2.5">
-          <Image src="/uploads/logo/logo.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
+          <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
           <span className="text-white/50 text-[11px] font-semibold tracking-[0.2em] uppercase">Admin</span>
         </Link>
       </div>

@@ -21,6 +21,12 @@ import {
   HomeConfigSchema,
   SettingsSchema,
   UploadResultSchema,
+  LeadListSchema,
+  LiveListSchema,
+  SubscriberListSchema,
+  type LeadList,
+  type LiveList,
+  type SubscriberList,
   type AdminLoginResponse,
   type Product,
   type ProductListItem,
@@ -585,6 +591,21 @@ export const adminApi = {
         ...(opts.occurredAt ? { occurredAt: opts.occurredAt } : {}),
       },
     });
+  },
+
+  // ── Leads (customer carts) ──
+  listLeads(): Promise<LeadList> {
+    return req("/admin/leads", { schema: LeadListSchema });
+  },
+
+  // ── Live (shoppers online right now) ──
+  listLive(): Promise<LiveList> {
+    return req("/admin/live", { schema: LiveListSchema });
+  },
+
+  // ── Subscribers (newsletter) ──
+  listSubscribers(): Promise<SubscriberList> {
+    return req("/admin/subscribers", { schema: SubscriberListSchema });
   },
 
   // ── Uploads ──

@@ -75,7 +75,7 @@ export default function RetryPaymentButton({
       order_id: res.razorpayOrderId,
       name: "SV Car Customs",
       description: `Order ${res.orderNumber}`,
-      image: "/uploads/logo/logo.webp",
+      image: "/uploads/logo/logo-v2.webp",
       prefill: {
         contact: user?.phone?.replace(/^\+91/, "") ?? "",
         email: user?.email ?? "",

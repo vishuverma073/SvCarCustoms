@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Package, FolderTree, Plus, AlertCircle } from "lucide-react";
+import { Package, FolderTree, Plus, AlertCircle, ShoppingCart, Mail } from "lucide-react";
 import { useProducts } from "@/lib/admin-hooks";
-import { useCategories } from "@/lib/admin-hooks";
+import { useCategories, useLeads, useSubscribers } from "@/lib/admin-hooks";
 import StatusPill from "@/components/admin/StatusPill";
 import AdminProductThumb from "@/components/admin/AdminProductThumb";
 import ProductRowActions from "@/components/admin/ProductRowActions";
@@ -17,6 +17,8 @@ import ProductRowActions from "@/components/admin/ProductRowActions";
 export default function AdminDashboard() {
   const { data: products, isLoading: pLoading, error: pError, mutate } = useProducts();
   const { data: categories, isLoading: cLoading } = useCategories();
+  const { data: leads, isLoading: lLoading } = useLeads();
+  const { data: subscribers, isLoading: sLoading } = useSubscribers();
 
   useEffect(() => {
     void mutate();
@@ -43,6 +45,20 @@ export default function AdminDashboard() {
       sub: `${rootCats} root`,
       border: "border-l-brand-blue",
       Icon: FolderTree,
+    },
+    {
+      label: "Live Carts",
+      value: lLoading ? "—" : (leads?.total ?? 0),
+      sub: leads ? `₹${leads.totalValue.toLocaleString("en-IN")} in carts` : "—",
+      border: "border-l-green-500",
+      Icon: ShoppingCart,
+    },
+    {
+      label: "Subscribers",
+      value: sLoading ? "—" : (subscribers?.activeCount ?? 0),
+      sub: subscribers ? `${subscribers.total} total` : "—",
+      border: "border-l-brand-orange",
+      Icon: Mail,
     },
   ];
 
@@ -87,6 +103,9 @@ export default function AdminDashboard() {
         </Link>
         <Link href="/admin/categories" className="btn btn-secondary text-sm">
           Categories
+        </Link>
+        <Link href="/admin/leads" className="btn btn-secondary text-sm">
+          Leads
         </Link>
       </div>
 

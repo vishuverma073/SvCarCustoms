@@ -10,6 +10,9 @@ import {
 } from "@svcar/contracts";
 import { products, toListItem } from "../data/products";
 import { categories } from "../data/categories";
+import { leads } from "../data/leads";
+import { snapshotLive } from "../data/live";
+import { subscribers } from "../data/subscribers";
 import { buildCategoryProductCounts } from "@/lib/category-tree";
 import { home } from "../data/home";
 import {
@@ -87,6 +90,32 @@ function deleteCategorySubtree(rootId: number): number[] {
 }
 
 export const adminHandlers = [
+  // ── Leads (customer carts) ──
+  http.get(`${A}/admin/leads`, ({ request }) => {
+    const denied = gate(request);
+    if (denied) return denied;
+    const sorted = [...leads].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+    const totalValue = sorted.reduce((sum, l) => sum + l.total, 0);
+    return HttpResponse.json({ items: sorted, total: sorted.length, totalValue });
+  }),
+
+  // ── Live (shoppers online right now) ──
+  http.get(`${A}/admin/live`, ({ request }) => {
+    const denied = gate(request);
+    if (denied) return denied;
+    const items = snapshotLive().sort((a, b) => (a.lastSeen < b.lastSeen ? 1 : -1));
+    return HttpResponse.json({ items, onlineCount: items.length });
+  }),
+
+  // ── Subscribers (newsletter) ──
+  http.get(`${A}/admin/subscribers`, ({ request }) => {
+    const denied = gate(request);
+    if (denied) return denied;
+    const items = [...subscribers].sort((a, b) => (a.subscribedAt < b.subscribedAt ? 1 : -1));
+    const activeCount = items.filter((s) => s.status === "active").length;
+    return HttpResponse.json({ items, total: items.length, activeCount });
+  }),
+
   // ── Auth ──
   http.post(`${A}/admin/auth/login`, async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };

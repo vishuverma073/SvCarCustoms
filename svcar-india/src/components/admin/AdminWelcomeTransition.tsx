@@ -104,7 +104,7 @@ export default function AdminWelcomeTransition({
       >
         <div className="admin-welcome-logo-wrap mb-8">
           <Image
-            src="/uploads/logo/logo.webp"
+            src="/uploads/logo/logo-v2.webp"
             alt="SV Car Customs"
             width={72}
             height={72}

@@ -7,6 +7,9 @@ import {
   ShoppingCart,
   Archive,
   ScrollText,
+  Users,
+  Radio,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,6 +31,12 @@ export const adminNav: AdminNavItem[] = [
   // hero/promo content, featured products, category showcase).
   { href: "/admin/home", label: "Home", icon: LayoutTemplate, mobile: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart, mobile: true },
+  // Leads — customer carts (what people are holding, newest first).
+  { href: "/admin/leads", label: "Leads", icon: Users, mobile: false },
+  // Live — shoppers active on the site right now + their carts.
+  { href: "/admin/live", label: "Live", icon: Radio, mobile: false },
+  // Subscribers — newsletter sign-ups.
+  { href: "/admin/subscribers", label: "Subscribers", icon: Mail, mobile: false },
   { href: "/admin/audit", label: "Audit", icon: ScrollText, mobile: true },
   { href: "/admin/settings", label: "Settings", icon: Settings, mobile: true },
 ];

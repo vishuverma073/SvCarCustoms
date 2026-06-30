@@ -19,14 +19,14 @@ export interface HeroSlide {
 }
 
 const FALLBACK_IMAGE =
-  "https://placehold.co/1600x900/0A0A0A/E11D2A/png?text=SV+Car+Customs";
+  "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=SV+Car+Customs";
 
 const AUTOPLAY_MS = 6000;
 
 /** Brand slides shown after the (admin-driven) primary hero slide. */
 const BRAND_SLIDES: HeroSlide[] = [
   {
-    image: "https://placehold.co/1600x900/0A0A0A/E11D2A/png?text=Exterior+Mods",
+    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Exterior+Mods",
     title: "EXTERIOR MODS",
     subtitle: "Body kits, spoilers, splitters & diffusers for an aggressive stance.",
     tagline: "TRANSFORM YOUR STANCE.",
@@ -34,7 +34,7 @@ const BRAND_SLIDES: HeroSlide[] = [
     ctaLink: "/category/exterior-mods",
   },
   {
-    image: "https://placehold.co/1600x900/0A0A0A/E11D2A/png?text=Performance+Parts",
+    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Performance+Parts",
     title: "PERFORMANCE PARTS",
     subtitle: "Exhausts, intakes & suspension engineered for the road.",
     tagline: "ENGINEERED FOR PURE PERFORMANCE.",

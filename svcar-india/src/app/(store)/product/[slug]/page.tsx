@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { backend } from "@/lib/backend";
+import { USE_MOCKS } from "@/lib/api-config";
 import { buildCategoryTree } from "@/lib/category-tree";
 import { getShopBrowseHref } from "@/lib/shop-nav";
 import type { Product } from "@svcar/contracts";
 import { getMinPrice, getMaxBasePrice } from "@/lib/sku-helpers";
 import ProductPageClient from "@/components/store/ProductPageClient";
+import ProductClientLoader from "@/components/store/ProductClientLoader";
 import { ProductPageSkeleton } from "@/components/store/Skeletons";
 
 interface ProductPageProps {
@@ -59,6 +61,10 @@ async function ProductDetailsFetcher({ slug }: { slug: string }) {
     try {
         product = await backend.getProductBySlug(slug);
     } catch {
+        // Under mocks, admin-created products live only in the browser mock store,
+        // not the server (node) one — so re-fetch on the client instead of 404ing.
+        // With a real backend this branch never triggers (the product is in the DB).
+        if (USE_MOCKS) return <ProductClientLoader slug={slug} />;
         notFound();
     }
 

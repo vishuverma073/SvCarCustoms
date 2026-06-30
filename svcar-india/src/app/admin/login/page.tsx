@@ -39,7 +39,7 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            <span className="text-brand-orange">V</span>ERONICA
+            SV<span className="text-brand-orange">CAR</span>CUSTOMS
           </h1>
           <p className="text-white/40 text-sm mt-1">Admin Portal</p>
         </div>

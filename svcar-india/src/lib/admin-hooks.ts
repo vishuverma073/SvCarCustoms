@@ -45,3 +45,19 @@ export function useHome() {
 export function useSettings() {
   return useSWR(["admin/settings"], () => adminApi.getSettings(), noRetryOn401);
 }
+
+export function useLeads() {
+  return useSWR(["admin/leads"], () => adminApi.listLeads(), noRetryOn401);
+}
+
+/** Live presence — auto-refreshes every 5s so the admin sees shoppers in real time. */
+export function useLive() {
+  return useSWR(["admin/live"], () => adminApi.listLive(), {
+    ...noRetryOn401,
+    refreshInterval: 5000,
+  });
+}
+
+export function useSubscribers() {
+  return useSWR(["admin/subscribers"], () => adminApi.listSubscribers(), noRetryOn401);
+}

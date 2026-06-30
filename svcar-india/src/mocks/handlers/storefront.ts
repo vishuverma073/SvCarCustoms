@@ -1,11 +1,12 @@
 import { http, HttpResponse } from "msw";
 import { API_BASE } from "@/lib/api-config";
 import type { Category, Product } from "@svcar/contracts";
-import { productFitsVehicle } from "@svcar/contracts";
+import { productFitsVehicle, NewsletterSubscribeRequestSchema } from "@svcar/contracts";
 import { categories } from "../data/categories";
 import { home } from "../data/home";
 import { products, toListItem } from "../data/products";
 import { makesWithModels } from "../data/vehicles";
+import { subscribers } from "../data/subscribers";
 
 /** Narrow a product list to those fitting the make/model/year query params (if any). */
 function applyFitment(list: Product[], params: URLSearchParams): Product[] {
@@ -67,6 +68,34 @@ function inCategoryTree(
 
 export const storefrontHandlers = [
   http.get(`${API_BASE}/home`, () => HttpResponse.json(home)),
+
+  // ── Newsletter signup (public) ──
+  http.post(`${API_BASE}/newsletter/subscribe`, async ({ request }) => {
+    const parsed = NewsletterSubscribeRequestSchema.safeParse(
+      await request.json().catch(() => null),
+    );
+    if (!parsed.success) {
+      return HttpResponse.json({ error: "invalid_email" }, { status: 400 });
+    }
+    const { email, name, phone, source } = parsed.data;
+    const existing = subscribers.find((s) => s.email.toLowerCase() === email.toLowerCase());
+    if (existing) {
+      existing.status = "active";
+      if (name) existing.name = name;
+      if (phone) existing.phone = phone;
+    } else {
+      subscribers.unshift({
+        id: `sub_${Date.now()}`,
+        email,
+        name: name ?? "",
+        phone: phone ?? "",
+        source: source ?? "footer",
+        status: "active",
+        subscribedAt: new Date().toISOString(),
+      });
+    }
+    return HttpResponse.json({ subscribed: true });
+  }),
 
   // ── Vehicle catalog (garage selector + fitment filter) ──
   http.get(`${API_BASE}/vehicles/makes`, () => HttpResponse.json({ makes: makesWithModels })),
