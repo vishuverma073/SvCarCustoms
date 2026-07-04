@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { API_BASE } from "@/lib/api-config";
+import { API_BASE, PAYMENT_PROVIDER } from "@/lib/api-config";
 import {
   AddressInputSchema,
   AddressUpdateSchema,
@@ -46,6 +46,32 @@ function normalizeDefaults(list: Address[], preferId?: number): Address[] {
   const target = hasPreferred ? preferId : list.some((a) => a.isDefault) ? undefined : list[0].id;
   if (target == null) return list; // an existing default stands
   return list.map((a) => ({ ...a, isDefault: a.id === target }));
+}
+
+/** Build a mock PayU handoff whose `surl` points at the MSW return handler. */
+function payuMockHandoff(
+  txnid: string,
+  orderNumber: string,
+  totalRupees: number,
+  user: { name?: string; email?: string; phone?: string },
+) {
+  const returnUrl = `${A}/payments/payu/return`;
+  return {
+    paymentUrl: "https://test.payu.in/_payment",
+    params: {
+      key: "payu_test_mockkey",
+      txnid,
+      amount: totalRupees.toFixed(2),
+      productinfo: `Order ${orderNumber}`,
+      firstname: user.name || "Customer",
+      email: user.email || "",
+      phone: user.phone || "",
+      surl: returnUrl,
+      furl: returnUrl,
+      udf1: orderNumber,
+      hash: `mock_${txnid}`,
+    } as Record<string, string>,
+  };
 }
 
 function toListItem(o: Order): OrderListItem {
@@ -133,7 +159,6 @@ export const checkoutHandlers = [
     }));
     const totals = computeTotals(items);
     const orderNumber = generateOrderNumber();
-    const razorpayOrderId = `order_${orderNumber}`;
 
     const order: Order = {
       id: nextOrderId(),
@@ -149,16 +174,30 @@ export const checkoutHandlers = [
     // Persist the order right away (status "created") so a checkout the customer
     // started but didn't pay for still appears in their history and can be
     // retried — mirroring the real backend, which inserts the pending order row
-    // at creation. `putPending` maps the Razorpay id → order for verify.
+    // at creation. `putPending` maps the gateway id → order for confirmation.
     addOrder(user.id, order);
-    putPending(razorpayOrderId, user.id, order);
+    const amountPaise = Math.round(totals.total * 100);
 
+    if (PAYMENT_PROVIDER === "payu") {
+      const txnid = orderNumber;
+      putPending(txnid, user.id, order);
+      return HttpResponse.json({
+        orderNumber,
+        provider: "payu",
+        payu: payuMockHandoff(txnid, orderNumber, totals.total, user),
+        amount: amountPaise,
+      });
+    }
+
+    const razorpayOrderId = `order_${orderNumber}`;
+    putPending(razorpayOrderId, user.id, order);
     return HttpResponse.json({
       orderNumber,
+      provider: "razorpay",
       razorpayOrderId,
       razorpayKeyId: "rzp_test_mockkey",
       // The real API (and Razorpay) work in paise; the client divides by 100.
-      amount: Math.round(totals.total * 100),
+      amount: amountPaise,
     });
   }),
 
@@ -198,15 +237,48 @@ export const checkoutHandlers = [
       // Already paid / shipped / cancelled — nothing to retry.
       return HttpResponse.json({ error: "not_payable", status: order.status }, { status: 409 });
     }
+    const amountPaise = Math.round(order.totals.total * 100);
+    if (PAYMENT_PROVIDER === "payu") {
+      const txnid = `${order.orderNumber}-r${++retrySeq}`;
+      putPending(txnid, user.id, order);
+      return HttpResponse.json({
+        orderNumber: order.orderNumber,
+        provider: "payu",
+        payu: payuMockHandoff(txnid, order.orderNumber, order.totals.total, user),
+        amount: amountPaise,
+      });
+    }
+
     // Fresh Razorpay order id for the re-attempt; park it for verify.
     const razorpayOrderId = `order_${order.orderNumber}_retry${++retrySeq}`;
     putPending(razorpayOrderId, user.id, order);
     return HttpResponse.json({
       orderNumber: order.orderNumber,
+      provider: "razorpay",
       razorpayOrderId,
       razorpayKeyId: "rzp_test_mockkey",
-      amount: Math.round(order.totals.total * 100),
+      amount: amountPaise,
     });
+  }),
+
+  // ── PayU callback (browser form-POST back from the hosted page). Mirrors the
+  // real API's /payments/payu/return: confirm the pending order, clear the cart.
+  http.post(`${A}/payments/payu/return`, async ({ request }) => {
+    const params = new URLSearchParams(await request.text());
+    const txnid = params.get("txnid") ?? "";
+    const pending = takePending(txnid);
+    if (!pending) return HttpResponse.json({ error: "order_not_found" }, { status: 404 });
+    const orderNumber = pending.order.orderNumber;
+    if (params.get("status") !== "success") {
+      return HttpResponse.json({ ok: false, orderNumber });
+    }
+    const paymentId = params.get("mihpayid");
+    const updated = updateOrder(pending.userId, orderNumber, { status: "paid", paymentId });
+    if (!updated) {
+      addOrder(pending.userId, { ...pending.order, status: "paid", paymentId });
+    }
+    serverCart.length = 0;
+    return HttpResponse.json({ ok: true, orderNumber });
   }),
 
   // ── Order history (cursor-paginated, newest first) ──

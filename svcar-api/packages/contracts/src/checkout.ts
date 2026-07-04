@@ -32,13 +32,27 @@ export const CreateOrderRequestSchema = z
   });
 export type CreateOrderRequest = z.infer<typeof CreateOrderRequestSchema>;
 
-/** POST /checkout/order response — everything the frontend needs to open Razorpay. */
+/** PayU hosted-checkout handoff: the URL + hidden form fields the browser POSTs. */
+export const PayuHandoffSchema = z.object({
+  paymentUrl: z.string().url(),
+  params: z.record(z.string(), z.string()),
+});
+export type PayuHandoff = z.infer<typeof PayuHandoffSchema>;
+
+/**
+ * POST /checkout/order response — the payment handoff for the active gateway.
+ * `provider` discriminates: Razorpay populates `razorpayOrderId`/`razorpayKeyId`
+ * (the frontend opens its modal); PayU populates `payu` (the frontend POSTs the
+ * form to PayU's hosted page). `amount` (paise) + `currency` are always present.
+ */
 export const CreateOrderResponseSchema = z.object({
   orderId: z.string().uuid(),
   orderNumber: z.string(),
-  razorpayOrderId: z.string(),
-  razorpayKeyId: z.string(),
-  amount: z.number(), // paise — the amount Razorpay's checkout modal expects
+  provider: z.enum(["razorpay", "payu"]).default("razorpay"),
+  razorpayOrderId: z.string().optional(),
+  razorpayKeyId: z.string().optional(),
+  payu: PayuHandoffSchema.optional(),
+  amount: z.number(), // paise
   currency: z.literal("INR"),
 });
 export type CreateOrderResponse = z.infer<typeof CreateOrderResponseSchema>;

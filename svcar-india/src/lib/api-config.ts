@@ -30,6 +30,15 @@ export const API_BASE = getApiBase();
 export const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === "true";
 
 /**
+ * Which payment gateway the storefront expects the API to use. This project is
+ * LOCKED to PayU (Razorpay is disabled), so this is hardcoded rather than read
+ * from env. The real API also tells the client the provider via the create-order
+ * response; this constant only drives the MSW mock + the "Secure payment via …"
+ * label.
+ */
+export const PAYMENT_PROVIDER: "razorpay" | "payu" = "payu";
+
+/**
  * Simulate Razorpay payments with the in-app mock modal instead of loading the
  * real checkout.razorpay.com SDK. True whenever API mocks are on, OR explicitly
  * via NEXT_PUBLIC_MOCK_PAYMENTS=true — so the checkout flow is fully testable

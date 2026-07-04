@@ -380,6 +380,27 @@ function mapStatus(s: string): Order["status"] {
   return ORDER_STATUS_MAP[s] ?? "created";
 }
 
+/** Wire shape of POST /checkout/order (+ retry). `amount` is in paise. */
+interface BeCreateOrder {
+  orderNumber: string;
+  provider?: "razorpay" | "payu";
+  razorpayOrderId?: string;
+  razorpayKeyId?: string;
+  payu?: { paymentUrl: string; params: Record<string, string> };
+  amount: number;
+}
+
+function mapCreateOrder(r: BeCreateOrder): CreateOrderResponse {
+  return {
+    orderNumber: r.orderNumber,
+    provider: r.provider ?? "razorpay",
+    razorpayOrderId: r.razorpayOrderId,
+    razorpayKeyId: r.razorpayKeyId,
+    payu: r.payu,
+    amount: r.amount / 100, // API returns paise; the storefront works in rupees
+  };
+}
+
 type BeShippingAddress = {
   id?: number;
   label?: string;
@@ -767,17 +788,11 @@ export const backend = {
   },
 
   // ── Checkout + orders (Phase 4) ──
-  /** Create a pending order + Razorpay order id from the server cart. */
+  /** Create a pending order + payment handoff (Razorpay or PayU) from the cart. */
   createOrder(payload: CreateOrderRequest): Promise<CreateOrderResponse> {
-    return authedFetch<{ orderNumber: string; razorpayOrderId: string; razorpayKeyId: string; amount: number }>(
-      "/checkout/order",
-      { method: "POST", body: payload },
-    ).then((r) => ({
-      orderNumber: r.orderNumber,
-      razorpayOrderId: r.razorpayOrderId,
-      razorpayKeyId: r.razorpayKeyId,
-      amount: r.amount / 100, // API returns paise; the storefront works in rupees
-    }));
+    return authedFetch<BeCreateOrder>("/checkout/order", { method: "POST", body: payload }).then(
+      mapCreateOrder,
+    );
   },
   /** Confirm the Razorpay signature. Returns the order number to route to. */
   async verifyOrder(payload: VerifyOrderRequest): Promise<{ orderNumber: string }> {
@@ -793,15 +808,9 @@ export const backend = {
    * normal `verifyOrder` then confirms it. Amount is returned in paise.
    */
   retryPayment(orderNumber: string): Promise<CreateOrderResponse> {
-    return authedFetch<{ orderNumber: string; razorpayOrderId: string; razorpayKeyId: string; amount: number }>(
-      `/checkout/order/${orderNumber}/pay`,
-      { method: "POST" },
-    ).then((r) => ({
-      orderNumber: r.orderNumber,
-      razorpayOrderId: r.razorpayOrderId,
-      razorpayKeyId: r.razorpayKeyId,
-      amount: r.amount / 100,
-    }));
+    return authedFetch<BeCreateOrder>(`/checkout/order/${orderNumber}/pay`, { method: "POST" }).then(
+      mapCreateOrder,
+    );
   },
   // Note: the API paginates orders by an ISO-date cursor, not the numeric cursor
   // the storefront uses, so we serve the first page and don't expose "load more".

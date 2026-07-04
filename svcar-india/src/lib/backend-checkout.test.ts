@@ -2,14 +2,27 @@ import { beforeAll, afterAll, beforeEach, describe, expect, it } from "vitest";
 import { server } from "@/mocks/node";
 import { backend, BackendAuthError } from "@/lib/backend";
 import { useAuthStore } from "@/store/authStore";
+import { API_BASE } from "@/lib/api-config";
 import { serverCart } from "@/mocks/data/account";
 import { __resetCheckoutState } from "@/mocks/data/orders";
-import type { AddressInput } from "@svcar/contracts";
+import type { AddressInput, CreateOrderResponse } from "@svcar/contracts";
 
 /**
- * Integration test for the Phase 4 checkout client against the MSW node server:
- * address CRUD, order create→verify, cart-clearing, and order history.
+ * Integration test for the checkout client against the MSW node server:
+ * address CRUD, order create→PayU-return, cart-clearing, and order history.
+ * [PayU-only project] Payment is confirmed via PayU's return callback, not the
+ * old Razorpay client verify step.
  */
+
+/** Simulate PayU posting a successful result back to our return endpoint. */
+async function payViaPayu(created: CreateOrderResponse) {
+  const txnid = created.payu?.params.txnid ?? created.orderNumber;
+  await fetch(`${API_BASE}/payments/payu/return`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ txnid, status: "success", mihpayid: "payu_mock_1" }).toString(),
+  });
+}
 
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterAll(() => server.close());
@@ -80,23 +93,19 @@ describe("addresses", () => {
 describe("checkout order flow", () => {
   beforeEach(login);
 
-  it("creates a pending order then verifies it, clearing the cart", async () => {
+  it("creates a pending order then confirms it via PayU, clearing the cart", async () => {
     await seedCart();
     const address = await backend.createAddress(SAMPLE_ADDRESS);
 
     const created = await backend.createOrder({ addressId: address.id });
     expect(created.orderNumber).toMatch(/^VE/);
-    expect(created.razorpayOrderId).toContain(created.orderNumber);
+    expect(created.provider).toBe("payu");
+    expect(created.payu?.params.txnid).toBe(created.orderNumber);
     expect(created.amount).toBe(2400 + 99); // 2×1200 + flat shipping
 
-    const result = await backend.verifyOrder({
-      razorpayOrderId: created.razorpayOrderId,
-      razorpayPaymentId: "pay_mock_123",
-      razorpaySignature: "sig_mock_123",
-    });
-    // verifyOrder now returns just the order number to route to (the real API's
-    // /checkout/verify responds { ok, orderNumber }); fetch detail for the rest.
-    expect(result.orderNumber).toBe(created.orderNumber);
+    // PayU posts the result back to /payments/payu/return, which marks the order
+    // paid and clears the cart (no client-side verify step for PayU).
+    await payViaPayu(created);
     expect(serverCart).toHaveLength(0); // cart emptied on success
   });
 
@@ -109,11 +118,7 @@ describe("checkout order flow", () => {
     await seedCart();
     const address = await backend.createAddress(SAMPLE_ADDRESS);
     const created = await backend.createOrder({ addressId: address.id });
-    await backend.verifyOrder({
-      razorpayOrderId: created.razorpayOrderId,
-      razorpayPaymentId: "pay_mock_1",
-      razorpaySignature: "sig_1",
-    });
+    await payViaPayu(created);
 
     const page = await backend.getOrders();
     expect(page.items).toHaveLength(1);
@@ -131,11 +136,7 @@ describe("checkout order flow", () => {
     await seedCart();
     const address = await backend.createAddress(SAMPLE_ADDRESS);
     const created = await backend.createOrder({ addressId: address.id });
-    await backend.verifyOrder({
-      razorpayOrderId: created.razorpayOrderId,
-      razorpayPaymentId: "pay_mock_1",
-      razorpaySignature: "sig_1",
-    });
+    await payViaPayu(created);
     const events = await backend.getOrderEvents(created.orderNumber);
     // getOrderEvents now preserves the backend's granular event types so the
     // tracking timeline can show every stage (placed → paid → … → delivered).

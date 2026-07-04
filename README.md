@@ -44,14 +44,14 @@ Everything below the site/admin baseline. Skip Inngest, Sentry, Slack, etc. unti
 | `JWT_ACCESS_SECRET` + `JWT_REFRESH_SECRET` | Customer login session |
 | `JWT_ADMIN_SECRET` | Admin login session |
 | `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Email OTP login (required in production — no email = no customer login) + order confirmation emails |
-| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET` | Payment modal + webhook |
+| `PAYU_MERCHANT_KEY`, `PAYU_MERCHANT_SALT`, `PAYU_MODE=live` | PayU hosted checkout + webhook (this project uses **PayU only**; Razorpay is disabled) |
 | `CORS_ORIGINS=https://yourdomain.com` | Browser → API |
 | `STOREFRONT_URL=https://yourdomain.com` | Order tracking links |
 | `NODE_ENV=production` | Disables dev OTP/payment shortcuts |
 
 Optional (order-update SMS): `MSG91_AUTH_KEY`, `MSG91_SENDER_ID`, `MSG91_ORDER_TEMPLATE_ID`. When unset, order SMS runs in stub mode (logged, not sent) — login does **not** depend on SMS.
 
-Register Razorpay webhook: `POST https://<api-host>/webhooks/razorpay`
+Register PayU webhook: `POST https://<api-host>/webhooks/payu`
 
 **Frontend** (`svcar-india/.env.local` on Vercel):
 
@@ -62,4 +62,4 @@ NEXT_PUBLIC_MOCK_PAYMENTS=false
 NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ```
 
-**Local test flow (no Resend yet):** keep `ENABLE_DEV_AUTH_BYPASS=1` on the API, use Razorpay **test** keys, OTP appears in the API terminal (`🔐 DEV OTP`).
+**Local test flow (no Resend yet):** keep `ENABLE_DEV_AUTH_BYPASS=1` on the API, leave PayU unset (stub mode) or use PayU **test** keys with `PAYU_MODE=test`, OTP appears in the API terminal (`🔐 DEV OTP`).

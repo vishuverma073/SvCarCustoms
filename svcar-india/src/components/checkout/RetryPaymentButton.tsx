@@ -5,10 +5,12 @@ import { Loader2, RefreshCw, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { MOCK_PAYMENTS } from "@/lib/api-config";
 import { backend } from "@/lib/backend";
-import { useAuthStore } from "@/store/authStore";
 import { formatPrice } from "@/lib/utils";
-import { loadRazorpay, type RazorpayOptions, type RazorpayResponse } from "@/lib/razorpay";
-import MockRazorpayModal from "./MockRazorpayModal";
+import { submitPayuForm, type PayuHandoff } from "@/lib/payu";
+import MockPayuModal from "./MockPayuModal";
+
+// [Razorpay disabled — PayU-only project] Retry payment uses PayU exclusively.
+// The Razorpay modal flow has been removed; see git history to restore it.
 
 const WHATSAPP_HELP =
   "https://wa.me/919350529717?text=" +
@@ -16,8 +18,8 @@ const WHATSAPP_HELP =
 
 /**
  * Re-initiate payment for an existing unpaid order (the previous attempt failed
- * or was dismissed). Reuses the same Razorpay flow as checkout; on success the
- * order is verified/confirmed and `onPaid` is called to refresh the view.
+ * or was dismissed). Builds a fresh PayU handoff; on success `onPaid` refreshes
+ * the view. PayU confirms via its own callback, so there's no client verify step.
  */
 export default function RetryPaymentButton({
   orderNumber,
@@ -28,32 +30,13 @@ export default function RetryPaymentButton({
   amount: number;
   onPaid: () => void;
 }) {
-  const user = useAuthStore((s) => s.user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mockOptions, setMockOptions] = useState<RazorpayOptions | null>(null);
+  const [payuHandoff, setPayuHandoff] = useState<PayuHandoff | null>(null);
 
-  async function handlePaid(resp: RazorpayResponse) {
-    try {
-      await backend.verifyOrder({
-        razorpayOrderId: resp.razorpay_order_id,
-        razorpayPaymentId: resp.razorpay_payment_id,
-        razorpaySignature: resp.razorpay_signature,
-      });
-      setMockOptions(null);
-      onPaid();
-    } catch {
-      setMockOptions(null);
-      setLoading(false);
-      setError(
-        "We couldn’t confirm your payment. If money was deducted it’ll be reconciled shortly — or reach us on WhatsApp.",
-      );
-    }
-  }
-
-  function onDismiss() {
-    setMockOptions(null);
-    setLoading(false);
+  function handlePayuPaid() {
+    setPayuHandoff(null);
+    onPaid();
   }
 
   async function retry() {
@@ -68,36 +51,16 @@ export default function RetryPaymentButton({
       return;
     }
 
-    const options: RazorpayOptions = {
-      key: res.razorpayKeyId,
-      amount: Math.round(res.amount * 100), // paise
-      currency: "INR",
-      order_id: res.razorpayOrderId,
-      name: "SV Car Customs",
-      description: `Order ${res.orderNumber}`,
-      image: "/uploads/logo/logo-v2.webp",
-      prefill: {
-        contact: user?.phone?.replace(/^\+91/, "") ?? "",
-        email: user?.email ?? "",
-        name: user?.name ?? "",
-      },
-      theme: { color: "#E8822A" },
-      handler: handlePaid,
-      modal: { ondismiss: onDismiss },
-    };
-
-    if (MOCK_PAYMENTS) {
-      setMockOptions(options);
-      return;
-    }
-
-    const ok = await loadRazorpay();
-    if (!ok || !window.Razorpay) {
+    if (res.provider !== "payu" || !res.payu) {
       setLoading(false);
-      setError("The payment window couldn’t load. Allow pop-ups and retry, or order on WhatsApp.");
+      setError("Couldn’t start the payment. Please try again.");
       return;
     }
-    new window.Razorpay(options).open();
+    if (MOCK_PAYMENTS) {
+      setPayuHandoff(res.payu);
+      return;
+    }
+    submitPayuForm(res.payu);
   }
 
   return (
@@ -125,7 +88,16 @@ export default function RetryPaymentButton({
           </Link>
         </div>
       )}
-      {MOCK_PAYMENTS && <MockRazorpayModal options={mockOptions} />}
+      {MOCK_PAYMENTS && (
+        <MockPayuModal
+          handoff={payuHandoff}
+          onSuccess={handlePayuPaid}
+          onDismiss={() => {
+            setPayuHandoff(null);
+            setLoading(false);
+          }}
+        />
+      )}
     </>
   );
 }

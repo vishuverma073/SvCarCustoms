@@ -12,6 +12,7 @@ import { makeSearchRouter } from "./routes/search.js";
 import { makeAuthRouter } from "./routes/auth.js";
 import { makeMeRouter } from "./routes/me.js";
 import { makeCheckoutRouter } from "./routes/checkout.js";
+import { makePaymentsRouter } from "./routes/payments.js";
 import { makeWebhooksRouter } from "./routes/webhooks.js";
 import { makePincodeRouter } from "./routes/pincode.js";
 import { makeMetricsRouter } from "./routes/metrics.js";
@@ -77,6 +78,7 @@ export function createApp(deps: AppDeps) {
   app.route("/auth", makeAuthRouter(deps.db));
   app.route("/me", makeMeRouter(deps.db));
   app.route("/checkout", makeCheckoutRouter(deps.db));
+  app.route("/payments", makePaymentsRouter(deps.db));
   app.route("/webhooks", makeWebhooksRouter(deps.db));
   app.route("/pincode", makePincodeRouter());
   app.route("/metrics", makeMetricsRouter());

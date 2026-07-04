@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = "test"; // PayU stub mode (deterministic dummy salt)
 
+// [Razorpay disabled — PayU-only project] This file previously tested the
+// /webhooks/razorpay route, which has been removed. It now covers the live
+// PayU server-to-server webhook (/webhooks/payu).
 import { createApp } from "../src/app.js";
-import { computeWebhookSignature } from "../src/lib/razorpay.js";
+import { computePayuResponseHash } from "../src/lib/payu.js";
 import type { DbClient } from "../src/db/client.js";
 
 interface Counters {
@@ -24,112 +27,97 @@ function makeDb(order: unknown, counters: Counters): DbClient {
         },
       }),
     }),
+    insert: () => ({ values: async () => {} }),
   } as unknown as DbClient;
 }
 
-const ORDER = {
+const BASE_ORDER = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  orderNumber: "VE0000000000",
-  razorpayOrderId: "order_stub_VE0000000000",
-  razorpayPaymentId: "pay_test_1",
+  orderNumber: "SV0000000001",
+  userId: "11111111-1111-1111-1111-111111111111",
   status: "pending",
 };
 
-function capturedEvent(orderId: string, paymentId = "pay_test_1") {
-  return JSON.stringify({
-    event: "payment.captured",
-    payload: { payment: { entity: { id: paymentId, order_id: orderId } } },
+function form(fields: Record<string, string>) {
+  return new URLSearchParams(fields).toString();
+}
+
+async function post(db: DbClient, fields: Record<string, string>) {
+  return createApp({ db }).request("/webhooks/payu", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: form(fields),
   });
 }
 
-async function post(db: DbClient, body: string, headers: Record<string, string>) {
-  return createApp({ db }).request("/webhooks/razorpay", { method: "POST", body, headers });
-}
-
-describe("GET /webhooks/razorpay-health", () => {
-  it("returns 200 for the uptime monitor", async () => {
-    const res = await createApp({ db: makeDb(null, { updates: 0 }) }).request(
-      "/webhooks/razorpay-health",
-    );
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ status: "ok" });
-  });
-});
-
-describe("POST /webhooks/razorpay", () => {
-  it("401 on an invalid signature", async () => {
+describe("POST /webhooks/payu", () => {
+  it("401 on an invalid hash", async () => {
     const counters: Counters = { updates: 0 };
-    const body = capturedEvent(ORDER.razorpayOrderId);
-    const res = await post(makeDb(ORDER, counters), body, {
-      "x-razorpay-signature": "badsignature",
-      "x-razorpay-event-id": "evt_bad_1",
+    const res = await post(makeDb({ ...BASE_ORDER, payuTxnId: "SV_BAD_1" }, counters), {
+      status: "success",
+      txnid: "SV_BAD_1",
+      mihpayid: "payu_bad_1",
+      hash: "0".repeat(128),
     });
     expect(res.status).toBe(401);
     expect(counters.updates).toBe(0);
   });
 
-  it("payment.captured → marks the order paid", async () => {
+  it("success + valid hash → marks the order paid", async () => {
     const counters: Counters = { updates: 0 };
-    const body = capturedEvent(ORDER.razorpayOrderId);
-    const res = await post(makeDb(ORDER, counters), body, {
-      "x-razorpay-signature": computeWebhookSignature(body),
-      "x-razorpay-event-id": "evt_captured_1",
-    });
+    const fields = {
+      status: "success",
+      txnid: "SV_OK_1",
+      amount: "3099.00",
+      productinfo: "Order SV0000000001",
+      firstname: "Asha",
+      email: "asha@example.com",
+      udf1: "SV0000000001",
+      mihpayid: "payu_ok_1",
+    };
+    const hash = computePayuResponseHash(fields);
+    const order = { ...BASE_ORDER, payuTxnId: "SV_OK_1" };
+    const res = await post(makeDb(order, counters), { ...fields, hash });
     expect(res.status).toBe(200);
     expect(counters.updates).toBe(1);
     expect(counters.lastSet).toMatchObject({ status: "paid" });
   });
 
-  it("duplicate event id → 200 and no second state change", async () => {
+  it("duplicate callback → 200 and no second state change", async () => {
     const counters: Counters = { updates: 0 };
-    const body = capturedEvent(ORDER.razorpayOrderId);
-    const headers = {
-      "x-razorpay-signature": computeWebhookSignature(body),
-      "x-razorpay-event-id": "evt_dup_1",
+    const fields = {
+      status: "success",
+      txnid: "SV_DUP_1",
+      amount: "3099.00",
+      productinfo: "Order SV0000000001",
+      firstname: "Asha",
+      email: "asha@example.com",
+      udf1: "SV0000000001",
+      mihpayid: "payu_dup_1",
     };
-    const first = await post(makeDb(ORDER, counters), body, headers);
-    const second = await post(makeDb(ORDER, counters), body, headers);
+    const hash = computePayuResponseHash(fields);
+    const order = { ...BASE_ORDER, payuTxnId: "SV_DUP_1" };
+    const first = await post(makeDb(order, counters), { ...fields, hash });
+    const second = await post(makeDb(order, counters), { ...fields, hash });
     expect(first.status).toBe(200);
     expect(second.status).toBe(200);
     expect(counters.updates).toBe(1); // second request short-circuited
   });
 
-  it("payment.failed → 200 with no state change", async () => {
+  it("non-success status → 200 with no state change", async () => {
     const counters: Counters = { updates: 0 };
-    const body = JSON.stringify({
-      event: "payment.failed",
-      payload: { payment: { entity: { id: "pay_x", order_id: ORDER.razorpayOrderId } } },
-    });
-    const res = await post(makeDb(ORDER, counters), body, {
-      "x-razorpay-signature": computeWebhookSignature(body),
-      "x-razorpay-event-id": "evt_failed_1",
-    });
-    expect(res.status).toBe(200);
-    expect(counters.updates).toBe(0);
-  });
-
-  it("refund.processed → marks the order refunded", async () => {
-    const counters: Counters = { updates: 0 };
-    const body = JSON.stringify({
-      event: "refund.processed",
-      payload: { refund: { entity: { payment_id: "pay_test_1" } } },
-    });
-    const res = await post(makeDb(ORDER, counters), body, {
-      "x-razorpay-signature": computeWebhookSignature(body),
-      "x-razorpay-event-id": "evt_refund_1",
-    });
-    expect(res.status).toBe(200);
-    expect(counters.updates).toBe(1);
-    expect(counters.lastSet).toMatchObject({ status: "refunded" });
-  });
-
-  it("unknown event type → 200 without crashing", async () => {
-    const counters: Counters = { updates: 0 };
-    const body = JSON.stringify({ event: "subscription.charged", payload: {} });
-    const res = await post(makeDb(ORDER, counters), body, {
-      "x-razorpay-signature": computeWebhookSignature(body),
-      "x-razorpay-event-id": "evt_unknown_1",
-    });
+    const fields = {
+      status: "failure",
+      txnid: "SV_FAIL_1",
+      amount: "3099.00",
+      productinfo: "Order SV0000000001",
+      firstname: "Asha",
+      email: "asha@example.com",
+      udf1: "SV0000000001",
+    };
+    const hash = computePayuResponseHash(fields);
+    const order = { ...BASE_ORDER, payuTxnId: "SV_FAIL_1" };
+    const res = await post(makeDb(order, counters), { ...fields, hash });
     expect(res.status).toBe(200);
     expect(counters.updates).toBe(0);
   });

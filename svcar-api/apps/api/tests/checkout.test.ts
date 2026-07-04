@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 process.env.JWT_ACCESS_SECRET = "test-access-secret-at-least-32-chars-long!!";
-process.env.NODE_ENV = "test"; // forces Razorpay stub mode
+process.env.NODE_ENV = "test"; // forces PayU stub mode (deterministic dummy salt)
 
 import { createApp } from "../src/app.js";
 import { signAccess } from "../src/lib/jwt.js";
-import { computePaymentSignature } from "../src/lib/razorpay.js";
 import { users, carts, addresses, orders } from "../src/db/schema.js";
 import type { DbClient } from "../src/db/client.js";
 
@@ -87,7 +86,7 @@ describe("POST /checkout/order", () => {
     expect(res.status).toBe(400);
   });
 
-  it("happy path → creates order, returns Razorpay handoff", async () => {
+  it("happy path → creates order, returns a PayU handoff", async () => {
     const res = await createApp({
       db: makeDb({ user: USER, cart: { id: "c1" }, items: [cartItem] }),
     }).request(
@@ -99,102 +98,21 @@ describe("POST /checkout/order", () => {
       },
     );
     expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, any>;
     // GST-inclusive pricing: subtotal 3000 + ₹99 shipping = total 3099 → 309900
     // paise (GST is already inside the price, not added on top).
-    expect(body).toMatchObject({ amount: 309900, currency: "INR" });
+    expect(body).toMatchObject({ amount: 309900, currency: "INR", provider: "payu" });
     expect(String(body.orderNumber)).toMatch(/^SV[0-9A-Z]{10}$/);
-    expect(String(body.razorpayOrderId)).toContain("order_stub_");
+    // PayU-only: no Razorpay handoff; the browser POSTs the payu form fields.
+    expect(body.razorpayOrderId).toBeUndefined();
+    expect(body.payu?.paymentUrl).toContain("payu.in");
+    expect(body.payu?.params?.txnid).toBe(body.orderNumber);
   });
 });
 
-describe("POST /checkout/verify", () => {
-  const RZP_ORDER_ID = "order_stub_VE0000000000";
-  const PAYMENT_ID = "pay_test_123";
-  const pendingOrder = {
-    id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-    orderNumber: "VE0000000000",
-    userId: USER_ID,
-    razorpayOrderId: RZP_ORDER_ID,
-    status: "pending",
-  };
-
-  it("404 when no order matches the razorpay order id", async () => {
-    const res = await createApp({ db: makeDb({ order: undefined }) }).request("/checkout/verify", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        razorpayOrderId: RZP_ORDER_ID,
-        razorpayPaymentId: PAYMENT_ID,
-        razorpaySignature: "deadbeef",
-      }),
-    });
-    expect(res.status).toBe(404);
-  });
-
-  it("403 when the order belongs to another user", async () => {
-    const res = await createApp({
-      db: makeDb({ order: { ...pendingOrder, userId: OTHER_ID } }),
-    }).request("/checkout/verify", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        razorpayOrderId: RZP_ORDER_ID,
-        razorpayPaymentId: PAYMENT_ID,
-        razorpaySignature: computePaymentSignature(RZP_ORDER_ID, PAYMENT_ID),
-      }),
-    });
-    expect(res.status).toBe(403);
-  });
-
-  it("400 on an invalid signature", async () => {
-    const res = await createApp({ db: makeDb({ order: pendingOrder, cart: { id: "c1" } }) }).request(
-      "/checkout/verify",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpayOrderId: RZP_ORDER_ID,
-          razorpayPaymentId: PAYMENT_ID,
-          razorpaySignature: "0".repeat(64),
-        }),
-      },
-    );
-    expect(res.status).toBe(400);
-  });
-
-  it("200 on a valid signature → order paid", async () => {
-    const res = await createApp({ db: makeDb({ order: pendingOrder, cart: { id: "c1" } }) }).request(
-      "/checkout/verify",
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpayOrderId: RZP_ORDER_ID,
-          razorpayPaymentId: PAYMENT_ID,
-          razorpaySignature: computePaymentSignature(RZP_ORDER_ID, PAYMENT_ID),
-        }),
-      },
-    );
-    expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ ok: true, orderNumber: "VE0000000000" });
-  });
-
-  it("200 idempotent when the order is already paid", async () => {
-    const res = await createApp({
-      db: makeDb({ order: { ...pendingOrder, status: "paid" } }),
-    }).request("/checkout/verify", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${await token()}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        razorpayOrderId: RZP_ORDER_ID,
-        razorpayPaymentId: PAYMENT_ID,
-        razorpaySignature: "irrelevant-not-checked",
-      }),
-    });
-    expect(res.status).toBe(200);
-  });
-});
+// [Razorpay disabled — PayU-only project] The POST /checkout/verify suite was
+// removed with the Razorpay client-verify route. PayU confirmation is covered by
+// the /payments/payu/return + /webhooks/payu tests (see payu.test.ts + webhooks.test.ts).
 
 describe("POST /checkout/order/:orderNumber/pay (retry)", () => {
   const pending = {
@@ -203,7 +121,6 @@ describe("POST /checkout/order/:orderNumber/pay (retry)", () => {
     userId: USER_ID,
     total: "679.00",
     status: "pending",
-    razorpayOrderId: "order_stub_old",
   };
 
   it("401 without a token", async () => {
@@ -233,16 +150,17 @@ describe("POST /checkout/order/:orderNumber/pay (retry)", () => {
     expect(res.status).toBe(409);
   });
 
-  it("200 → fresh Razorpay handoff for a pending order", async () => {
+  it("200 → fresh PayU handoff for a pending order", async () => {
     const res = await createApp({ db: makeDb({ order: pending }) }).request(
       "/checkout/order/VE0000000000/pay",
       { method: "POST", headers: { Authorization: `Bearer ${await token()}` } },
     );
     expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
+    const body = (await res.json()) as Record<string, any>;
     expect(body.orderNumber).toBe("VE0000000000");
-    expect(String(body.razorpayOrderId)).toContain("order_stub_");
-    expect(body.razorpayKeyId).toBeTruthy();
+    expect(body.provider).toBe("payu");
+    expect(body.payu?.paymentUrl).toContain("payu.in");
+    expect(body.razorpayOrderId).toBeUndefined();
     expect(body.amount).toBe(67900); // ₹679 → paise
   });
 });

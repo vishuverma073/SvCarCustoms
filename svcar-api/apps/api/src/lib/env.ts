@@ -36,6 +36,18 @@ const EnvSchema = z.object({
   RAZORPAY_KEY_ID: z.string().min(1).optional(),
   RAZORPAY_KEY_SECRET: z.string().min(1).optional(),
   RAZORPAY_WEBHOOK_SECRET: z.string().min(1).optional(),
+  // Payment gateway selector. This project is locked to PayU (see
+  // lib/payments.ts → getPaymentProvider), so the value is effectively ignored;
+  // the default is "payu" to keep config self-documenting. Razorpay support
+  // remains in the tree but disabled.
+  PAYMENT_PROVIDER: z.enum(["razorpay", "payu"]).default("payu"),
+  // PayU hosted checkout. Optional: when KEY/SALT are unset the flow runs in stub
+  // mode with a built-in dummy key+salt (no real PayU account needed) — hashes
+  // are computed deterministically so dev/tests produce valid callbacks. Find
+  // these in the PayU dashboard. PAYU_MODE picks the test vs live payment host.
+  PAYU_MERCHANT_KEY: z.string().min(1).optional(),
+  PAYU_MERCHANT_SALT: z.string().min(1).optional(),
+  PAYU_MODE: z.enum(["test", "live"]).default("test"),
   // Inngest async jobs (Phase 4). Optional: events are skipped in test/dev when
   // unset; the local `inngest-cli dev` server needs no keys.
   INNGEST_EVENT_KEY: z.string().min(1).optional(),

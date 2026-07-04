@@ -326,9 +326,15 @@ export const orders = pgTable(
     gstAmount: numeric("gst_amount", { precision: 10, scale: 2 }).notNull(),
     total: numeric("total", { precision: 10, scale: 2 }).notNull(),
     status: orderStatusEnum("status").default("pending").notNull(),
+    // Which gateway this order is being paid through ("razorpay" | "payu").
+    paymentProvider: text("payment_provider").default("razorpay").notNull(),
     razorpayOrderId: text("razorpay_order_id").unique(),
     razorpayPaymentId: text("razorpay_payment_id"),
     razorpaySignature: text("razorpay_signature"),
+    // PayU: our per-attempt transaction id (unique; updated on retry) + PayU's
+    // own payment id (mihpayid) once the callback confirms payment.
+    payuTxnId: text("payu_txn_id").unique(),
+    payuPaymentId: text("payu_payment_id"),
     notes: text("notes"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

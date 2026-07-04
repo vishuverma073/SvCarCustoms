@@ -53,9 +53,11 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     // Permissive but meaningful: blocks clickjacking + MIME-sniffing, and a CSP
-    // that still allows Next.js' inline runtime, Razorpay checkout, the UPI QR
-    // (api.qrserver.com → https img), Supabase images, and the API. HSTS only in
-    // production builds. Tighten the CSP (nonces, drop unsafe-*) later.
+    // that still allows Next.js' inline runtime, PayU hosted checkout, Supabase
+    // images, and the API. HSTS only in production builds. Tighten the CSP
+    // (nonces, drop unsafe-*) later.
+    // [Razorpay disabled — PayU-only project] Razorpay's checkout/frame hosts
+    // were removed from script-src/frame-src since the modal is no longer loaded.
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -64,9 +66,11 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://*.razorpay.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "connect-src 'self' https: ws: wss: " + apiConnectSrc(),
-      "frame-src 'self' https://www.google.com https://maps.google.com https://api.razorpay.com https://*.razorpay.com",
+      "frame-src 'self' https://www.google.com https://maps.google.com",
+      // PayU hosted checkout is a full-page form POST to its payment host.
+      "form-action 'self' https://secure.payu.in https://test.payu.in https://*.payu.in",
     ].join("; ");
 
     const headers = [

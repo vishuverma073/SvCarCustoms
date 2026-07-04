@@ -78,11 +78,22 @@ export const CreateOrderRequestSchema = z.object({
 });
 export type CreateOrderRequest = z.infer<typeof CreateOrderRequestSchema>;
 
+/** PayU hosted-checkout handoff: the URL + hidden form fields to POST to PayU. */
+export const PayuHandoffSchema = z.object({
+  paymentUrl: z.string().url(),
+  params: z.record(z.string(), z.string()),
+});
+export type PayuHandoff = z.infer<typeof PayuHandoffSchema>;
+
 export const CreateOrderResponseSchema = z.object({
   orderNumber: z.string(),
-  razorpayOrderId: z.string(),
-  razorpayKeyId: z.string(),
-  amount: MoneySchema, // total in rupees (the modal converts to paise)
+  provider: z.enum(["razorpay", "payu"]).default("razorpay"),
+  // Razorpay handoff (present when provider === "razorpay").
+  razorpayOrderId: z.string().optional(),
+  razorpayKeyId: z.string().optional(),
+  // PayU handoff (present when provider === "payu").
+  payu: PayuHandoffSchema.optional(),
+  amount: MoneySchema, // total in rupees (the modal/converter handles paise)
 });
 export type CreateOrderResponse = z.infer<typeof CreateOrderResponseSchema>;
 
