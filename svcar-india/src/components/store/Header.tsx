@@ -105,7 +105,7 @@ export default function StoreHeader() {
 
       <header className="site-header sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-400 mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
             <Image
               src="/uploads/logo/logo-v2.webp"
               alt="SV Car Customs"
@@ -114,10 +114,10 @@ export default function StoreHeader() {
               className="rounded-lg transition-transform duration-300 group-hover:scale-105"
             />
             <div className="flex flex-col">
-              <span className="text-lg font-extrabold tracking-tight text-brand-black leading-none whitespace-nowrap">
+              <span className="text-base sm:text-lg font-extrabold tracking-tight text-brand-black leading-none whitespace-nowrap">
                 SV<span className="text-brand-orange">CAR</span>CUSTOMS
               </span>
-              <span className="text-[9px] font-medium tracking-[0.2em] text-text-muted uppercase leading-none mt-0.5">
+              <span className="hidden sm:block text-[9px] font-medium tracking-[0.2em] text-text-muted uppercase leading-none mt-0.5">
                 Car Customisation
               </span>
             </div>
@@ -221,7 +221,7 @@ export default function StoreHeader() {
 
             <Link
               href="/search"
-              className="p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
+              className="p-2 sm:p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
               aria-label="Search"
             >
               <Search size={20} strokeWidth={2} />
@@ -233,7 +233,7 @@ export default function StoreHeader() {
               <div className="relative">
                 <button
                   onClick={() => setAccountOpen((o) => !o)}
-                  className="flex items-center gap-1 p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
+                  className="flex items-center gap-1 p-2 sm:p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
                   aria-label="Account menu"
                   aria-expanded={accountOpen}
                 >
@@ -263,7 +263,7 @@ export default function StoreHeader() {
             ) : (
               <Link
                 href="/login"
-                className="p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200 flex items-center gap-1"
+                className="p-2 sm:p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200 flex items-center gap-1"
                 aria-label="Sign in"
               >
                 <User size={20} strokeWidth={2} />
@@ -273,7 +273,7 @@ export default function StoreHeader() {
 
             <Link
               href="/cart"
-              className="p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200 relative"
+              className="p-2 sm:p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200 relative"
               aria-label="Cart"
             >
               <ShoppingBag size={20} strokeWidth={2} />
@@ -284,10 +284,10 @@ export default function StoreHeader() {
               )}
             </Link>
 
-            <ThemeToggle />
+            <span className="hidden sm:inline-flex"><ThemeToggle /></span>
 
             <button
-              className="md:hidden p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
+              className="md:hidden p-2 sm:p-2.5 rounded-xl text-text-primary hover:text-brand-orange hover:bg-surface-dim transition-all duration-200"
               onClick={toggleMobileMenu}
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
@@ -298,7 +298,7 @@ export default function StoreHeader() {
         </div>
 
         <div
-          className={`md:hidden border-t border-border/50 bg-white/95 backdrop-blur-xl overflow-y-auto transition-all duration-300 ease-out ${
+          className={`mobile-menu-panel md:hidden border-t border-border/50 bg-white/95 backdrop-blur-xl overflow-y-auto transition-all duration-300 ease-out ${
             isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
           }`}
         >

@@ -66,6 +66,12 @@
 .dark .site-header {
   background-color: rgb(27 27 31 / 0.92);
 }
+/* Mobile menu drawer: same dark-mode fix as the header. Its `bg-white/95`
+   isn't caught by `.dark .bg-white` (opacity variant), so it stayed white in
+   dark mode — making the light text inside invisible. Force a dark panel. */
+.dark .mobile-menu-panel {
+  background-color: rgb(27 27 31 / 0.97);
+}
 .dark .text-brand-black,
 .dark .hover\:text-brand-black:hover {
   color: var(--color-text-primary);
