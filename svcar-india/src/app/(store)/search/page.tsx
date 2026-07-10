@@ -36,7 +36,10 @@ function SearchPageContent() {
     const vehicle = useGarageStore((s) => s.vehicle);
     const hydrated = useGarageStore((s) => s.hydrated);
     const [onlyFits, setOnlyFits] = useState(true);
-    const fitsActive = hydrated && !!vehicle && onlyFits;
+    // [Personalization temporarily disabled] Flip to true to restore the
+    // vehicle-fitment feature (garage selector, "fits my car" filter, PDP badge).
+    const PERSONALIZATION_ENABLED = false;
+    const fitsActive = PERSONALIZATION_ENABLED && hydrated && !!vehicle && onlyFits;
 
     const { data: categoryShortcuts } = useSWR("search-category-shortcuts", async () => {
         const navbar = await backend.getNavbar().catch(() => []);
@@ -136,7 +139,7 @@ function SearchPageContent() {
                     className="w-full pl-14 pr-5 py-4 text-base rounded-2xl bg-surface-card border border-border-light shadow-card focus:border-brand-orange focus:shadow-lg transition-all duration-300 outline-none font-medium"
                     autoFocus
                 />
-                {hydrated && vehicle && (
+                {PERSONALIZATION_ENABLED && hydrated && vehicle && (
                     <label className="mt-3 flex items-center gap-2 text-[13px] font-medium text-text-secondary cursor-pointer select-none">
                         <input
                             type="checkbox"

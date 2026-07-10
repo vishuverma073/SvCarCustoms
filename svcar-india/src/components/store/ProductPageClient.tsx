@@ -7,7 +7,7 @@ import { formatPrice, productImageUrl } from "@/lib/utils";
 import { useStoreSettings } from "@/lib/use-store-settings";
 import AddToCartButton from "@/components/store/AddToCartButton";
 import ProductCarousel from "@/components/store/ProductCarousel";
-import ProductFitment from "@/components/store/ProductFitment";
+// [Personalization disabled for now] import ProductFitment from "@/components/store/ProductFitment";
 import SectionHeader from "@/components/store/SectionHeader";
 import { Truck, Package, MessageCircle, ChevronRight, ChevronLeft, Home, Shield } from "lucide-react";
 import type { Product, ProductListItem } from "@svcar/contracts";
@@ -288,8 +288,8 @@ export default function ProductPageClient({
                             <p className="text-[11px] text-text-muted mt-1">SKU: {currentSKU.skuCode}</p>
                         )}
 
-                        {/* Vehicle fitment */}
-                        <ProductFitment product={product} />
+                        {/* [Personalization disabled for now] Vehicle fitment panel hidden.
+                        <ProductFitment product={product} /> */}
 
                         {/* Variant Dimension Selectors */}
                         {sortedDimensions.map((dim) => {
