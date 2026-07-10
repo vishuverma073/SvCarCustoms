@@ -277,11 +277,7 @@ export default async function HomePage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            {order
-                // [TEMP] "Build a Car" hero banner hidden for now.
-                // To restore it, delete the .filter(...) line below.
-                .filter((key) => key !== "hero")
-                .map((key) => {
+            {order.map((key) => {
                 switch (key) {
                     case "hero":
                         return <HeroCarousel key="hero" hero={hero} shopHref={browseAllHref} />;

@@ -23,23 +23,32 @@ const FALLBACK_IMAGE =
 
 const AUTOPLAY_MS = 6000;
 
-/** Brand slides shown after the (admin-driven) primary hero slide. */
+/** Brand slides shown after the (admin-driven) primary hero slide.
+ * Links point to REAL top-level categories (body-kits, exhausts, lighting). */
 const BRAND_SLIDES: HeroSlide[] = [
   {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Exterior+Mods",
-    title: "EXTERIOR MODS",
-    subtitle: "Body kits, spoilers, splitters & diffusers for an aggressive stance.",
+    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Body+Kits",
+    title: "BODY KITS",
+    subtitle: "Full body kits, front splitters & rear diffusers for an aggressive stance.",
     tagline: "TRANSFORM YOUR STANCE.",
-    ctaText: "Shop Exterior",
-    ctaLink: "/category/exterior-mods",
+    ctaText: "Shop Body Kits",
+    ctaLink: "/category/body-kits",
   },
   {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Performance+Parts",
-    title: "PERFORMANCE PARTS",
-    subtitle: "Exhausts, intakes & suspension engineered for the road.",
+    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Exhausts",
+    title: "EXHAUSTS & TIPS",
+    subtitle: "Performance exhausts and tips engineered for sound and flow.",
     tagline: "ENGINEERED FOR PURE PERFORMANCE.",
-    ctaText: "Shop Performance",
-    ctaLink: "/category/performance-parts",
+    ctaText: "Shop Exhausts",
+    ctaLink: "/category/exhausts",
+  },
+  {
+    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Lighting",
+    title: "LIGHTING",
+    subtitle: "Ambient lighting, headlights and interior kits to light up your ride.",
+    tagline: "LIGHT UP THE ROAD.",
+    ctaText: "Shop Lighting",
+    ctaLink: "/category/lighting",
   },
 ];
 
