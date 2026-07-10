@@ -13,7 +13,8 @@ import { backend } from "@/lib/backend";
 import { useShopNav } from "@/lib/use-shop-nav";
 import ThemeToggle from "./ThemeToggle";
 import AnnouncementBar from "./AnnouncementBar";
-import GarageSelector from "./GarageSelector";
+// [TEMP] "Select your car" (garage selector) hidden for now — uncomment to restore.
+// import GarageSelector from "./GarageSelector";
 import ShopMegaMenu from "./nav/ShopMegaMenu";
 import MobileShopNav from "./nav/MobileShopNav";
 
@@ -203,7 +204,8 @@ export default function StoreHeader() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <GarageSelector className="hidden md:block mr-1" />
+            {/* [TEMP] "Select your car" hidden for now — restore this line to re-enable.
+            <GarageSelector className="hidden md:block mr-1" /> */}
 
             {isMounted && authStatus === "authenticated" && authUser?.isAdmin && (
               <button
@@ -300,9 +302,10 @@ export default function StoreHeader() {
             isMobileMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
+          {/* [TEMP] "Select your car" hidden for now — restore this block to re-enable.
           <div className="p-4 border-b border-border/50">
             <GarageSelector className="w-full [&>button]:w-full [&>button]:justify-between" />
-          </div>
+          </div> */}
           <MobileShopNav
             open={isMobileMenuOpen}
             tree={tree}
