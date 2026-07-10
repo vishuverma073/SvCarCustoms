@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 const DEFAULT_ORDER: HomeSectionKey[] = ["hero", "categories", "bestsellers", "promo", "new"];
 
 const DEFAULT_HERO: HomeBanner = {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=SV+Car+Customs",
+    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=SV+Car+Customs",
     title: "Style. Performance. Quality.",
     subtitle:
         "Body Kits, Lighting, Audio & Custom Interiors. Built for Indian Roads & Enthusiasts.",
@@ -32,7 +32,7 @@ const DEFAULT_HERO: HomeBanner = {
 };
 
 const DEFAULT_PROMO: HomeBanner = {
-    image: "https://placehold.co/1600x600/0C0C0D/C8A24B/png?text=Up+to+55%25+Off",
+    image: "https://placehold.co/1600x600/0C0C0D/E11D2A/png?text=Up+to+55%25+Off",
     title: "Premium Quality, Honest Prices",
     subtitle: "Upto 55% off on all products.",
     ctaText: "Browse All Products",

@@ -7,9 +7,9 @@
    re-skins from here. Read `brand-orange*` as "brand accent". */
 @theme {
   --color-brand-black: #0C0C0D;
-  --color-brand-orange: #C8A24B;
-  --color-brand-orange-dark: #9A7B33;
-  --color-brand-orange-light: #F7F1E1;
+  --color-brand-orange: #E11D2A;
+  --color-brand-orange-dark: #B31620;
+  --color-brand-orange-light: #FDE8EA;
   --color-brand-blue: #3F3F46;
   --color-surface: #FCFCFC;
   --color-surface-dim: #F3F3F3;
@@ -30,8 +30,8 @@
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
   --shadow-card-hover: 0 8px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
   --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.06);
-  --shadow-btn: 0 2px 8px rgba(200, 162, 75, 0.25);
-  --shadow-glow-orange: 0 0 20px rgba(200, 162, 75, 0.15);
+  --shadow-btn: 0 2px 8px rgba(225, 29, 42, 0.25);
+  --shadow-glow-orange: 0 0 20px rgba(225, 29, 42, 0.15);
 
   /* Announcement-bar ticker. Registering it here makes `animate-marquee` a real
      Tailwind v4 utility (otherwise the class resolves to an empty animation). */
@@ -54,7 +54,7 @@
   --color-text-primary: #FAFAFA;
   --color-text-secondary: #B4B4BC;
   --color-text-muted: #8A8A93;
-  --color-brand-orange-light: #24200F;
+  --color-brand-orange-light: #2A1214;
 }
 .dark .bg-white {
   background-color: var(--color-surface-card);
@@ -187,11 +187,11 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(200, 162, 75, 0.25);
+    box-shadow: 0 0 0 0 rgba(225, 29, 42, 0.25);
   }
 
   50% {
-    box-shadow: 0 0 0 6px rgba(200, 162, 75, 0);
+    box-shadow: 0 0 0 6px rgba(225, 29, 42, 0);
   }
 }
 
@@ -317,9 +317,9 @@ body {
 }
 
 .badge-bestseller {
-  background: linear-gradient(135deg, #C8A24B, #E0C074);
-  color: #0C0C0D;
-  box-shadow: 0 2px 8px rgba(200, 162, 75, 0.3);
+  background: linear-gradient(135deg, #E11D2A, #F04250);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(225, 29, 42, 0.3);
 }
 
 .badge-new {
@@ -356,14 +356,14 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #C8A24B, #B08C38);
-  color: #0C0C0D;
+  background: linear-gradient(135deg, #E11D2A, #C41A25);
+  color: #FFFFFF;
   box-shadow: var(--shadow-btn);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #B08C38, #9A7B33);
-  box-shadow: 0 4px 16px rgba(200, 162, 75, 0.35);
+  background: linear-gradient(135deg, #C41A25, #B31620);
+  box-shadow: 0 4px 16px rgba(225, 29, 42, 0.35);
   transform: translateY(-1px);
 }
 
@@ -375,7 +375,7 @@ body {
 
 .btn-secondary:hover {
   background-color: var(--color-brand-orange);
-  color: #0C0C0D;
+  color: #FFFFFF;
   box-shadow: var(--shadow-btn);
   transform: translateY(-1px);
 }
@@ -431,7 +431,7 @@ body {
   width: 40px;
   height: 3px;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--color-brand-orange), #E0C074);
+  background: linear-gradient(90deg, var(--color-brand-orange), #F04250);
   margin-bottom: 12px;
 }
 
@@ -450,7 +450,7 @@ body {
 }
 
 .section-title .highlight {
-  background: linear-gradient(135deg, var(--color-brand-orange), #B08C38);
+  background: linear-gradient(135deg, var(--color-brand-orange), #C41A25);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -625,7 +625,7 @@ body {
   inset: 0;
   border-radius: 16px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(200, 162, 75, 0.25), rgba(63, 63, 70, 0.1), rgba(200, 162, 75, 0.06));
+  background: linear-gradient(135deg, rgba(225, 29, 42, 0.25), rgba(63, 63, 70, 0.1), rgba(225, 29, 42, 0.06));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -705,7 +705,7 @@ body {
   border-color: var(--color-brand-orange);
   color: var(--color-brand-orange);
   background: var(--color-brand-orange-light);
-  box-shadow: 0 0 0 3px rgba(200, 162, 75, 0.15);
+  box-shadow: 0 0 0 3px rgba(225, 29, 42, 0.15);
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
@@ -725,7 +725,7 @@ body {
   inset: 0;
   border-radius: 16px;
   padding: 1.5px;
-  background: linear-gradient(135deg, rgba(200, 162, 75, 0.35), rgba(63, 63, 70, 0.15), rgba(200, 162, 75, 0.12));
+  background: linear-gradient(135deg, rgba(225, 29, 42, 0.35), rgba(63, 63, 70, 0.15), rgba(225, 29, 42, 0.12));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -748,7 +748,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(200, 162, 75, 0.03), transparent 60%);
+  background: linear-gradient(135deg, rgba(225, 29, 42, 0.03), transparent 60%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -818,9 +818,9 @@ body {
 
 .subcat-pill.active {
   background: var(--color-brand-orange);
-  color: #0C0C0D;
+  color: #FFFFFF;
   border-color: var(--color-brand-orange);
-  box-shadow: 0 2px 10px rgba(200, 162, 75, 0.25);
+  box-shadow: 0 2px 10px rgba(225, 29, 42, 0.25);
 }
 
 /* ─── Category Tabs ─────────────────────────────────────────── */
@@ -871,7 +871,7 @@ body {
 }
 
 .admin-nav-item.active {
-  color: #0C0C0D;
+  color: #FFFFFF;
   background-color: var(--color-brand-orange);
 }
 
@@ -888,8 +888,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200, 162, 75, 0.14), transparent 55%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(200, 162, 75, 0.07), transparent 50%),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(225, 29, 42, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(225, 29, 42, 0.07), transparent 50%),
     linear-gradient(180deg, #0a0a0a 0%, #111111 50%, #0a0a0a 100%);
 }
 
@@ -898,7 +898,7 @@ body {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(200, 162, 75, 0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(225, 29, 42, 0.18) 0%, transparent 70%);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -979,10 +979,10 @@ body {
 
 @keyframes adminWelcomeLogoGlow {
   0%, 100% {
-    filter: drop-shadow(0 0 18px rgba(200, 162, 75, 0.4));
+    filter: drop-shadow(0 0 18px rgba(225, 29, 42, 0.4));
   }
   50% {
-    filter: drop-shadow(0 0 28px rgba(200, 162, 75, 0.6));
+    filter: drop-shadow(0 0 28px rgba(225, 29, 42, 0.6));
   }
 }
 
@@ -1057,7 +1057,7 @@ body {
 
 .input:focus {
   border-color: var(--color-brand-orange);
-  box-shadow: 0 0 0 3px rgba(200, 162, 75, 0.15);
+  box-shadow: 0 0 0 3px rgba(225, 29, 42, 0.15);
   background: var(--color-surface-card);
 }
 

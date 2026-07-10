@@ -16,7 +16,7 @@ const TILES = [
 ];
 
 const tileImg = (text: string) =>
-  `https://placehold.co/600x600/0C0C0D/C8A24B/png?text=${encodeURIComponent(text)}`;
+  `https://placehold.co/600x600/0C0C0D/E11D2A/png?text=${encodeURIComponent(text)}`;
 
 export default function InstagramSection() {
   return (

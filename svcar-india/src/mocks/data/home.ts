@@ -23,7 +23,7 @@ export const home: HomeWire = {
       enabled: true,
       order: 0,
       config: {
-        imageUrl: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=SV+Car+Customs",
+        imageUrl: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=SV+Car+Customs",
         title: "Build a Car That Turns Heads",
         subtitle: "Body kits, spoilers, ambient lighting, exhausts & more. Best car accessories delivered to your doorstep.",
         ctaText: "Shop Accessories",
@@ -39,7 +39,7 @@ export const home: HomeWire = {
       enabled: true,
       order: 5,
       config: {
-        imageUrl: "https://placehold.co/1600x600/0C0C0D/C8A24B/png?text=Up+to+40%25+Off",
+        imageUrl: "https://placehold.co/1600x600/0C0C0D/E11D2A/png?text=Up+to+40%25+Off",
         headline: "Festive Sale — Up to 40% Off",
         ctaText: "View Offers",
         ctaHref: "/category/exterior-mods",

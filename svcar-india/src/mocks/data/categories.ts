@@ -2,7 +2,7 @@ import type { Category } from "@svcar/contracts";
 
 /** On-brand dark placeholder image for a category tile. */
 const img = (text: string) =>
-  `https://placehold.co/600x600/0C0C0D/C8A24B/png?text=${encodeURIComponent(text)}`;
+  `https://placehold.co/600x600/0C0C0D/E11D2A/png?text=${encodeURIComponent(text)}`;
 
 /**
  * Mock category tree for SV Car Customs — 9 roots + children. The roots mirror

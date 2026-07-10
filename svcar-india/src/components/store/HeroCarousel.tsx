@@ -19,7 +19,7 @@ export interface HeroSlide {
 }
 
 const FALLBACK_IMAGE =
-  "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=SV+Car+Customs";
+  "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=SV+Car+Customs";
 
 const AUTOPLAY_MS = 6000;
 
@@ -27,7 +27,7 @@ const AUTOPLAY_MS = 6000;
  * Links point to REAL top-level categories (body-kits, exhausts, lighting). */
 const BRAND_SLIDES: HeroSlide[] = [
   {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Body+Kits",
+    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Body+Kits",
     title: "BODY KITS",
     subtitle: "Full body kits, front splitters & rear diffusers for an aggressive stance.",
     tagline: "TRANSFORM YOUR STANCE.",
@@ -35,7 +35,7 @@ const BRAND_SLIDES: HeroSlide[] = [
     ctaLink: "/category/body-kits",
   },
   {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Exhausts",
+    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Exhausts",
     title: "EXHAUSTS & TIPS",
     subtitle: "Performance exhausts and tips engineered for sound and flow.",
     tagline: "ENGINEERED FOR PURE PERFORMANCE.",
@@ -43,7 +43,7 @@ const BRAND_SLIDES: HeroSlide[] = [
     ctaLink: "/category/exhausts",
   },
   {
-    image: "https://placehold.co/1600x900/0C0C0D/C8A24B/png?text=Lighting",
+    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Lighting",
     title: "LIGHTING",
     subtitle: "Ambient lighting, headlights and interior kits to light up your ride.",
     tagline: "LIGHT UP THE ROAD.",
