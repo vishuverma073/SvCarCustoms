@@ -407,24 +407,6 @@ export default function ProductEditor({
             >
               <Copy size={15} /> {duplicating ? "Duplicating…" : "Duplicate"}
             </button>
-            {status !== "archived" && (
-              <button
-                type="button"
-                onClick={handleArchive}
-                disabled={archiving || deleting}
-                className="btn btn-secondary text-sm"
-              >
-                <Archive size={15} /> {archiving ? "Archiving…" : "Archive"}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={deleting || archiving}
-              className="btn text-sm bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50"
-            >
-              <Trash2 size={15} /> {deleting ? "Deleting…" : "Delete"}
-            </button>
           </div>
         )}
       </div>
