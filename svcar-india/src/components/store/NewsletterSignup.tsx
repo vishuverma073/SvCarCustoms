@@ -7,12 +7,14 @@ import { backend } from "@/lib/backend";
 export default function NewsletterSignup() {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("Please enter a valid email address.");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (state === "loading") return;
     const trimmed = email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setErrorMsg("Please enter a valid email address.");
       setState("error");
       return;
     }
@@ -22,6 +24,7 @@ export default function NewsletterSignup() {
       setState("done");
       setEmail("");
     } catch {
+      setErrorMsg("Couldn't subscribe right now. Please try again in a moment.");
       setState("error");
     }
   }
@@ -67,7 +70,7 @@ export default function NewsletterSignup() {
         )}
       </div>
       {state === "error" && (
-        <p className="mt-2 text-[12px] text-red-400">Please enter a valid email address.</p>
+        <p className="mt-2 text-[12px] text-red-400">{errorMsg}</p>
       )}
     </div>
   );

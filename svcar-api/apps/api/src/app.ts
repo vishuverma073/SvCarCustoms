@@ -14,6 +14,7 @@ import { makeMeRouter } from "./routes/me.js";
 import { makeCheckoutRouter } from "./routes/checkout.js";
 import { makePaymentsRouter } from "./routes/payments.js";
 import { makeWebhooksRouter } from "./routes/webhooks.js";
+import { makeNewsletterRouter } from "./routes/newsletter.js";
 import { makePincodeRouter } from "./routes/pincode.js";
 import { makeMetricsRouter } from "./routes/metrics.js";
 import { makeInngestRouter } from "./routes/inngest.js";
@@ -80,6 +81,7 @@ export function createApp(deps: AppDeps) {
   app.route("/checkout", makeCheckoutRouter(deps.db));
   app.route("/payments", makePaymentsRouter(deps.db));
   app.route("/webhooks", makeWebhooksRouter(deps.db));
+  app.route("/newsletter", makeNewsletterRouter(deps.db));
   app.route("/pincode", makePincodeRouter());
   app.route("/metrics", makeMetricsRouter());
   app.route("/api/inngest", makeInngestRouter(deps.db));
