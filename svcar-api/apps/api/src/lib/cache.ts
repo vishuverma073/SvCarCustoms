@@ -111,7 +111,7 @@ export async function invalidatePrefix(prefix: string): Promise<void> {
 
 /** Invalidate everything affected by a product write (detail + category lists). */
 export async function invalidateProductCaches(slug: string): Promise<void> {
-  await invalidate(`product:${slug}`, "categories:root");
+  await invalidate(`product:${slug}`, "categories:root", "categories:all");
   await invalidatePrefix("category-products:");
   await invalidatePrefix("category:");
   await notifyStorefrontRevalidate(["products", `product-${slug}`]);
@@ -119,7 +119,10 @@ export async function invalidateProductCaches(slug: string): Promise<void> {
 
 /** Invalidate everything affected by a category write. */
 export async function invalidateCategoryCaches(): Promise<void> {
-  await invalidate("categories:root");
+  // Note: `categories:all` must be listed explicitly — the `category:` prefix
+  // below does NOT match it ("categories:all" ≠ "category:*"), so without this
+  // the nav/header (which reads /categories/all) stayed stale after an edit.
+  await invalidate("categories:root", "categories:all");
   await invalidatePrefix("category:");
   await invalidatePrefix("category-products:");
   // A category add/edit/delete changes the nav, footer, sidebar and homepage —

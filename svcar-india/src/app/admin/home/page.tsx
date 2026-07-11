@@ -103,7 +103,7 @@ export default function HomeComposerPage() {
         const saved = await adminApi.putHome(config!);
         setConfig(saved);
         setDirty(false);
-        await globalMutate("nav-categories");
+        await globalMutate("shop-nav");
       }
       const navEntries = Object.entries(navbarPending);
       if (navEntries.length > 0) {
@@ -112,7 +112,7 @@ export default function HomeComposerPage() {
         );
         setNavbarPending({});
         mutateCategories();
-        await globalMutate("nav-categories");
+        await globalMutate("shop-nav");
       }
       toast.success("Home page saved");
     } catch {
