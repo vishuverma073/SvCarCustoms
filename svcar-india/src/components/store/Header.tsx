@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useId, useCallback } from "react";
+import { useState, useEffect, useId, useCallback, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingBag, Menu, X, User, LogOut, ChevronDown, Shield } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
@@ -93,7 +93,26 @@ export default function StoreHeader() {
   );
 
   const shopActive = pathname.startsWith("/category/");
-  const closeShop = () => setShopOpen(false);
+
+  // Hover-intent for the Shop mega-menu: opening is instant, but closing waits a
+  // beat so the pointer can cross the small gap between the button and the panel
+  // (and move around inside the panel) without it snapping shut.
+  const shopCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openShop = () => {
+    if (shopCloseTimer.current) clearTimeout(shopCloseTimer.current);
+    setShopOpen(true);
+  };
+  const scheduleCloseShop = () => {
+    if (shopCloseTimer.current) clearTimeout(shopCloseTimer.current);
+    shopCloseTimer.current = setTimeout(() => setShopOpen(false), 160);
+  };
+  const closeShop = () => {
+    if (shopCloseTimer.current) clearTimeout(shopCloseTimer.current);
+    setShopOpen(false);
+  };
+  useEffect(() => () => {
+    if (shopCloseTimer.current) clearTimeout(shopCloseTimer.current);
+  }, []);
   const closeAllMenus = () => {
     setShopOpen(false);
     closeMobileMenu();
@@ -143,11 +162,11 @@ export default function StoreHeader() {
               // Not positioned: the mega panel anchors to the header container
               // above (which is `relative`), so it spans the full width and
               // never spills off-screen. This div only groups hover/focus.
-              onMouseEnter={() => setShopOpen(true)}
-              onMouseLeave={() => setShopOpen(false)}
-              onFocus={() => setShopOpen(true)}
+              onMouseEnter={openShop}
+              onMouseLeave={scheduleCloseShop}
+              onFocus={openShop}
               onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget as Node)) setShopOpen(false);
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) closeShop();
               }}
             >
               <button
