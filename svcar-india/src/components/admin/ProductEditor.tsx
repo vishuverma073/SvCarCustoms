@@ -399,14 +399,38 @@ export default function ProductEditor({
                 Preview
               </Link>
             )}
-            <button
-              type="button"
-              onClick={() => void handleDuplicate()}
-              disabled={duplicating || deleting || archiving}
-              className="btn btn-secondary text-sm"
-            >
-              <Copy size={15} /> {duplicating ? "Duplicating…" : "Duplicate"}
-            </button>
+            {/* Draft / Active quick-toggle — click to flip status, then Save. */}
+            {status !== "archived" && (
+              <button
+                type="button"
+                onClick={() =>
+                  setValue("status", status === "active" ? "draft" : "active", {
+                    shouldDirty: true,
+                  })
+                }
+                title="Toggle publish status — remember to Save"
+                className={`btn text-sm ${
+                  status === "active"
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-amber-500 text-white hover:bg-amber-600"
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-white/90 shrink-0" />
+                {status === "active" ? "Active" : "Draft"}
+              </button>
+            )}
+
+            {/* Duplicate — temporarily hidden. Change `false` → `true` to restore. */}
+            {false && (
+              <button
+                type="button"
+                onClick={() => void handleDuplicate()}
+                disabled={duplicating || deleting || archiving}
+                className="btn btn-secondary text-sm"
+              >
+                <Copy size={15} /> {duplicating ? "Duplicating…" : "Duplicate"}
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -15,6 +15,11 @@ import { makeCheckoutRouter } from "./routes/checkout.js";
 import { makePaymentsRouter } from "./routes/payments.js";
 import { makeWebhooksRouter } from "./routes/webhooks.js";
 import { makeNewsletterRouter } from "./routes/newsletter.js";
+import {
+  makeAdminLeadsRouter,
+  makeAdminLiveRouter,
+  makeAdminSubscribersRouter,
+} from "./routes/admin/engagement.js";
 import { makePincodeRouter } from "./routes/pincode.js";
 import { makeMetricsRouter } from "./routes/metrics.js";
 import { makeInngestRouter } from "./routes/inngest.js";
@@ -95,6 +100,9 @@ export function createApp(deps: AppDeps) {
   app.route("/admin/orders", makeAdminOrdersRouter(deps.db));
   app.route("/admin/audit-log", makeAdminAuditRouter(deps.db));
   app.route("/admin/uploads", makeAdminUploadsRouter(deps.db));
+  app.route("/admin/leads", makeAdminLeadsRouter(deps.db));
+  app.route("/admin/live", makeAdminLiveRouter(deps.db));
+  app.route("/admin/subscribers", makeAdminSubscribersRouter(deps.db));
 
   // Phase 5 failure drill: an opt-in route that throws, to verify the full
   // Sentry → Axiom → Slack pipeline end to end. Off unless ENABLE_TEST_ERROR=1,
