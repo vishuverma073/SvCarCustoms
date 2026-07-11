@@ -667,41 +667,41 @@ export default function ProductEditor({
         <span className="text-xs text-text-muted min-w-0 truncate">
           {isSubmitting ? "Saving…" : isDirty ? "Unsaved changes" : "All changes saved"}
         </span>
-        <div className="flex gap-2 shrink-0">
-          {isEdit && status !== "archived" && (
-            <button
-              type="button"
-              onClick={handleArchive}
-              disabled={archiving || deleting || isSubmitting}
-              className="btn btn-secondary text-sm"
-            >
-              <Archive size={15} /> Archive
-            </button>
-          )}
+        <div className="flex gap-1.5 shrink-0">
           {isEdit && (
             <button
               type="button"
               onClick={handleDelete}
               disabled={deleting || archiving || isSubmitting}
-              className="btn text-sm bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50"
+              className="btn px-3! py-2! text-xs bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50"
             >
-              <Trash2 size={15} /> Delete
+              <Trash2 size={14} /> Delete
             </button>
           )}
           <button
             type="button"
             onClick={() => router.push("/admin/products")}
-            className="btn btn-ghost text-sm"
+            className="btn btn-ghost px-3! py-2! text-xs"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || (isEdit && !isDirty)}
-            className="btn btn-primary text-sm disabled:opacity-50"
+            className="btn btn-primary px-3! py-2! text-xs disabled:opacity-50"
           >
             {isEdit ? "Save" : "Create Product"}
           </button>
+          {isEdit && status !== "archived" && (
+            <button
+              type="button"
+              onClick={handleArchive}
+              disabled={archiving || deleting || isSubmitting}
+              className="btn btn-secondary px-3! py-2! text-xs"
+            >
+              <Archive size={14} /> Archive
+            </button>
+          )}
         </div>
       </div>
 
