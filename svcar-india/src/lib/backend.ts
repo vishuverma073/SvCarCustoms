@@ -682,7 +682,9 @@ export const backend = {
   getProductBySlug(slug: string): Promise<Product> {
     return apiFetch<Product>(`/products/${slug}`, {
       schema: ProductSchema,
-      next: { revalidate: 3600, tags: [`product-${slug}`] },
+      // no-store: the PDP always reflects the latest product data (image edits,
+      // admin uploads) instead of waiting out a revalidate window.
+      cache: "no-store",
     });
   },
 

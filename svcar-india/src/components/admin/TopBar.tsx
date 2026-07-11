@@ -6,6 +6,7 @@ import Image from "next/image";
 import { LogOut, Store } from "lucide-react";
 import { useAdminAuthStore } from "@/store/adminAuthStore";
 import ThemeToggle from "@/components/store/ThemeToggle";
+import MobileNavDrawer from "./MobileNavDrawer";
 
 /**
  * Admin top bar. On mobile the avatar opens a menu with logout (sidebar logout
@@ -30,9 +31,12 @@ export default function TopBar({ onLogout }: { onLogout: () => void }) {
 
   return (
     <header className="bg-white border-b border-border h-14 px-4 lg:px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
-      <Link href="/admin" className="lg:hidden flex items-center">
-        <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
-      </Link>
+      <div className="flex items-center gap-1">
+        <MobileNavDrawer />
+        <Link href="/admin" className="lg:hidden flex items-center">
+          <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={30} height={30} className="rounded-lg" />
+        </Link>
+      </div>
       <span className="hidden lg:block" aria-hidden />
 
       <div className="flex items-center gap-2">

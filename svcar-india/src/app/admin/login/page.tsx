@@ -55,7 +55,7 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input"
-              placeholder="admin@test.local"
+              placeholder="admin@svcarcustoms.com"
               autoComplete="username"
               required
             />
@@ -88,7 +88,7 @@ function LoginForm() {
         </form>
 
         <p className="text-center text-white/30 text-xs mt-6">
-          Mock credentials: admin@test.local / admin123
+          Mock credentials: admin@svcarcustoms.com / Admin@12345
         </p>
       </div>
     </div>
