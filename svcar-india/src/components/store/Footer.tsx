@@ -57,9 +57,9 @@ export default async function StoreFooter() {
                     <NewsletterSignup />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
                     {/* Brand */}
-                    <div className="lg:col-span-1">
+                    <div className="col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-2.5 mb-3">
                             <Image src="/uploads/logo/logo-v2.webp" alt="SV Car Customs" width={36} height={36} className="rounded-lg" />
                             <div className="flex flex-col leading-none">
@@ -142,7 +142,7 @@ export default async function StoreFooter() {
                     </div>
 
                     {/* Contact */}
-                    <div>
+                    <div className="col-span-2 lg:col-span-1">
                         <h4 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30 mb-5">
                             Contact
                         </h4>
