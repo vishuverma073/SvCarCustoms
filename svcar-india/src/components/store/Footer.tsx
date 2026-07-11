@@ -147,20 +147,20 @@ export default async function StoreFooter() {
                             Contact
                         </h4>
                         <div className="space-y-3 text-[13px] text-white/50">
-                            <a href="mailto:support@svcarcustoms.com" className="flex items-start gap-2.5 hover:text-white transition-colors duration-200">
+                            <a href="mailto:shivam187100@gmail.com" className="flex items-start gap-2.5 hover:text-white transition-colors duration-200">
                                 <Mail size={15} className="mt-0.5 shrink-0" />
-                                <span>support@svcarcustoms.com</span>
+                                <span>shivam187100@gmail.com</span>
                             </a>
-                            <a href="tel:+919350529717" className="flex items-center gap-2.5 hover:text-white transition-colors duration-200">
+                            <a href="tel:+919205005425" className="flex items-center gap-2.5 hover:text-white transition-colors duration-200">
                                 <Phone size={15} className="shrink-0" />
-                                <span>+91 93505 29717</span>
+                                <span>+91 92050 05425</span>
                             </a>
                             <div className="flex items-start gap-2.5">
                                 <MapPin size={15} className="mt-0.5 shrink-0" />
                                 <span>
-                                    Plot 734, Bijwasan - Palam Vihar Rd,
+                                    Shop no.2, Ground Floor, Plot no. 734-A,
                                     <br />
-                                    New Delhi, 110061
+                                    Opposite CISF Camp, Delhi NCR, 110061
                                 </span>
                             </div>
                         </div>

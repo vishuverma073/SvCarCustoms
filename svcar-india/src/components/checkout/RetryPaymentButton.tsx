@@ -13,7 +13,7 @@ import MockPayuModal from "./MockPayuModal";
 // The Razorpay modal flow has been removed; see git history to restore it.
 
 const WHATSAPP_HELP =
-  "https://wa.me/919350529717?text=" +
+  "https://wa.me/919205005425?text=" +
   encodeURIComponent("Hi, I had trouble paying for my order on the SV Car Customs website.");
 
 /**

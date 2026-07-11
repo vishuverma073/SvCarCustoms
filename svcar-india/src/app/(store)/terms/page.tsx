@@ -69,10 +69,10 @@ export default function TermsPage() {
           <h2>Contact</h2>
           <p>
             Questions about these terms? Email{" "}
-            <a href="mailto:support@svcarcustoms.com" className="text-brand-orange hover:underline">
-              support@svcarcustoms.com
+            <a href="mailto:shivam187100@gmail.com" className="text-brand-orange hover:underline">
+              shivam187100@gmail.com
             </a>{" "}
-            or call +91 93505 29717.
+            or call +91 92050 05425.
           </p>
         </section>
       </div>

@@ -428,7 +428,7 @@ export default function ProductPageClient({
 
                         {/* WhatsApp CTA */}
                         <Link
-                            href="https://wa.me/919350529717"
+                            href="https://wa.me/919205005425"
                             target="_blank"
                             className="mt-4 flex items-center gap-2 text-[13px] text-whatsapp font-medium hover:underline transition-colors"
                         >

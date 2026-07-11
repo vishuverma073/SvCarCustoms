@@ -16,7 +16,7 @@ import MockPayuModal from "./MockPayuModal";
 // /checkout/verify) has been removed from this component. See git history to
 // restore Razorpay support if ever needed.
 
-const WHATSAPP_HELP = "https://wa.me/919350529717?text=" +
+const WHATSAPP_HELP = "https://wa.me/919205005425?text=" +
   encodeURIComponent("Hi, I had trouble paying for my order on the SV Car Customs website.");
 
 interface PayButtonProps {

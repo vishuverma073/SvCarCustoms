@@ -77,7 +77,7 @@ export default function SettingsPage() {
           <input {...register("supportEmail")} className="input" type="email" />
         </Field>
         <Field label="WhatsApp number (E.164)" error={errors.whatsappNumber?.message}>
-          <input {...register("whatsappNumber")} className="input" placeholder="+919350529717" />
+          <input {...register("whatsappNumber")} className="input" placeholder="+919205005425" />
         </Field>
         <div className="pt-1">
           <p className="text-xs font-bold uppercase tracking-wide text-text-secondary mb-2">Store address</p>

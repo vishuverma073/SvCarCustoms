@@ -61,7 +61,7 @@ export default function RefundPolicyPage() {
                 <section>
                     <h2>How to request a return</h2>
                     <ul>
-                        <li>Email <a href="mailto:support@svcarcustoms.com">support@svcarcustoms.com</a> or message us on <a href="https://wa.me/919350529717" target="_blank" rel="noopener noreferrer">WhatsApp</a> with your order number and reason.</li>
+                        <li>Email <a href="mailto:shivam187100@gmail.com">shivam187100@gmail.com</a> or message us on <a href="https://wa.me/919205005425" target="_blank" rel="noopener noreferrer">WhatsApp</a> with your order number and reason.</li>
                         <li>We&rsquo;ll confirm eligibility and arrange a pickup or share return instructions.</li>
                         <li>Once we receive and inspect the item, we&rsquo;ll process your refund.</li>
                     </ul>
@@ -92,8 +92,8 @@ export default function RefundPolicyPage() {
                     <h2>Need help?</h2>
                     <p>
                         Reach us at{" "}
-                        <a href="mailto:support@svcarcustoms.com">support@svcarcustoms.com</a>{" "}
-                        or <a href="tel:+919350529717">+91 93505 29717</a>. See our{" "}
+                        <a href="mailto:shivam187100@gmail.com">shivam187100@gmail.com</a>{" "}
+                        or <a href="tel:+919205005425">+91 92050 05425</a>. See our{" "}
                         <a href="/contact">Contact page</a> for hours and address.
                     </p>
                 </section>

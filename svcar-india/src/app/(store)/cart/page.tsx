@@ -12,7 +12,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { useStoreSettings } from "@/lib/use-store-settings";
 
-const PHONE = "9350529717";
+const PHONE = "9205005425";
 
 export default function CartPage() {
     const [mounted, setMounted] = useState(false);

@@ -24,7 +24,7 @@ export const SettingsSchema = z.object({
   shippingFreeAbove: z.number().nonnegative(),
   /** Flat shipping fee charged below the free-shipping threshold (INR). */
   shippingFlatFee: z.number().nonnegative(),
-  /** WhatsApp number used for the deep-link CTA, in E.164 (e.g. +919350529717). */
+  /** WhatsApp number used for the deep-link CTA, in E.164 (e.g. +919205005425). */
   whatsappNumber: z.string().min(1),
   updatedAt: z.string().optional(),
 });

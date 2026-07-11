@@ -85,8 +85,8 @@ export default function PrivacyPolicyPage() {
                     <h2>Contact</h2>
                     <p>
                         Questions about this policy? Email{" "}
-                        <a href="mailto:support@svcarcustoms.com">support@svcarcustoms.com</a>{" "}
-                        or call <a href="tel:+919350529717">+91 93505 29717</a>. See our{" "}
+                        <a href="mailto:shivam187100@gmail.com">shivam187100@gmail.com</a>{" "}
+                        or call <a href="tel:+919205005425">+91 92050 05425</a>. See our{" "}
                         <a href="/contact">Contact page</a> for more ways to reach us.
                     </p>
                 </section>

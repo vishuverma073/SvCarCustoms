@@ -11,10 +11,10 @@ export const metadata: Metadata = {
     alternates: { canonical: absoluteUrl("/contact") },
 };
 
-const EMAIL = "support@svcarcustoms.com";
-const PHONE_DISPLAY = "+91 93505 29717";
-const PHONE_TEL = "+919350529717";
-const WHATSAPP = "919350529717";
+const EMAIL = "shivam187100@gmail.com";
+const PHONE_DISPLAY = "+91 92050 05425";
+const PHONE_TEL = "+919205005425";
+const WHATSAPP = "919205005425";
 
 export default function ContactPage() {
     // Minimal Organization/ContactPoint structured data so search engines can
@@ -28,8 +28,8 @@ export default function ContactPage() {
         telephone: PHONE_TEL,
         address: {
             "@type": "PostalAddress",
-            streetAddress: "Plot 734, Bijwasan - Palam Vihar Rd",
-            addressLocality: "New Delhi",
+            streetAddress: "Shop no.2, Ground Floor, Plot no. 734-A, Opposite CISF Camp",
+            addressLocality: "Delhi",
             postalCode: "110061",
             addressCountry: "IN",
         },
@@ -102,9 +102,9 @@ export default function ContactPage() {
                             <p className="text-sm text-white/70 flex items-start gap-2">
                                 <MapPin size={15} className="mt-0.5 shrink-0" />
                                 <span>
-                                    Plot 734, Bijwasan - Palam Vihar Rd,
+                                    Shop no.2, Ground Floor, Plot no. 734-A,
                                     <br />
-                                    New Delhi, 110061
+                                    Opposite CISF Camp, Delhi NCR, 110061
                                 </span>
                             </p>
                         </div>

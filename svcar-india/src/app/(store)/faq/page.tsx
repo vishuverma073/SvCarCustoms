@@ -43,7 +43,7 @@ const FAQ = [
   },
   {
     q: "How do I contact support?",
-    a: "Call +91 93505 29717, email support@svcarcustoms.com, or use the Contact page / WhatsApp link on any product page.",
+    a: "Call +91 92050 05425, email shivam187100@gmail.com, or use the Contact page / WhatsApp link on any product page.",
   },
 ] as const;
 

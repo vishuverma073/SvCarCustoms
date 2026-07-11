@@ -68,7 +68,7 @@ export default function ShippingPage() {
         <section>
           <h2>Need help?</h2>
           <p>
-            WhatsApp us at +91 93505 29717 or visit our{" "}
+            WhatsApp us at +91 92050 05425 or visit our{" "}
             <a href="/contact" className="text-brand-orange hover:underline">
               Contact
             </a>{" "}

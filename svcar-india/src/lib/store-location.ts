@@ -1,18 +1,19 @@
 /** SV Car Customs store / office — single source for contact, about, footer. */
 export const STORE_ADDRESS = {
-  line1: "Plot 734, Bijwasan - Palam Vihar Rd",
-  city: "New Delhi",
+  line1: "Shop no.2, Ground Floor, Plot no. 734-A",
+  landmark: "Opposite CISF Camp",
+  city: "Delhi",
   pincode: "110061",
   country: "India",
 } as const;
 
 export const STORE_ADDRESS_LINES = [
   STORE_ADDRESS.line1,
-  `${STORE_ADDRESS.city}, ${STORE_ADDRESS.pincode}`,
+  `${STORE_ADDRESS.landmark}, Delhi NCR, ${STORE_ADDRESS.pincode}`,
 ] as const;
 
 const MAPS_QUERY = encodeURIComponent(
-  `${STORE_ADDRESS.line1}, ${STORE_ADDRESS.city}, ${STORE_ADDRESS.pincode}, ${STORE_ADDRESS.country}`,
+  `${STORE_ADDRESS.line1}, ${STORE_ADDRESS.landmark}, ${STORE_ADDRESS.city}, ${STORE_ADDRESS.pincode}, ${STORE_ADDRESS.country}`,
 );
 
 /** Opens the place in the Google Maps app / website (no API key). */

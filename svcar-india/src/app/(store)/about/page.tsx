@@ -91,11 +91,11 @@ export default function AboutPage() {
                                 Email
                             </h4>
                             <a
-                                href="mailto:support@svcarcustoms.com"
+                                href="mailto:shivam187100@gmail.com"
                                 className="text-sm text-white/70 hover:text-brand-orange transition-colors flex items-center gap-2"
                             >
                                 <Mail size={15} className="shrink-0" />
-                                support@svcarcustoms.com
+                                shivam187100@gmail.com
                             </a>
                         </div>
                         <div>
@@ -103,11 +103,11 @@ export default function AboutPage() {
                                 Phone
                             </h4>
                             <a
-                                href="tel:+919350529717"
+                                href="tel:+919205005425"
                                 className="text-sm text-white/70 hover:text-brand-orange transition-colors flex items-center gap-2"
                             >
                                 <Phone size={15} className="shrink-0" />
-                                +91 93505 29717
+                                +91 92050 05425
                             </a>
                         </div>
                         <div>
@@ -117,14 +117,14 @@ export default function AboutPage() {
                             <p className="text-sm text-white/70 flex items-start gap-2">
                                 <MapPin size={15} className="mt-0.5 shrink-0" />
                                 <span>
-                                    Plot 734, Bijwasan - Palam Vihar Rd,
+                                    Shop no.2, Ground Floor, Plot no. 734-A,
                                     <br />
-                                    New Delhi, 110061
+                                    Opposite CISF Camp, Delhi NCR, 110061
                                 </span>
                             </p>
                         </div>
                         <Link
-                            href="https://wa.me/919350529717"
+                            href="https://wa.me/919205005425"
                             target="_blank"
                             className="btn bg-whatsapp text-white inline-flex hover:shadow-lg transition-all duration-300"
                         >

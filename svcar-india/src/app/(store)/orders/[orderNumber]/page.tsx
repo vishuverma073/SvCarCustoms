@@ -95,7 +95,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ orderNum
   });
 
   const whatsappHelp =
-    "https://wa.me/919350529717?text=" +
+    "https://wa.me/919205005425?text=" +
     encodeURIComponent(`Hi, I need help with my SV Car Customs order ${order.orderNumber}.`);
 
   return (
