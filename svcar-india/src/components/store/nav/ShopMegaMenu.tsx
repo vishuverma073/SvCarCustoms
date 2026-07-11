@@ -1,108 +1,93 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { ShopNavNode } from "@/lib/shop-nav";
 import { isCategoryPathActive } from "@/lib/shop-nav";
+import { getSafeImageSrc } from "@/lib/utils";
 
-function SubcategoryLinks({
-  nodes,
-  depth,
+/** A single category rendered as a photo card with subcategory chips. */
+function CategoryCard({
+  node,
   pathname,
   onNavigate,
 }: {
-  nodes: ShopNavNode[];
-  depth: number;
+  node: ShopNavNode;
   pathname: string;
   onNavigate: () => void;
 }) {
-  if (nodes.length === 0) return null;
+  const img = getSafeImageSrc(node.image);
+  const active = isCategoryPathActive(pathname, node.slug);
+  const subs = node.children.slice(0, 3);
+  const extra = node.children.length - subs.length;
 
   return (
-    <ul
-      className={
-        depth > 0
-          ? "mt-1 ml-4 space-y-1 border-l border-white/10 pl-4"
-          : "mt-1.5 space-y-1"
-      }
-    >
-      {nodes.map((node) => {
-        const active = isCategoryPathActive(pathname, node.slug);
-        return (
-          <li key={node.id}>
-            <Link
-              href={`/category/${node.slug}`}
-              onClick={onNavigate}
-              className={`block py-0.5 leading-snug transition-colors duration-150 ${
-                depth === 0
-                  ? "text-[12px] font-medium"
-                  : "text-[11px] font-normal"
-              } ${
-                active
-                  ? "text-brand-orange/75 font-medium"
-                  : depth === 0
-                    ? "text-white/70 hover:text-white/85"
-                    : "text-white/60 hover:text-white/75"
-              }`}
-            >
-              {node.name}
-            </Link>
-            {node.children.length > 0 && (
-              <SubcategoryLinks
-                nodes={node.children}
-                depth={depth + 1}
-                pathname={pathname}
-                onNavigate={onNavigate}
-              />
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+    <div className="group relative isolate flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-xl border border-white/10">
+      {/* Photo (or brand-gradient fallback) */}
+      {img ? (
+        <Image
+          src={img}
+          alt={node.name}
+          fill
+          sizes="(max-width: 768px) 45vw, 240px"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/25 to-brand-black" />
+      )}
 
-function CategoryColumn({
-  root,
-  pathname,
-  onNavigate,
-}: {
-  root: ShopNavNode;
-  pathname: string;
-  onNavigate: () => void;
-}) {
-  const active = isCategoryPathActive(pathname, root.slug);
+      {/* Legibility scrim */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/5" />
 
-  return (
-    <div className="min-w-0 break-inside-avoid pb-1">
+      {/* Whole-card link → the category (accessible name = category name) */}
       <Link
-        href={`/category/${root.slug}`}
+        href={`/category/${node.slug}`}
         onClick={onNavigate}
-        className={`mb-2.5 block text-[15px] font-bold leading-tight tracking-tight transition-colors duration-150 ${
-          active ? "text-brand-orange" : "text-white/95 hover:text-white"
-        }`}
-      >
-        {root.name}
-      </Link>
-      <SubcategoryLinks
-        nodes={root.children}
-        depth={0}
-        pathname={pathname}
-        onNavigate={onNavigate}
+        aria-label={node.name}
+        className="absolute inset-0 z-10 rounded-xl outline-none ring-brand-orange focus-visible:ring-2"
       />
+
+      {/* Content sits above the scrim; text lets clicks fall through to the
+          stretched link, while the chips capture their own clicks. */}
+      <div className="pointer-events-none relative z-20 p-3.5">
+        <span
+          className={`block text-[15px] font-bold uppercase leading-tight tracking-tight transition-colors ${
+            active ? "text-brand-orange" : "text-white group-hover:text-white"
+          }`}
+        >
+          {node.name}
+        </span>
+
+        {subs.length > 0 && (
+          <div className="pointer-events-auto mt-2 flex flex-wrap gap-1.5">
+            {subs.map((s) => (
+              <Link
+                key={s.id}
+                href={`/category/${s.slug}`}
+                onClick={onNavigate}
+                className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white/85 backdrop-blur-sm transition-colors hover:border-transparent hover:bg-brand-orange hover:text-white"
+              >
+                {s.name}
+              </Link>
+            ))}
+            {extra > 0 && (
+              <span className="rounded-full bg-white/5 px-2 py-1 text-[11px] text-white/50">
+                +{extra} more
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 function MegaMenuSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-x-8 gap-y-5 px-5 py-4 md:grid-cols-3 lg:grid-cols-4 animate-pulse">
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-        <div key={i} className="space-y-2">
-          <div className="h-3.5 w-28 rounded bg-white/12" />
-          <div className="h-2.5 w-20 rounded bg-white/8" />
-          <div className="h-2.5 w-24 rounded bg-white/8" />
-        </div>
+    <div className="grid grid-cols-3 gap-3 p-4 lg:grid-cols-4">
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="aspect-[5/4] animate-pulse rounded-xl bg-white/8" />
       ))}
     </div>
   );
@@ -138,43 +123,68 @@ export default function ShopMegaMenu({
       id={menuId}
       role="region"
       aria-label="Shop categories"
-      className="absolute left-1/2 top-full z-50 w-[min(100vw-2rem,56rem)] -translate-x-1/2 pt-2"
+      // Anchored to the header container (inset-x-0), NOT the Shop button, so a
+      // wide panel can never spill off-screen — the fix for tablet clipping.
+      className="absolute inset-x-0 top-full z-50 pt-2"
     >
-      <div className="overflow-hidden rounded-xl bg-brand-black shadow-xl shadow-black/30">
-        {isLoading && tree.length === 0 ? (
-          <MegaMenuSkeleton />
-        ) : tree.length > 0 ? (
-          <>
-            {fetchWarning && (
-              <p className="border-b border-white/8 px-5 py-2 text-[11px] text-amber-200/80">
-                Showing partial category list.
-              </p>
-            )}
-            <div className="max-h-[min(480px,70vh)] overflow-y-auto overscroll-contain px-5 py-4">
-              <div className="grid grid-cols-2 gap-x-8 gap-y-7 md:grid-cols-3 lg:grid-cols-4">
-                {tree.map((root) => (
-                  <CategoryColumn
-                    key={root.id}
-                    root={root}
-                    pathname={pathname}
-                    onNavigate={onNavigate}
-                  />
-                ))}
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="overflow-hidden rounded-2xl bg-brand-black shadow-xl shadow-black/40 ring-1 ring-white/10">
+          {isLoading && tree.length === 0 ? (
+            <MegaMenuSkeleton />
+          ) : tree.length > 0 ? (
+            <>
+              {fetchWarning && (
+                <p className="border-b border-white/8 px-5 py-2 text-[11px] text-amber-200/80">
+                  Showing partial category list.
+                </p>
+              )}
+              <div className="max-h-[min(72vh,560px)] overflow-y-auto overscroll-contain p-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {tree.map((root) => (
+                    <CategoryCard
+                      key={root.id}
+                      node={root}
+                      pathname={pathname}
+                      onNavigate={onNavigate}
+                    />
+                  ))}
+                </div>
+              </div>
+              <Link
+                href="/search"
+                onClick={onNavigate}
+                className="flex items-center justify-center gap-1.5 border-t border-white/8 px-5 py-3 text-[13px] font-semibold text-white/70 transition-colors hover:text-white"
+              >
+                Browse all products
+                <ArrowRight size={14} />
+              </Link>
+            </>
+          ) : isError ? (
+            <div className="px-5 py-8 text-center">
+              <p className="mb-1 text-sm font-medium text-white">Could not load categories</p>
+              <p className="mb-4 text-[13px] text-white/50">Try again or search the catalog.</p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/15"
+                >
+                  Retry
+                </button>
+                <Link
+                  href="/search"
+                  onClick={onNavigate}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand-orange px-4 py-2 text-sm font-semibold text-white hover:bg-brand-orange/90"
+                >
+                  Search products
+                  <ArrowRight size={14} />
+                </Link>
               </div>
             </div>
-          </>
-        ) : isError ? (
-          <div className="px-5 py-8 text-center">
-            <p className="mb-1 text-sm font-medium text-white">Could not load categories</p>
-            <p className="mb-4 text-[13px] text-white/50">Try again or search the catalog.</p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={onRetry}
-                className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/15"
-              >
-                Retry
-              </button>
+          ) : isEmpty ? (
+            <div className="px-5 py-8 text-center">
+              <p className="mb-1 text-sm font-medium text-white">No categories yet</p>
+              <p className="mb-4 text-[13px] text-white/50">Browse products or check back soon.</p>
               <Link
                 href="/search"
                 onClick={onNavigate}
@@ -184,21 +194,8 @@ export default function ShopMegaMenu({
                 <ArrowRight size={14} />
               </Link>
             </div>
-          </div>
-        ) : isEmpty ? (
-          <div className="px-5 py-8 text-center">
-            <p className="mb-1 text-sm font-medium text-white">No categories yet</p>
-            <p className="mb-4 text-[13px] text-white/50">Browse products or check back soon.</p>
-            <Link
-              href="/search"
-              onClick={onNavigate}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-orange px-4 py-2 text-sm font-semibold text-white hover:bg-brand-orange/90"
-            >
-              Search products
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </div>
   );

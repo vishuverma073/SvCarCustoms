@@ -104,7 +104,7 @@ export default function StoreHeader() {
       <AnnouncementBar />
 
       <header className="site-header sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-400 mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-400 mx-auto px-4 h-16 flex items-center justify-between relative">
           <Link href="/" className="flex items-center gap-2 sm:gap-2.5 group">
             <Image
               src="/uploads/logo/logo-v2.webp"
@@ -140,7 +140,9 @@ export default function StoreHeader() {
             </Link>
 
             <div
-              className="relative"
+              // Not positioned: the mega panel anchors to the header container
+              // above (which is `relative`), so it spans the full width and
+              // never spills off-screen. This div only groups hover/focus.
               onMouseEnter={() => setShopOpen(true)}
               onMouseLeave={() => setShopOpen(false)}
               onFocus={() => setShopOpen(true)}
