@@ -10,6 +10,7 @@ import { useHome, useProducts, useCategories } from "@/lib/admin-hooks";
 import { adminApi } from "@/lib/admin-api";
 import { cn } from "@/lib/utils";
 import { useUnsavedChangesGuard } from "@/lib/use-unsaved-changes-guard";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 const SECTION_LABELS: Record<HomeSectionKey, string> = {
   hero: "Hero banner",
@@ -182,6 +183,13 @@ export default function HomeComposerPage() {
               <Field label="CTA link" value={config[key].ctaLink} onChange={(v) => setBanner(key, { ctaLink: v })} />
             </div>
             <Field label="Image URL" value={config[key].image} onChange={(v) => setBanner(key, { image: v })} />
+            <div>
+              <label className="input-label">Or upload an image</label>
+              <ImageUploader
+                value={config[key].image ? [config[key].image] : []}
+                onChange={(urls) => setBanner(key, { image: urls[urls.length - 1] ?? "" })}
+              />
+            </div>
           </div>
         </div>
       ))}
