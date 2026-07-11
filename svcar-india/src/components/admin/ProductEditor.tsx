@@ -645,46 +645,41 @@ export default function ProductEditor({
 
       {/* Sticky save bar — sits above the mobile bottom nav (~56px + safe-area),
           flush to the bottom on desktop where the nav is hidden. */}
-      <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 inset-x-0 lg:left-60 z-40 bg-white border-t border-border px-4 pt-3 pb-3 lg:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] flex items-center justify-between gap-2">
-        <span className="text-xs text-text-muted min-w-0 truncate">
-          {isSubmitting ? "Saving…" : isDirty ? "Unsaved changes" : "All changes saved"}
-        </span>
-        <div className="flex gap-1.5 shrink-0">
-          {isEdit && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={deleting || archiving || isSubmitting}
-              className="btn px-3! py-2! text-xs bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50"
-            >
-              <Trash2 size={14} /> Delete
-            </button>
-          )}
+      <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] lg:bottom-0 inset-x-0 lg:left-60 z-40 bg-white border-t border-border px-4 pt-3 pb-3 lg:pb-[calc(env(safe-area-inset-bottom)+0.75rem)] flex items-center gap-1.5">
+        {isEdit && (
           <button
             type="button"
-            onClick={() => router.push("/admin/products")}
-            className="btn btn-ghost px-3! py-2! text-xs"
+            onClick={handleDelete}
+            disabled={deleting || archiving || isSubmitting}
+            className="btn flex-1 px-3! py-2! text-xs bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50"
           >
-            Cancel
+            <Trash2 size={14} /> Delete
           </button>
+        )}
+        <button
+          type="button"
+          onClick={() => router.push("/admin/products")}
+          className="btn btn-ghost flex-1 px-3! py-2! text-xs"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting || (isEdit && !isDirty)}
+          className="btn btn-primary flex-1 px-3! py-2! text-xs disabled:opacity-50"
+        >
+          {isEdit ? "Save" : "Create Product"}
+        </button>
+        {isEdit && status !== "archived" && (
           <button
-            type="submit"
-            disabled={isSubmitting || (isEdit && !isDirty)}
-            className="btn btn-primary px-3! py-2! text-xs disabled:opacity-50"
+            type="button"
+            onClick={handleArchive}
+            disabled={archiving || deleting || isSubmitting}
+            className="btn btn-secondary flex-1 px-3! py-2! text-xs"
           >
-            {isEdit ? "Save" : "Create Product"}
+            <Archive size={14} /> Archive
           </button>
-          {isEdit && status !== "archived" && (
-            <button
-              type="button"
-              onClick={handleArchive}
-              disabled={archiving || deleting || isSubmitting}
-              className="btn btn-secondary px-3! py-2! text-xs"
-            >
-              <Archive size={14} /> Archive
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       <ConfirmDialog
