@@ -11,7 +11,8 @@ import { adminNav, isNavActive } from "./nav-items";
  */
 export default function BottomNav() {
   const pathname = usePathname();
-  const items = adminNav.filter((i) => i.mobile);
+  // Show ALL admin sections in the scrollable bottom bar (swipe horizontally).
+  const items = adminNav;
 
   return (
     <nav
