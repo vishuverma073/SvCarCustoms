@@ -13,13 +13,19 @@ import { ProductPageSkeleton } from "@/components/store/Skeletons";
 
 interface ProductPageProps {
     params: Promise<{ slug: string }>;
+    searchParams?: Promise<{ preview?: string }>;
 }
 
 /** Per-product SEO metadata (title, description, canonical, OG). */
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: ProductPageProps): Promise<Metadata> {
     const { slug } = await params;
+    const preview = Boolean((await searchParams)?.preview);
     try {
-        const product = await backend.getProductBySlug(slug);
+        const product = await backend.getProductBySlug(slug, { preview });
+        if (preview) {
+            // Draft/preview pages must never be indexed.
+            return { title: `Preview · ${product.name}`, robots: { index: false, follow: false } };
+        }
         const description =
             product.description?.trim().slice(0, 160) ||
             `Buy ${product.name} from SV Car Customs — best car accessories delivered to your doorstep.`;
@@ -56,10 +62,10 @@ function productJsonLd(product: Product) {
     };
 }
 
-async function ProductDetailsFetcher({ slug }: { slug: string }) {
+async function ProductDetailsFetcher({ slug, preview }: { slug: string; preview: boolean }) {
     let product: Product;
     try {
-        product = await backend.getProductBySlug(slug);
+        product = await backend.getProductBySlug(slug, { preview });
     } catch {
         // Under mocks, admin-created products live only in the browser mock store,
         // not the server (node) one — so re-fetch on the client instead of 404ing.
@@ -89,6 +95,11 @@ async function ProductDetailsFetcher({ slug }: { slug: string }) {
 
     return (
         <>
+            {preview && (
+                <div className="bg-brand-orange/10 border-b border-brand-orange/30 px-4 py-2 text-center text-[13px] font-semibold text-brand-orange">
+                    Draft preview — status: {product.status}. Not visible to customers until published.
+                </div>
+            )}
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd(product)) }}
@@ -105,12 +116,13 @@ async function ProductDetailsFetcher({ slug }: { slug: string }) {
     );
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
     const { slug } = await params;
+    const preview = Boolean((await searchParams)?.preview);
 
     return (
         <Suspense fallback={<ProductPageSkeleton />}>
-            <ProductDetailsFetcher slug={slug} />
+            <ProductDetailsFetcher slug={slug} preview={preview} />
         </Suspense>
     );
 }

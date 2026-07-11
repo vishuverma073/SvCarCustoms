@@ -262,9 +262,15 @@ export function makeProductsRouter(db: DbClient) {
   // GET /products/:slug — full active product detail.
   router.get("/:slug", async (c) => {
     const slug = c.req.param("slug");
-    const { value, hit } = await cached<Product | null>(`product:${slug}`, PRODUCT_TTL, async () => {
+    // Admin preview (?preview=1): return the product regardless of status so
+    // draft products can be reviewed before publishing. Bypasses the cache so a
+    // draft is never stored under the public product:<slug> key.
+    const preview = !!c.req.query("preview");
+    const loadProduct = async () => {
       const p = await db.query.products.findFirst({
-        where: and(eq(products.slug, slug), eq(products.status, "active")),
+        where: preview
+          ? eq(products.slug, slug)
+          : and(eq(products.slug, slug), eq(products.status, "active")),
         with: {
           images: { orderBy: (img, { asc }) => [asc(img.sortOrder)] },
           dimensions: {
@@ -323,7 +329,11 @@ export function makeProductsRouter(db: DbClient) {
       updatedAt: p.updatedAt.toISOString(),
       };
       return ProductSchema.parse({ ...detail, structuredData: buildStructuredData(detail) });
-    });
+    };
+
+    const { value, hit } = preview
+      ? { value: await loadProduct(), hit: false }
+      : await cached<Product | null>(`product:${slug}`, PRODUCT_TTL, loadProduct);
 
     if (!value) return c.json({ error: "Not Found" }, 404);
     c.header("x-cache", hit ? "HIT" : "MISS");

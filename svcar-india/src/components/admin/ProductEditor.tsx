@@ -391,7 +391,7 @@ export default function ProductEditor({
           <div className="flex flex-wrap gap-2 shrink-0 justify-end">
             {slug && status !== "archived" && (
               <Link
-                href={`/product/${slug}`}
+                href={`/product/${slug}?preview=1`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary text-sm"

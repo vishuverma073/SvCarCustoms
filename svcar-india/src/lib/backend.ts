@@ -679,11 +679,13 @@ export const backend = {
   },
 
   /** Full product detail for the PDP. */
-  getProductBySlug(slug: string): Promise<Product> {
-    return apiFetch<Product>(`/products/${slug}`, {
+  getProductBySlug(slug: string, opts: { preview?: boolean } = {}): Promise<Product> {
+    const qs = opts.preview ? "?preview=1" : "";
+    return apiFetch<Product>(`/products/${encodeURIComponent(slug)}${qs}`, {
       schema: ProductSchema,
       // no-store: the PDP always reflects the latest product data (image edits,
-      // admin uploads) instead of waiting out a revalidate window.
+      // admin uploads) instead of waiting out a revalidate window. Preview must
+      // also never be cached (it can return a draft).
       cache: "no-store",
     });
   },
