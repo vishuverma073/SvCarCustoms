@@ -23,7 +23,11 @@ function CategoryCard({
   const extra = node.children.length - subs.length;
 
   return (
-    <div className="group relative isolate flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-xl border border-white/10">
+    // No overlapping links: the photo area, the title, and each chip are
+    // separate, non-overlapping <Link>s — so a chip click can never land on the
+    // category link behind it. Photo + scrim are absolute (behind, z-0); the two
+    // flex rows (photo-link fills the top, content sits at the bottom) sit on top.
+    <div className="group relative isolate flex aspect-[5/4] flex-col overflow-hidden rounded-xl border border-white/10">
       {/* Photo (or brand-gradient fallback) */}
       {img ? (
         <Image
@@ -40,27 +44,28 @@ function CategoryCard({
       {/* Legibility scrim */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/5" />
 
-      {/* Whole-card link → the category (accessible name = category name) */}
+      {/* Upper photo area → the category page (fills the space above the title). */}
       <Link
         href={`/category/${node.slug}`}
         onClick={onNavigate}
         aria-label={node.name}
-        className="absolute inset-0 z-10 rounded-xl outline-none ring-brand-orange focus-visible:ring-2"
+        className="relative z-10 flex-1 rounded-t-xl outline-none ring-brand-orange focus-visible:ring-2"
       />
 
-      {/* Content sits above the scrim; text lets clicks fall through to the
-          stretched link, while the chips capture their own clicks. */}
-      <div className="pointer-events-none relative z-20 p-3.5">
-        <span
-          className={`block text-[15px] font-bold uppercase leading-tight tracking-tight transition-colors ${
-            active ? "text-brand-orange" : "text-white group-hover:text-white"
+      {/* Bottom content — title links to the category, chips to sub-categories. */}
+      <div className="relative z-10 p-3.5 pt-2">
+        <Link
+          href={`/category/${node.slug}`}
+          onClick={onNavigate}
+          className={`block w-fit text-[15px] font-bold uppercase leading-tight tracking-tight transition-colors ${
+            active ? "text-brand-orange" : "text-white group-hover:text-brand-orange"
           }`}
         >
           {node.name}
-        </span>
+        </Link>
 
         {subs.length > 0 && (
-          <div className="pointer-events-auto mt-2 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex flex-wrap gap-1.5">
             {subs.map((s) => (
               <Link
                 key={s.id}
