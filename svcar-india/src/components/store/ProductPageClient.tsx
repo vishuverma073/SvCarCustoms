@@ -344,7 +344,7 @@ export default function ProductPageClient({
                         {/* Description */}
                         <div className="mt-8">
                             <h3 className="text-[13px] font-bold uppercase tracking-wider text-text-primary mb-3">About this product</h3>
-                            <p className="text-[14px] leading-relaxed text-text-secondary">
+                            <p className="text-[14px] leading-relaxed text-text-secondary whitespace-pre-line">
                                 {product.description}
                             </p>
                         </div>
