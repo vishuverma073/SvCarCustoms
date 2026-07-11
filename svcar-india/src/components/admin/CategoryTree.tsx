@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   DndContext,
@@ -27,6 +27,7 @@ import {
   GripVertical,
   SquarePen,
   Package,
+  MoreHorizontal,
 } from "lucide-react";
 import type { Category } from "@svcar/contracts";
 import { cn, formatPrice } from "@/lib/utils";
@@ -218,6 +219,9 @@ function SortableCategoryRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: cat.id,
   });
+  // Row actions (add / edit / archive / delete) stay collapsed behind a single
+  // toggle so the row isn't cluttered — especially on phones.
+  const [actionsOpen, setActionsOpen] = useState(false);
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -273,40 +277,57 @@ function SortableCategoryRow({
       </button>
       <button
         type="button"
-        onClick={onAddChild}
-        className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
-        aria-label="Add child category"
-        title="Add child category"
+        onClick={() => setActionsOpen((o) => !o)}
+        className={cn(
+          "p-1.5 rounded-lg shrink-0 hover:bg-surface-dim",
+          actionsOpen ? "text-brand-orange bg-surface-dim" : "text-text-muted hover:text-brand-orange",
+        )}
+        aria-label={actionsOpen ? "Hide actions" : "Show actions"}
+        aria-expanded={actionsOpen}
+        title="Actions"
       >
-        <Plus size={15} />
+        <MoreHorizontal size={15} />
       </button>
-      <button
-        type="button"
-        onClick={onEdit}
-        className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
-        aria-label="Edit category"
-        title="Edit category"
-      >
-        <Pencil size={15} />
-      </button>
-      <button
-        type="button"
-        onClick={onArchive}
-        className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
-        aria-label="Archive Category"
-        title="Archive Category"
-      >
-        <Archive size={15} />
-      </button>
-      <button
-        type="button"
-        onClick={onDelete}
-        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50"
-        aria-label="Delete Category"
-        title="Delete Category"
-      >
-        <Trash2 size={15} />
-      </button>
+      {actionsOpen && (
+        <>
+          <button
+            type="button"
+            onClick={onAddChild}
+            className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
+            aria-label="Add child category"
+            title="Add child category"
+          >
+            <Plus size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={onEdit}
+            className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
+            aria-label="Edit category"
+            title="Edit category"
+          >
+            <Pencil size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={onArchive}
+            className="p-1.5 rounded-lg text-text-muted hover:text-brand-orange hover:bg-surface-dim"
+            aria-label="Archive Category"
+            title="Archive Category"
+          >
+            <Archive size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50"
+            aria-label="Delete Category"
+            title="Delete Category"
+          >
+            <Trash2 size={15} />
+          </button>
+        </>
+      )}
     </div>
   );
 }
