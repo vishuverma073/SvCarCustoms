@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
       },
       // Placeholder host used by MSW mock image URLs (serves real PNGs)
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
+      // Pexels — product & home-page stock photography (until real photos are uploaded)
+      { protocol: "https", hostname: "images.pexels.com", pathname: "/**" },
     ],
   },
   async redirects() {

@@ -27,7 +27,7 @@ const AUTOPLAY_MS = 6000;
  * Links point to REAL top-level categories (body-kits, exhausts, lighting). */
 const BRAND_SLIDES: HeroSlide[] = [
   {
-    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Body+Kits",
+    image: "https://images.pexels.com/photos/15085608/pexels-photo-15085608.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "BODY KITS",
     subtitle: "Full body kits, front splitters & rear diffusers for an aggressive stance.",
     tagline: "TRANSFORM YOUR STANCE.",
@@ -35,7 +35,7 @@ const BRAND_SLIDES: HeroSlide[] = [
     ctaLink: "/category/body-kits",
   },
   {
-    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Exhausts",
+    image: "https://images.pexels.com/photos/10827691/pexels-photo-10827691.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "EXHAUSTS & TIPS",
     subtitle: "Performance exhausts and tips engineered for sound and flow.",
     tagline: "ENGINEERED FOR PURE PERFORMANCE.",
@@ -43,7 +43,7 @@ const BRAND_SLIDES: HeroSlide[] = [
     ctaLink: "/category/exhausts",
   },
   {
-    image: "https://placehold.co/1600x900/0C0C0D/E11D2A/png?text=Lighting",
+    image: "https://images.pexels.com/photos/38510054/pexels-photo-38510054.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "LIGHTING",
     subtitle: "Ambient lighting, headlights and interior kits to light up your ride.",
     tagline: "LIGHT UP THE ROAD.",
