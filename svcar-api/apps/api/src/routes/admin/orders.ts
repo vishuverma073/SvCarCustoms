@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, asc, desc, eq, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, or, sql } from "drizzle-orm";
 import {
   AddOrderEventRequestSchema,
   OrderEventListResponseSchema,
@@ -10,6 +10,20 @@ import { orderEvents, orders } from "../../db/schema.js";
 import { makeRequireAdmin } from "../../middleware/auth.js";
 import { logAudit } from "../../lib/audit.js";
 import type { AppEnv } from "../../lib/types.js";
+
+/** Date-range presets shared by the order list filter and the stats tiles. */
+const RANGE_DAYS: Record<string, number | null> = {
+  today: 1,
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+  "12m": 365,
+  all: null,
+};
+function rangeStart(range: string | undefined): Date {
+  const d = RANGE_DAYS[range ?? "12m"] ?? 365;
+  return d == null ? new Date(0) : new Date(Date.now() - d * 86400000);
+}
 
 /** Event types that are also order statuses — posting one advances the order. */
 const STATUS_EVENTS: ReadonlySet<string> = new Set<OrderStatus>([
@@ -36,8 +50,10 @@ export function makeAdminOrdersRouter(db: DbClient) {
   router.get("/", async (c) => {
     const status = c.req.query("status") as OrderStatus | undefined;
     const q = c.req.query("q")?.trim();
+    const range = c.req.query("range");
     const conditions = [];
     if (status) conditions.push(eq(orders.status, status));
+    if (range && range !== "all") conditions.push(gte(orders.createdAt, rangeStart(range)));
     if (q) {
       conditions.push(
         or(
@@ -71,6 +87,36 @@ export function makeAdminOrdersRouter(db: DbClient) {
   });
 
   // GET /admin/orders/:id — full order detail for the admin order view.
+  // GET /admin/orders/stats?range= — dashboard tiles + per-status counts.
+  router.get("/stats", async (c) => {
+    const range = c.req.query("range") ?? "12m";
+    const start = rangeStart(range);
+    // db.execute needs an ISO string cast to timestamptz (a JS Date serializes
+    // via toString() and Postgres can't parse it).
+    const raw = await db.execute(sql`
+      select status, count(*)::int cnt, coalesce(sum(total),0) revenue
+      from orders where created_at >= ${start.toISOString()}::timestamptz group by status`);
+    const rows = (Array.isArray(raw) ? raw : (raw as { rows?: unknown[] }).rows ?? []) as {
+      status: string;
+      cnt: number;
+      revenue: string;
+    }[];
+    const statusCounts: Record<string, number> = {};
+    let totalOrders = 0;
+    let totalRevenue = 0;
+    let pendingOrders = 0;
+    let completedOrders = 0;
+    for (const r of rows) {
+      const cnt = Number(r.cnt);
+      statusCounts[r.status] = cnt;
+      totalOrders += cnt;
+      if (r.status !== "cancelled" && r.status !== "refunded") totalRevenue += Number(r.revenue);
+      if (["pending", "paid", "confirmed", "shipped"].includes(r.status)) pendingOrders += cnt;
+      if (r.status === "delivered") completedOrders += cnt;
+    }
+    return c.json({ range, totalOrders, totalRevenue, pendingOrders, completedOrders, statusCounts });
+  });
+
   router.get("/:id", async (c) => {
     const id = c.req.param("id");
     const order = await db.query.orders.findFirst({

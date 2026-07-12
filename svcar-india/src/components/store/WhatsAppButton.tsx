@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { trackWhatsapp } from "@/lib/track-whatsapp";
 
 export default function WhatsAppButton() {
     return (
@@ -9,6 +10,7 @@ export default function WhatsAppButton() {
             href="https://wa.me/919205005425"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsapp("floating")}
             className="fixed bottom-5 right-5 z-50 group"
             aria-label="Chat on WhatsApp"
         >

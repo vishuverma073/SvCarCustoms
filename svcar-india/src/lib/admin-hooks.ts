@@ -63,7 +63,17 @@ export function useSubscribers() {
   return useSWR(["admin/subscribers"], () => adminApi.listSubscribers(), noRetryOn401);
 }
 
+/** WhatsApp CTA intent leads (newest first). */
+export function useWhatsappLeads() {
+  return useSWR(["admin/whatsapp-leads"], () => adminApi.listWhatsappLeads(), noRetryOn401);
+}
+
 /** Store Analytics dashboard data for the selected range. */
 export function useAnalytics(range: AnalyticsRange = "days") {
   return useSWR(["admin/analytics", range], () => adminApi.getAnalytics(range), noRetryOn401);
+}
+
+/** Order dashboard tiles + per-status counts for the selected date range. */
+export function useOrderStats(range = "12m") {
+  return useSWR(["admin/orders/stats", range], () => adminApi.getOrderStats(range), noRetryOn401);
 }

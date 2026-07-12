@@ -109,6 +109,36 @@ const AdminOrderListSchema = z.object({
 });
 export type AdminOrderItem = z.infer<typeof AdminOrderItemSchema>;
 
+// Order dashboard tiles + per-status counts (backend GET /admin/orders/stats).
+const AdminOrderStatsSchema = z.object({
+  range: z.string(),
+  totalOrders: z.number(),
+  totalRevenue: z.number(),
+  pendingOrders: z.number(),
+  completedOrders: z.number(),
+  statusCounts: z.record(z.string(), z.number()),
+});
+export type AdminOrderStats = z.infer<typeof AdminOrderStatsSchema>;
+
+// WhatsApp CTA intent lead (backend GET /admin/whatsapp-leads).
+const WhatsappLeadSchema = z.object({
+  id: z.string(),
+  path: z.string(),
+  source: z.string(),
+  productId: z.number().nullable(),
+  productName: z.string().nullish().transform((v) => v ?? ""),
+  city: z.string().nullish().transform((v) => v ?? ""),
+  country: z.string().nullish().transform((v) => v ?? ""),
+  createdAt: z.string(),
+});
+const WhatsappLeadListSchema = z.object({
+  items: z.array(WhatsappLeadSchema),
+  total: z.number(),
+  todayCount: z.number(),
+});
+export type WhatsappLead = z.infer<typeof WhatsappLeadSchema>;
+export type WhatsappLeadList = z.infer<typeof WhatsappLeadListSchema>;
+
 const BeAuditEntrySchema = z.object({
   id: z.number(),
   actorUserId: z.string().nullish(),
@@ -563,12 +593,16 @@ export const adminApi = {
   },
 
   // ── Orders ──
-  listOrders(status?: string, q?: string): Promise<AdminOrderItem[]> {
+  listOrders(status?: string, q?: string, range?: string): Promise<AdminOrderItem[]> {
     const sp = new URLSearchParams();
     if (status) sp.set("status", status);
     if (q?.trim()) sp.set("q", q.trim());
+    if (range && range !== "all") sp.set("range", range);
     const qs = sp.toString();
     return req(`/admin/orders${qs ? `?${qs}` : ""}`, { schema: AdminOrderListSchema }).then((r) => r.items);
+  },
+  getOrderStats(range = "12m"): Promise<AdminOrderStats> {
+    return req(`/admin/orders/stats?range=${range}`, { schema: AdminOrderStatsSchema });
   },
   getOrder(id: string): Promise<AdminOrderDetail> {
     return req(`/admin/orders/${id}`, { schema: AdminOrderDetailSchema });
@@ -609,6 +643,11 @@ export const adminApi = {
   // ── Subscribers (newsletter) ──
   listSubscribers(): Promise<SubscriberList> {
     return req("/admin/subscribers", { schema: SubscriberListSchema });
+  },
+
+  // ── WhatsApp leads (CTA intent clicks) ──
+  listWhatsappLeads(): Promise<WhatsappLeadList> {
+    return req("/admin/whatsapp-leads", { schema: WhatsappLeadListSchema });
   },
 
   // ── Store Analytics ──

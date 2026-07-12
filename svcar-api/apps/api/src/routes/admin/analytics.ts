@@ -23,6 +23,11 @@ export function makeAdminAnalyticsRouter(db: DbClient) {
     const rk = (c.req.query("range") as RangeKey) || "days";
     const { days, bucket } = RANGES[rk] ?? RANGES.days;
     const start = new Date(Date.now() - days * 86400000);
+    // drizzle's db.execute serializes JS Date via toString() (unparseable by
+    // Postgres) and can't type-infer bucket inside date_trunc — pass an ISO
+    // string cast to timestamptz, and inline the validated bucket literal.
+    const startIso = start.toISOString();
+    const bucketSql = sql.raw(`'${bucket}'`);
 
     const exec = async (q: ReturnType<typeof sql>): Promise<Row[]> => {
       const r = await db.execute(q);
@@ -34,7 +39,7 @@ export function makeAdminAnalyticsRouter(db: DbClient) {
       with s as (
         select session_id, visitor_id, count(*)::int as views,
                extract(epoch from (max(created_at) - min(created_at))) as dur
-        from analytics_events where created_at >= ${start}
+        from analytics_events where created_at >= ${startIso}::timestamptz
         group by session_id, visitor_id
       )
       select count(*)::int total_sessions,
@@ -46,26 +51,26 @@ export function makeAdminAnalyticsRouter(db: DbClient) {
     const [newAgg] = await exec(sql`
       select count(*)::int new_visitors from (
         select visitor_id, min(created_at) first_seen from analytics_events group by visitor_id
-      ) f where f.first_seen >= ${start}`);
+      ) f where f.first_seen >= ${startIso}::timestamptz`);
 
     const traffic = await exec(sql`
-      select date_trunc(${bucket}, created_at) as b, count(distinct session_id)::int users
-      from analytics_events where created_at >= ${start}
+      select date_trunc(${bucketSql}, created_at) as b, count(distinct session_id)::int users
+      from analytics_events where created_at >= ${startIso}::timestamptz
       group by b order by b`);
 
     const cities = await exec(sql`
       select coalesce(city,'Unknown') city, count(distinct session_id)::int cnt
-      from analytics_events where created_at >= ${start} and city is not null and city <> ''
+      from analytics_events where created_at >= ${startIso}::timestamptz and city is not null and city <> ''
       group by city order by cnt desc limit 8`);
 
     const devices = await exec(sql`
       select device_type, coalesce(os,'Other') os, count(*)::int cnt
-      from analytics_events where created_at >= ${start}
+      from analytics_events where created_at >= ${startIso}::timestamptz
       group by device_type, os`);
 
     const channels = await exec(sql`
       select channel, count(*)::int cnt
-      from analytics_events where created_at >= ${start}
+      from analytics_events where created_at >= ${startIso}::timestamptz
       group by channel order by cnt desc`);
 
     const unique = num(sessAgg?.unique_visitors);

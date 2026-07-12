@@ -19,9 +19,11 @@ import {
   makeAdminLeadsRouter,
   makeAdminLiveRouter,
   makeAdminSubscribersRouter,
+  makeAdminWhatsappLeadsRouter,
 } from "./routes/admin/engagement.js";
 import { makeAnalyticsRouter } from "./routes/analytics.js";
 import { makeAdminAnalyticsRouter } from "./routes/admin/analytics.js";
+import { makeWhatsappLeadsRouter } from "./routes/whatsapp-leads.js";
 import { makePincodeRouter } from "./routes/pincode.js";
 import { makeMetricsRouter } from "./routes/metrics.js";
 import { makeInngestRouter } from "./routes/inngest.js";
@@ -105,6 +107,8 @@ export function createApp(deps: AppDeps) {
   app.route("/admin/leads", makeAdminLeadsRouter(deps.db));
   app.route("/admin/live", makeAdminLiveRouter(deps.db));
   app.route("/admin/subscribers", makeAdminSubscribersRouter(deps.db));
+  app.route("/leads", makeWhatsappLeadsRouter(deps.db));
+  app.route("/admin/whatsapp-leads", makeAdminWhatsappLeadsRouter(deps.db));
   app.route("/analytics", makeAnalyticsRouter(deps.db));
   app.route("/admin/analytics", makeAdminAnalyticsRouter(deps.db));
 

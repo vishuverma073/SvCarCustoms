@@ -12,6 +12,7 @@ import SectionHeader from "@/components/store/SectionHeader";
 import { Truck, Package, MessageCircle, ChevronRight, ChevronLeft, Home, Shield } from "lucide-react";
 import type { Product, ProductListItem } from "@svcar/contracts";
 import { getSKUBySelections, getAvailableValues, getMinPrice, getMaxBasePrice, getBestDiscount } from "@/lib/sku-helpers";
+import { trackWhatsapp } from "@/lib/track-whatsapp";
 
 interface ProductPageClientProps {
     product: Product;
@@ -430,6 +431,7 @@ export default function ProductPageClient({
                         <Link
                             href="https://wa.me/919205005425"
                             target="_blank"
+                            onClick={() => trackWhatsapp("product", { productId: product.id, productName: product.name })}
                             className="mt-4 flex items-center gap-2 text-[13px] text-whatsapp font-medium hover:underline transition-colors"
                         >
                             <MessageCircle size={15} strokeWidth={1.8} />

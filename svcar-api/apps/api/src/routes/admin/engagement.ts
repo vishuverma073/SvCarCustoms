@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { desc, gte } from "drizzle-orm";
+import { desc, gte, sql } from "drizzle-orm";
 import type { DbClient } from "../../db/client.js";
-import { carts, subscribers } from "../../db/schema.js";
+import { carts, subscribers, whatsappLeads } from "../../db/schema.js";
 import { makeRequireAdmin } from "../../middleware/auth.js";
 import type { AppEnv } from "../../lib/types.js";
 
@@ -113,6 +113,39 @@ export function makeAdminLiveRouter(db: DbClient) {
       };
     });
     return c.json({ items, onlineCount: items.length });
+  });
+  return router;
+}
+
+/** GET /admin/whatsapp-leads — WhatsApp CTA intent clicks, newest first. */
+export function makeAdminWhatsappLeadsRouter(db: DbClient) {
+  const router = new Hono<AppEnv>();
+  router.use("*", makeRequireAdmin(db));
+  router.get("/", async (c) => {
+    const rows = await db
+      .select()
+      .from(whatsappLeads)
+      .orderBy(desc(whatsappLeads.createdAt))
+      .limit(200);
+    const [{ count } = { count: 0 }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(whatsappLeads);
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const items = rows.map((r) => ({
+      id: r.id,
+      path: r.path,
+      source: r.source,
+      productId: r.productId ?? null,
+      productName: r.productName ?? "",
+      city: r.city ?? "",
+      country: r.country ?? "",
+      createdAt: r.createdAt.toISOString(),
+    }));
+    return c.json({
+      items,
+      total: Number(count),
+      todayCount: items.filter((i) => new Date(i.createdAt) >= dayAgo).length,
+    });
   });
   return router;
 }

@@ -529,6 +529,29 @@ export const analyticsEvents = pgTable(
   ],
 );
 
+/**
+ * WhatsApp intent leads. Every click on a storefront "Chat on WhatsApp" CTA
+ * records the page it fired from and (when on a product) the product context.
+ * We can't capture the visitor's phone number (that would need the WhatsApp
+ * Business API), so a lead here is an intent signal + context, not a contact.
+ */
+export const whatsappLeads = pgTable(
+  "whatsapp_leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    visitorId: text("visitor_id"),
+    path: text("path").notNull().default("/"),
+    // floating | product | cart | contact | other — which CTA was clicked
+    source: text("source").notNull().default("other"),
+    productId: integer("product_id"),
+    productName: text("product_name"),
+    city: text("city"),
+    country: text("country"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("whatsapp_leads_created_idx").on(t.createdAt)],
+);
+
 // ─── Relations ───────────────────────────────────────────────
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
