@@ -2,6 +2,7 @@ import StoreHeader from "@/components/store/Header";
 import StoreFooter from "@/components/store/Footer";
 import WhatsAppButton from "@/components/store/WhatsAppButton";
 import RecentPurchaseToast from "@/components/store/RecentPurchaseToast";
+import AnalyticsTracker from "@/components/store/AnalyticsTracker";
 import AuthProvider from "@/components/auth/AuthProvider";
 
 export default function StoreLayout({
@@ -16,6 +17,7 @@ export default function StoreLayout({
             <StoreFooter />
             <WhatsAppButton />
             <RecentPurchaseToast />
+            <AnalyticsTracker />
         </AuthProvider>
     );
 }

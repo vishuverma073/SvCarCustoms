@@ -24,9 +24,12 @@ import {
   LeadListSchema,
   LiveListSchema,
   SubscriberListSchema,
+  AnalyticsSchema,
   type LeadList,
   type LiveList,
   type SubscriberList,
+  type Analytics,
+  type AnalyticsRange,
   type AdminLoginResponse,
   type Product,
   type ProductListItem,
@@ -606,6 +609,11 @@ export const adminApi = {
   // ── Subscribers (newsletter) ──
   listSubscribers(): Promise<SubscriberList> {
     return req("/admin/subscribers", { schema: SubscriberListSchema });
+  },
+
+  // ── Store Analytics ──
+  getAnalytics(range: AnalyticsRange = "days"): Promise<Analytics> {
+    return req(`/admin/analytics?range=${range}`, { schema: AnalyticsSchema });
   },
 
   // ── Uploads ──

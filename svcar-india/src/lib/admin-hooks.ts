@@ -2,6 +2,7 @@
 
 import useSWR, { type SWRConfiguration } from "swr";
 import { adminApi, type ProductListParams } from "@/lib/admin-api";
+import type { AnalyticsRange } from "@svcar/contracts";
 
 /**
  * SWR read hooks for the admin panel. Keys are arrays so different filter
@@ -60,4 +61,9 @@ export function useLive() {
 
 export function useSubscribers() {
   return useSWR(["admin/subscribers"], () => adminApi.listSubscribers(), noRetryOn401);
+}
+
+/** Store Analytics dashboard data for the selected range. */
+export function useAnalytics(range: AnalyticsRange = "days") {
+  return useSWR(["admin/analytics", range], () => adminApi.getAnalytics(range), noRetryOn401);
 }

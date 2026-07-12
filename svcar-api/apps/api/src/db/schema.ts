@@ -502,6 +502,33 @@ export const subscribers = pgTable("subscribers", {
   subscribedAt: timestamp("subscribed_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/** Storefront analytics — one row per page view, powering the Store Analytics
+ * dashboard (visitors, devices, acquisition channels, cities, traffic trend). */
+export const analyticsEvents = pgTable(
+  "analytics_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    visitorId: text("visitor_id").notNull(),
+    sessionId: text("session_id").notNull(),
+    path: text("path").notNull(),
+    referrer: text("referrer"),
+    // Google | Instagram | Facebook | Whatsapp | Direct | Others
+    channel: text("channel").notNull().default("Direct"),
+    // Mobile | Desktop | Other
+    deviceType: text("device_type").notNull().default("Other"),
+    os: text("os"), // iOS | Android | Windows | macOS | Other
+    browser: text("browser"),
+    city: text("city"),
+    country: text("country"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("analytics_events_created_idx").on(t.createdAt),
+    index("analytics_events_visitor_idx").on(t.visitorId),
+    index("analytics_events_session_idx").on(t.sessionId),
+  ],
+);
+
 // ─── Relations ───────────────────────────────────────────────
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({

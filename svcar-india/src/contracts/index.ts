@@ -22,3 +22,4 @@ export * from "./address";
 export * from "./order";
 export * from "./lead";
 export * from "./subscriber";
+export * from "./analytics";

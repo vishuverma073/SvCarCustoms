@@ -10,6 +10,7 @@ import {
   Users,
   Radio,
   Mail,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,8 @@ export const adminNav: AdminNavItem[] = [
   { href: "/admin/live", label: "Live", icon: Radio, mobile: false },
   // Subscribers — newsletter sign-ups.
   { href: "/admin/subscribers", label: "Subscribers", icon: Mail, mobile: false },
+  // Store Analytics — visitors, devices, acquisition, traffic trend.
+  { href: "/admin/analytics", label: "Store Analytics", icon: BarChart3, mobile: false },
   { href: "/admin/audit", label: "Audit", icon: ScrollText, mobile: true },
   { href: "/admin/settings", label: "Settings", icon: Settings, mobile: true },
 ];
