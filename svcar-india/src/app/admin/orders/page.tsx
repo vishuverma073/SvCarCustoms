@@ -151,21 +151,7 @@ export default function OrdersPage() {
 
   return (
     <div className="max-w-5xl pb-20">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h1 className="text-xl font-bold text-text-primary">Orders</h1>
-        <select
-          value={range}
-          onChange={(e) => setRange(e.target.value)}
-          className="input py-2! w-auto text-sm font-semibold"
-          aria-label="Date range"
-        >
-          {RANGES.map((r) => (
-            <option key={r.key} value={r.key}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <h1 className="text-xl font-bold text-text-primary mb-4">Orders</h1>
 
       {/* Dashboard tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
@@ -195,18 +181,32 @@ export default function OrdersPage() {
         />
       </div>
 
-      <div className="relative mb-4">
-        <Search
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
-        />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search order #, phone, or name…"
-          className="input pl-10!"
-          type="search"
-        />
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search order #, phone, or name…"
+            className="input pl-10!"
+            type="search"
+          />
+        </div>
+        <select
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+          className="input py-2! w-full text-sm font-semibold sm:w-48"
+          aria-label="Date range"
+        >
+          {RANGES.map((r) => (
+            <option key={r.key} value={r.key}>
+              {r.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-5">
